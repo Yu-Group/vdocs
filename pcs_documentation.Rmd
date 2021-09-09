@@ -2,7 +2,7 @@
 title: "PCS Documentation"
 author: ""
 date: "`r format(Sys.time(), '%B %d, %Y')`"
-bibliography: bibliography.bib
+# bibliography: bibliography.bib
 header-includes:
     - \usepackage{float}
     - \usepackage{amsmath}
@@ -37,7 +37,54 @@ library(tidyverse)
 
 ```
 
-<!-- # Domain problem formulation {#sec:domain} -->
 # Domain problem formulation
+
+TODO:
+
+- Come up with a checklist of questions to answer in the write-up
+
+# Data
+
+A description of the data, where it came from, what it is, etc.
+
+## Data Cleaning and Preprocessing
+
+TODO:
+
+- Checklist
+
+# EDA
+
+- A collection of basic viz (probably can be automated)
+
+# Modeling
+
+What models and why? 
+What metrics and why?
+
+## Data splitting
+
+- training/validation/test
+
+## Prediction and stability checks
+
+- across data perturbations and model perturbations
+- measure on validation set
+- filter out bad models
+
+Do the model fitting and prediction analysis here
+
+## Interpretability
+
+# Main Results
+
+- Summarize prediction accuracies on test set
+
+# Post hoc analysis
+
+- EDA on the individual predictions
+- More "local" analysis
+
+# Conclusions
 
 # Bibliography {-}
