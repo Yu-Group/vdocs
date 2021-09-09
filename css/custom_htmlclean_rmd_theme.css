@@ -1,0 +1,64 @@
+#content {
+	background: white;
+}
+
+h1, h2, h3, h4, h5, h6, legend {
+	color: #001379;
+}
+
+.col-md-12 {
+	background: white;
+}
+
+#sidebar h2 {
+	/*background-color: #161D43;*/
+	background-color: #1b2248;
+}
+
+#sidebar {
+	background: #171717;
+	/*background: #1f1d1d;*/
+	/*width: 250px;*/
+}
+
+#postamble {
+	border-top: #171717;
+	background: #171717;
+	/*background: #212020;*/
+}
+
+#nav-top span.glyphicon {
+	color: #1b2248;
+}
+
+#table-of-contents ul.nav > li.active > a {
+	color: #1b2248 !important;
+}
+
+#table-of-contents ul.nav li.active a {
+	background-color: #a0a0ad;
+}
+
+#main .nav-pills > li.active > a, 
+#main .nav-pills > li.active > a:hover, 
+#main .nav-pills > li.active > a:focus,
+#main .nav-pills > li > a:hover {
+	/*background-color: #273169;*/
+	background-color: #3b8790;
+	font-weight: bold;
+}
+
+#main a {
+	/*color: #1b2248;*/
+	color: #3b8790;
+	background-image: linear-gradient(180deg, white, white);
+}
+
+#main a:hover, #main a:focus {
+	color: #205f67;
+	background-image: linear-gradient(180deg, white, white);
+}
+
+.sourceCode > .row {
+	background: white;
+}

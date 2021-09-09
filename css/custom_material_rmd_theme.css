@@ -1,0 +1,57 @@
+/* make left navigation bar smaller */
+.col-xs-3 {
+	width: 15%;
+}
+.col-xs-9 {
+	width: 85%;
+}
+
+/* make right margin bar smaller */
+.col-xs-2 {
+	width: 10%;
+}
+.col-xs-10 {
+	width: 90%; 
+}
+
+/* bold navigation bar text */
+.nav a {
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+/* bold text of active tab */
+.pages .nav-tabs>li.active>a {
+	font-weight: bold !important;
+}
+
+/* color text of active tab white */
+.nav-tabs>li.active>a {
+	color: #fff !important;
+}
+
+/* color text of inactive tab gray */
+.nav-tabs>li>a {
+	color: #DADADA !important;
+}
+
+/* reduce vertical space between tabs */
+.pages ul.nav {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+/* make horizontal navigation tab bar darker */
+.nav-tabs {
+	background: #009284;
+}
+
+/* change font family */
+/*body, h1, h2, h3, h4, h5, h6 {
+    font-family: "Fira Sans", sans-serif;
+}*/
+
+/* .h1, .h2, .h3, .h4, body, h1, h2, h3, h4, h5, h6 {
+    font-family: Roboto,Helvetica,Arial,sans-serif;
+    font-weight: 300;
+} */
