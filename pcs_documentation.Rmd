@@ -1,0 +1,43 @@
+---
+title: "PCS Documentation"
+author: ""
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+bibliography: bibliography.bib
+header-includes:
+    - \usepackage{float}
+    - \usepackage{amsmath}
+    - \usepackage{gensymb}
+output:
+  # rmdformats::html_clean:
+  rmdformats::readthedown:
+  # rmdformats::material:
+    fig_caption: true
+    code_folding: hide
+    number_sections: true
+    use_bookdown: true
+    fig_width: 8
+    fig_height: 6
+    lightbox: true
+css: css/custom_htmlclean_rmd_theme.css
+---
+
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  fig.align = "center",
+  fig.pos = "H",
+  fig.show = "hold"
+)
+
+# load in packages
+library(tidyverse)
+
+```
+
+<!-- # Domain problem formulation {#sec:domain} -->
+# Domain problem formulation
+
+# Bibliography {-}
