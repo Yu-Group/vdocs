@@ -6,7 +6,7 @@
     <meta name="generator" content="pandoc" />
 
     
-        <meta name="date" content="2021-09-09" />
+        <meta name="date" content="2021-09-14" />
     
     <title>PCS Documentation</title>
 
@@ -141,24 +141,26 @@
       <li><a href="#domain-problem-formulation"><span class="toc-section-number">1</span> Domain problem formulation</a></li>
       <li><a href="#data"><span class="toc-section-number">2</span> Data</a>
       <ul>
-      <li><a href="#data-cleaning-and-preprocessing"><span class="toc-section-number">2.1</span> Data Cleaning and Preprocessing</a></li>
+      <li><a href="#data-collection"><span class="toc-section-number">2.1</span> Data Collection</a></li>
+      <li><a href="#data-cleaning-and-preprocessing"><span class="toc-section-number">2.2</span> Data Cleaning and Preprocessing</a></li>
+      <li><a href="#data-exploration"><span class="toc-section-number">2.3</span> Data Exploration</a></li>
       </ul></li>
-      <li><a href="#eda"><span class="toc-section-number">3</span> EDA</a></li>
-      <li><a href="#modeling"><span class="toc-section-number">4</span> Modeling</a>
+      <li><a href="#prediction-modeling"><span class="toc-section-number">3</span> Prediction Modeling</a>
       <ul>
-      <li><a href="#data-splitting"><span class="toc-section-number">4.1</span> Data splitting</a></li>
-      <li><a href="#prediction-and-stability-checks"><span class="toc-section-number">4.2</span> Prediction and stability checks</a></li>
-      <li><a href="#interpretability"><span class="toc-section-number">4.3</span> Interpretability</a></li>
+      <li><a href="#data-splitting"><span class="toc-section-number">3.1</span> Data splitting</a></li>
+      <li><a href="#prediction-check"><span class="toc-section-number">3.2</span> Prediction check</a></li>
+      <li><a href="#stability-check"><span class="toc-section-number">3.3</span> Stability check</a></li>
+      <li><a href="#interpretability"><span class="toc-section-number">3.4</span> Interpretability</a></li>
       </ul></li>
-      <li><a href="#main-results"><span class="toc-section-number">5</span> Main Results</a></li>
-      <li><a href="#post-hoc-analysis"><span class="toc-section-number">6</span> Post hoc analysis</a></li>
-      <li><a href="#conclusions"><span class="toc-section-number">7</span> Conclusions</a></li>
+      <li><a href="#main-results"><span class="toc-section-number">4</span> Main Results</a></li>
+      <li><a href="#post-hoc-analysis"><span class="toc-section-number">5</span> Post hoc analysis</a></li>
+      <li><a href="#conclusions"><span class="toc-section-number">6</span> Conclusions</a></li>
       <li><a href="#bibliography">Bibliography</a></li>
       </ul>
     </div>
     <div id="postamble" data-toggle="wy-nav-shift" class="status">
                   <p class="author"><span class="glyphicon glyphicon-user"></span> </p>
-                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> September 09, 2021</p>
+                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> September 14, 2021</p>
           </div>
    </div>
      
@@ -170,66 +172,135 @@
 <div id="main">
 <div id="domain-problem-formulation" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Domain problem formulation</h1>
-<p>TODO:</p>
 <ul>
-<li>Come up with a checklist of questions to answer in the write-up</li>
+<li>What is the real-world question? This could be hypothesis-driven or discovery-based.</li>
+<li>Why is this question interesting and important? What are the implications of better understanding this data?</li>
+<li>Is there any prior work or background information related to this question? Describe the premise and put your questions and analysis in the domain context.</li>
+<li>Briefly describe how this question can be answered in the context of a model or analysis.</li>
+<li>Outline the rest of the report/analysis.</li>
 </ul>
 </div>
 <div id="data" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Data</h1>
-<p>A description of the data, where it came from, what it is, etc.</p>
-<div id="data-cleaning-and-preprocessing" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Data Cleaning and Preprocessing</h2>
-<p>TODO:</p>
 <ul>
-<li>Checklist</li>
+<li>What is the data under investigation? Provide a brief overview/description of the data.</li>
+<li>How is this data relevant to the problem of interest? In other words, make the link between the data and the domain problem.</li>
+</ul>
+<div id="data-collection" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Data Collection</h2>
+<ul>
+<li>How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.</li>
+<li>Describe what the data represents in reality, i.e., make the link between the data and reality.</li>
+<li>Where is the data stored, and how can it be accessed by others (if applicable)?</li>
+</ul>
+</div>
+<div id="data-cleaning-and-preprocessing" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Data Cleaning and Preprocessing</h2>
+<ul>
+<li>What steps were taken to clean the data? More importantly, why was the data cleaned in this way?</li>
+<li>Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).</li>
+<li>Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your preprocessing.</li>
+<li>It can be helpful to include relevant plots that help to explain/justify the choices that were made when cleaning the data.</li>
+<li>If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.</li>
+<li>Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.</li>
+</ul>
+</div>
+<div id="data-exploration" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Data Exploration</h2>
+<ul>
+<li>The main goal of this section is to give the reader a feel for what the data “looks like” at a basic level.</li>
+<li>Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.</li>
+</ul>
+<p>TODO: Provide some code to automate parts of this.</p>
+<ul>
+<li><p>Some possible plots</p>
+<ul>
+<li>density/histogram plot of X/y distribution</li>
+<li>correlation heatmap</li>
+<li>pair plots</li>
+<li>dimension reduction plots</li>
+</ul></li>
+<li><p>For inspiration: <a href="https://tiffanymtang.shinyapps.io/ShinyEDA/">Shiny App</a></p></li>
 </ul>
 </div>
 </div>
-<div id="eda" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> EDA</h1>
+<div id="prediction-modeling" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Prediction Modeling</h1>
+<p>Assuming the goal is prediction…</p>
 <ul>
-<li>A collection of basic viz (probably can be automated)</li>
+<li>Discuss the prediction methods under consideration, and explain why these methods were chosen.</li>
+<li>Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.</li>
+<li>Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data.</li>
+</ul>
+<div id="data-splitting" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Data splitting</h2>
+<ul>
+<li>Split the data into a training, validation, and test set.</li>
+<li>Decide on the proportion of data in each split.</li>
+<li>Decide on the “how” to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.</li>
+</ul>
+<p>TODO: Provide some code to do the data splitting.</p>
+</div>
+<div id="prediction-check" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Prediction check</h2>
+<ul>
+<li><p>Carry out the prediction pipeline, outlined above.</p>
+<ul>
+<li>Fit prediction methods on training data.</li>
+<li>Evaluate prediction methods on validation data.</li>
+<li>Compare results, and filter out poor models.</li>
+</ul></li>
+</ul>
+<p>TODO: Provide some example code (for both fitting and visualizing results) here so that the practitioner can easily input their data and models.</p>
+</div>
+<div id="stability-check" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Stability check</h2>
+<ul>
+<li><p>Taking the prediction methods that pass the prediction check, perform stability analysis.</p>
+<ul>
+<li>Specify the data perturbation(s).</li>
+<li>Re-fit the prediction methods on these perturbed data sets.</li>
+<li>Evaluate prediction methods on validation data.</li>
+<li>Assess stability across the data perturbations as well as across the various methods.</li>
+<li>Interpret stability results.</li>
+</ul></li>
+</ul>
+<p>TODO: Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.</p>
+</div>
+<div id="interpretability" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Interpretability</h2>
+<ul>
+<li><p>For the models that pass the prediction and stability checks,</p>
+<ul>
+<li>Extract the important features in the predictive models that are stable across both data and model perturbations.</li>
+</ul></li>
+</ul>
+<p>TODO: Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.</p>
+</div>
+</div>
+<div id="main-results" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Main Results</h1>
+<ul>
+<li>Interpret and summarize the prediction and stability results.</li>
+<li>Fit pipeline on test data.</li>
+<li>Summarize test set prediction and/or interpretability results.</li>
 </ul>
 </div>
-<div id="modeling" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Modeling</h1>
-<p>What models and why?
-What metrics and why?</p>
-<div id="data-splitting" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Data splitting</h2>
+<div id="post-hoc-analysis" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Post hoc analysis</h1>
 <ul>
-<li>training/validation/test</li>
+<li><p>Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions, i.e., provide a more “local” analysis.</p>
+<ul>
+<li>Examine any points that had poor predictions.</li>
+<li>Examine differences between prediction methods.</li>
+</ul></li>
 </ul>
 </div>
-<div id="prediction-and-stability-checks" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Prediction and stability checks</h2>
+<div id="conclusions" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Conclusions</h1>
 <ul>
-<li>across data perturbations and model perturbations</li>
-<li>measure on validation set</li>
-<li>filter out bad models</li>
+<li>Reiterate main findings, and clearly translate findings/analysis back to the domain problem context.</li>
 </ul>
-<p>Do the model fitting and prediction analysis here</p>
-</div>
-<div id="interpretability" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> Interpretability</h2>
-</div>
-</div>
-<div id="main-results" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Main Results</h1>
-<ul>
-<li>Summarize prediction accuracies on test set</li>
-</ul>
-</div>
-<div id="post-hoc-analysis" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Post hoc analysis</h1>
-<ul>
-<li>EDA on the individual predictions</li>
-<li>More “local” analysis</li>
-</ul>
-</div>
-<div id="conclusions" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Conclusions</h1>
 </div>
 <div id="bibliography" class="section level1 unnumbered">
 <h1>Bibliography</h1>
