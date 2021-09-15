@@ -53,15 +53,15 @@ library(tidyverse)
 ## Data Collection
 
 -   How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.
--   Describe what the data represents in reality, i.e., make the link between the data and reality.
+-   Describe what the data represents in reality, i.e., make the link between the data and reality. Also be sure to describe ways in which the data cannot model reality.
 -   Where is the data stored, and how can it be accessed by others (if applicable)?
 
 ## Data Cleaning and Preprocessing
 
 -   What steps were taken to clean the data? More importantly, why was the data cleaned in this way?
 -   Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).
--   Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your preprocessing.
--   It can be helpful to include relevant plots that help to explain/justify the choices that were made when cleaning the data.
+-   Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your steps.
+-   It can be helpful to include relevant plots that explain/justify the choices that were made when cleaning the data.
 -   If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.
 -   Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.
 
@@ -69,8 +69,10 @@ library(tidyverse)
 
 -   The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.
 -   Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.
+-   Provide additional plots representing remaining oddities after pre-processing if applicable.
+-   Add summary statistics in accompanying tables (or in figures) for quick comparisons.
 
-TODO: Provide some code to automate parts of this.
+TODO: Tiffany - Provide some code to automate parts of this.
 
 -   Some possible plots
 
@@ -83,19 +85,18 @@ TODO: Provide some code to automate parts of this.
 
 # Prediction Modeling
 
-Assuming the goal is prediction...
-
 -   Discuss the prediction methods under consideration, and explain why these methods were chosen.
 -   Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.
--   Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data.
+-   Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.
 
 ## Data splitting
 
 -   Split the data into a training, validation, and test set.
 -   Decide on the proportion of data in each split.
 -   Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
+-   Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.
 
-TODO: Provide some code to do the data splitting.
+TODO: Ana - Provide some code to do the data splitting.
 
 ## Prediction check
 
@@ -105,43 +106,49 @@ TODO: Provide some code to do the data splitting.
     -   Evaluate prediction methods on validation data.
     -   Compare results, and filter out poor models.
 
-TODO: Provide some example code (for both fitting and visualizing results) here so that the practitioner can easily input their data and models.
+TODO: Tiffany - Provide some example code (for both fitting and visualizing results) here so that the practitioner can easily input their data and models.
 
 ## Stability check
 
 -   Taking the prediction methods that pass the prediction check, perform stability analysis.
 
-    -   Specify the data perturbation(s).
+    -   Specify and justify the appropriate data perturbation(s).
     -   Re-fit the prediction methods on these perturbed data sets.
     -   Evaluate prediction methods on validation data.
     -   Assess stability across the data perturbations as well as across the various methods.
-    -   Interpret stability results.
+    -   Filter out poor models where necessary and interpret stability results.
 
-TODO: Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.
+TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.
+Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling).
+Add parameter to include/exclude certain code chunks.
 
 ## Interpretability
 
 -   For the models that pass the prediction and stability checks,
 
-    -   Extract the important features in the predictive models that are stable across both data and model perturbations.
+    -   Extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
 
-TODO: Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.
+TODO: Tiffany - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.
 
 # Main Results
 
 -   Interpret and summarize the prediction and stability results.
--   Fit pipeline on test data.
+-   Evaluate pipeline on test data.
 -   Summarize test set prediction and/or interpretability results.
+
+TODO: Ana - add template tables with interpretation
 
 # Post hoc analysis
 
--   Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions, i.e., provide a more "local" analysis.
+-   Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.
 
     -   Examine any points that had poor predictions.
     -   Examine differences between prediction methods.
 
+TODO: Tiffany - Add examples with interesting observations of prediction accuracy metrics so the user knows what to look for.
+
 # Conclusions
 
--   Reiterate main findings, and clearly translate findings/analysis back to the domain problem context.
+-   Reiterate main findings, note any caveats, and clearly translate findings/analysis back to the domain problem context.
 
 # Bibliography {.unnumbered}
