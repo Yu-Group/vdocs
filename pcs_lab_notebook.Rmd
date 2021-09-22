@@ -9,16 +9,16 @@ header-includes:
     - \usepackage{gensymb}
 output:
   # rmdformats::html_clean:
-  rmdformats::readthedown:
-  # rmdformats::material:
+  # rmdformats::readthedown:
+  rmdformats::material:
     fig_caption: true
     code_folding: hide
     number_sections: true
     use_bookdown: true
-    fig_width: 8
-    fig_height: 6
+    fig_width: 10
+    fig_height: 8
     lightbox: true
-css: css/custom_htmlclean_rmd_theme.css
+css: css/custom_material_rmd_theme.css
 ---
 
 ```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
@@ -26,15 +26,24 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
   message = FALSE,
-  cache = TRUE,
+  # cache = TRUE,
+  collapse = TRUE,
   fig.align = "center",
   fig.pos = "H",
-  fig.show = "hold"
+  fig.show = "hold",
+  comment = "#>"
 )
 
 # load in packages
 library(tidyverse)
+library(skimr)
+library(R.utils)
 
+for (f in list.files("R", pattern = ".R", full.names = TRUE)) {
+  source(f, chdir = T)
+}
+
+chunk_idx <- 1
 ```
 
 # Domain problem formulation
@@ -56,6 +65,31 @@ library(tidyverse)
 -   Describe what the data represents in reality, i.e., make the link between the data and reality. Also be sure to describe ways in which the data cannot model reality.
 -   Where is the data stored, and how can it be accessed by others (if applicable)?
 
+## Data splitting
+
+-   Split the data into a training, validation, and test set.
+-   Decide on the proportion of data in each split.
+-   Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
+-   Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.
+
+TODO: Ana - Provide some code to do the data splitting.
+
+```{r load-data}
+# TODO: pick more interesting datasets
+X <- iris %>% dplyr::select(-Species)
+y <- iris$Species
+data_df <- dplyr::bind_cols(.y = y, X)
+splits <- rsample::initial_split(data_df)
+train_df <- rsample::training(splits)
+valid_df <- rsample::testing(splits)
+Xtrain <- X  # placeholders for now
+Xvalid <- X
+Xtest <- X
+ytrain <- y
+yvalid <- y
+ytest <- y
+```
+
 ## Data Cleaning and Preprocessing
 
 -   What steps were taken to clean the data? More importantly, why was the data cleaned in this way?
@@ -72,31 +106,93 @@ library(tidyverse)
 -   Provide additional plots representing remaining oddities after pre-processing if applicable.
 -   Add summary statistics in accompanying tables (or in figures) for quick comparisons.
 
-TODO: Tiffany - Provide some code to automate parts of this.
+### Data Overview
 
--   Some possible plots
+```{r echo = FALSE}
+if (length(ytrain) != nrow(Xtrain)) {
+  text_out <- paste0(
+    "Warning: Number of samples in Xtrain (n = ", nrow(Xtrain), ") ",
+    "not equal to number of samples in ytrain (n = ", length(ytrain), ")."
+  )
+} else {
+  text_out <- paste0(
+    paste0("Number of samples: ", nrow(Xtrain), "\n"),
+    paste0("Number of features: ", ncol(Xtrain), "\n"),
+    paste0("Number of NAs in training y: ", sum(is.na(ytrain)), "\n"),
+    paste0("Number of NAs in training X: ", sum(is.na(Xtrain)), "\n"),
+    paste0("Number of columns in training X with NAs: ", 
+           sum(apply(Xtrain, 2, FUN = function(x) any(is.na(x)))), 
+           "\n"),
+    paste0("Number of constant columns in training X: ",
+           sum(apply(Xtrain, 2,
+                     FUN = function(x) {
+                       all(x == x[!is.na(x)][1], na.rm = T)
+                     }), na.rm = T)))
+}
+cat(text_out)
+```
 
-    -   density/histogram plot of X/y distribution
-    -   correlation heatmap
-    -   pair plots
-    -   dimension reduction plots
+### {- .tabset .tabset-pills .tabset-fade}
 
--   For inspiration: [Shiny App](https://tiffanymtang.shinyapps.io/ShinyEDA/)
+#### Summary Tables {-}
+
+```{r results="asis"}
+data_types(Xtrain = Xtrain, ytrain = ytrain)
+```
+
+```{r results="asis"}
+dt_ls <- data_summary(Xtrain = Xtrain, ytrain = ytrain, digits = 2, sigfig = F)
+for (dt_name in names(dt_ls)) {
+  subchunkify(dt_ls[[dt_name]], i = chunk_idx, other_args = "results='asis'")
+  chunk_idx <- chunk_idx + 1
+}
+```
+
+#### X distribution {-}
+
+```{r}
+# plot X distribution
+plot_X_distribution(Xtrain, "density")
+```
+
+#### Y distribution {-}
+
+```{r}
+# plot y distribution
+plot_y_distribution(ytrain, "bar")
+```
+
+#### Feature Correlation {-}
+
+```{r}
+# correlation heatmap
+plotCorHeatmap(X = Xtrain, cor.type = "pearson", clust = TRUE, text.size = 8)
+```
+
+#### Feature Pair Plots {-}
+
+```{r}
+# pair plots
+col_ids <- 1:min(ncol(Xtrain), 6)
+plotPairs(data = Xtrain, columns = col_ids, 
+          color = ytrain, color.label = "y")
+```
+
+#### PCA Plots {-}
+
+```{r}
+# dimension reduction plots
+plotPCA(X = Xtrain, npcs = 3, color = ytrain, color.label = "y",
+        center = T, scale = FALSE)$plot
+```
+
+For inspiration: [Shiny App](https://tiffanymtang.shinyapps.io/ShinyEDA/)
 
 # Prediction Modeling
 
 -   Discuss the prediction methods under consideration, and explain why these methods were chosen.
 -   Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.
 -   Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.
-
-## Data splitting
-
--   Split the data into a training, validation, and test set.
--   Decide on the proportion of data in each split.
--   Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
--   Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.
-
-TODO: Ana - Provide some code to do the data splitting.
 
 ## Prediction check
 
@@ -108,6 +204,59 @@ TODO: Ana - Provide some code to do the data splitting.
 
 TODO: Tiffany - Provide some example code (for both fitting and visualizing results) here so that the practitioner can easily input their data and models.
 
+```{r}
+# TODO: add code for tuning parameters
+mod_recipe <- recipes::recipe(.y ~., data = splits)
+
+# for classification
+rf_mod <- parsnip::rand_forest() %>%
+  # parsnip::set_args(metric = tune::tune()) %>%
+  parsnip::set_engine("ranger", importance = "impurity") %>%
+  parsnip::set_mode("classification")
+
+svm_model <- parsnip::svm_rbf() %>%
+  parsnip::set_engine("kernlab") %>%
+  parsnip::set_mode("classification")
+
+log_model <- parsnip::logistic_reg() %>%
+  parsnip::set_engine("glmnet") %>%
+  parsnip::set_mode("classification")
+
+model_list <- list(RF = rf_mod, SVM = svm_model, Logistic = log_model)
+model_fits <- list()
+model_preds <- list()
+model_errs <- list()
+for (model_name in names(model_list)) {
+  mod <- model_list[[model_name]]
+  mod_fit <- workflows::workflow() %>%
+    workflows::add_recipe(mod_recipe) %>%
+    workflows::add_model(mod) %>%
+    tune::last_fit(splits)
+  model_fits[[model_name]] <- mod_fit
+  model_preds[[model_name]] <- mod_fit %>%
+    tune::collect_predictions()
+  model_errs[[model_name]] <- mod_fit %>%
+    tune::collect_metrics()
+}
+model_preds <- dplyr::bind_rows(model_preds, .id = "model")
+model_errs <- dplyr::bind_rows(model_errs, .id = "model")
+
+```
+
+```{r results = "asis", echo = FALSE}
+# table of accuracy metrics
+model_errs %>%
+  dplyr::select(-.estimator, -.config) %>%
+  tidyr::pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+           caption = "Validation Prediction Accuracies", 
+           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+           bold_scheme = c(F, rep(T, ncol(.) - 1)),
+           options = list(dom = 't'))
+
+```
+
+
 ## Stability check
 
 -   Taking the prediction methods that pass the prediction check, perform stability analysis.
@@ -118,9 +267,7 @@ TODO: Tiffany - Provide some example code (for both fitting and visualizing resu
     -   Assess stability across the data perturbations as well as across the various methods.
     -   Filter out poor models where necessary and interpret stability results.
 
-TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.
-Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling).
-Add parameter to include/exclude certain code chunks.
+TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks.
 
 ## Interpretability
 
