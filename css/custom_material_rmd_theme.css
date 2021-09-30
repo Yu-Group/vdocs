@@ -46,6 +46,12 @@
 	background: #009284;
 }
 
+/*Add box around each step in recipe*/
+.padded-panel {
+    padding: 15px;
+    position: relative;
+}
+
 /* change font family */
 /*body, h1, h2, h3, h4, h5, h6 {
     font-family: "Fira Sans", sans-serif;
