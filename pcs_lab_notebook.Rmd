@@ -39,7 +39,11 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(skimr)
 library(R.utils)
-
+library(datasets)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(reshape2)
 for (f in list.files("R", pattern = ".R", full.names = TRUE)) {
   source(f, chdir = T)
 }
@@ -51,11 +55,27 @@ chunk_idx <- 1
 
 <input type="checkbox" unchecked> What is the real-world question? This could be hypothesis-driven or discovery-based.</input>
 
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
+
 <input type="checkbox" unchecked> Why is this question interesting and important? What are the implications of better understanding this data?</input>
 
-<input type="checkbox" unchecked> Is there any prior work or background information related to this question? Describe the premise and put your questions and analysis in the domain context.</input>
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
+
+<input type="checkbox" unchecked> Briefly describe any background information necessary to understand this problem.</input>
+
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
 
 <input type="checkbox" unchecked> Briefly describe how this question can be answered in the context of a model or analysis.</input>
+
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
 
 <input type="checkbox" unchecked> Outline the rest of the report/analysis.</input>
 
@@ -63,32 +83,16 @@ chunk_idx <- 1
 Insert narrative here.
 :::
 
-```{r echo = FALSE, eval = FALSE}
-shinyApp(
-
-  ui = fluidPage(
-    selectInput("region", "Region:",
-                choices = colnames(WorldPhones)),
-    plotOutput("phonePlot")
-  ),
-
-  server = function(input, output) {
-    output$phonePlot = renderPlot({
-      barplot(WorldPhones[,input$region]*1000,
-              ylab = "Number of Telephones", xlab = "Year")
-    })
-  },
-
-  options = list(height = 500)
-)
-```
-
 
 # Data
 
 <input type="checkbox" unchecked> What is the data under investigation? Provide a brief overview/description of the data.</input>
 
-<input type="checkbox" unchecked> How is this data relevant to the problem of interest? In other words, make the link between the data and the domain problem.</input>
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
+
+<input type="checkbox" unchecked> Describe how your data connects to the domain problem.</input>
 
 ::: {contenteditable="true" .panel .panel-default .padded-panel}
 Insert narrative here.
@@ -96,50 +100,20 @@ Insert narrative here.
 
 ## Data Collection
 
-```{r echo = FALSE, eval = FALSE}
-shinyApp(
-  ui = fluidPage(
-    # sliderInput("slider", "Slider", 1, 100, 50),
-    downloadButton("report", "Generate report")
-  ),
-  server = function(input, output) {
-    output$report <- downloadHandler(
-      # For PDF output, change this to "report.pdf"
-      filename = "pcs_lab_notebook.html",
-      content = function(file) {
-        # Copy the report file to a temporary directory before processing it, in
-        # case we don't have write permissions to the current working dir (which
-        # can happen when deployed).
-        if (!dir.exists(file.path(tempdir(), "css"))) {
-          dir.create(file.path(tempdir(), "css"))
-        }
-        tempReport <- file.path(tempdir(), "pcs_lab_notebook.Rmd")
-        tempCSS <- file.path(tempdir(), "css", "custom_material_rmd_theme.css")
-        file.copy("pcs_lab_notebook.Rmd", tempReport, overwrite = TRUE)
-        file.copy(file.path("css", "custom_material_rmd_theme.css"), 
-                  tempCSS, overwrite = TRUE)
-
-        # Set up parameters to pass to Rmd document
-        # params <- list(n = input$slider)
-
-        # Knit the document, passing in the `params` list, and eval it in a
-        # child of the global environment (this isolates the code in the document
-        # from the code in this app).
-        rmarkdown::render(tempReport, output_file = file,
-          # params = params,
-          envir = new.env(parent = globalenv())
-        )
-      }
-    )
-  }
-)
-```
-
 <input type="checkbox" unchecked> How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.</input>
 
-<input type="checkbox" unchecked> Describe what the data represents in reality, i.e., make the link between the data and reality. Also be sure to describe ways in which the data cannot model reality.</input>
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
+
+<input type="checkbox" unchecked> Describe any limitations when using the data to answer the domain problem of interest.</input>
+
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
 
 <input type="checkbox" unchecked> Where is the data stored, and how can it be accessed by others (if applicable)?</input>
+
 
 ::: {contenteditable="true" .panel .panel-default .padded-panel}
 Insert narrative here.
@@ -147,11 +121,17 @@ Insert narrative here.
 
 ## Data splitting
 
+TODO: add advice for possible data splits
+
 <input type="checkbox" unchecked> Split the data into a training, validation, and test set.</input>
 
 <input type="checkbox" unchecked> Decide on the proportion of data in each split.</input>
 
 <input type="checkbox" unchecked> Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.</input>
+
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
 
 <input type="checkbox" unchecked> Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.</input>
 
@@ -159,24 +139,82 @@ Insert narrative here.
 Insert narrative here.
 :::
 
-TODO: Ana - Provide some code to do the data splitting.
-
+### Data Split Overview
 ```{r load-data}
 # TODO: pick more interesting datasets
+data = iris
+breakdown = c(train = 0.6, validate = 0.2, test = 0.2)
+labels = sample(cut(
+  seq(nrow(data)), 
+  nrow(data)*cumsum(c(0,breakdown)),
+  labels = names(breakdown)
+))
+data_split = split(data, labels)
+
+Xtrain <- data_split$train %>% dplyr::select(-Species)
+Xvalid <- data_split$validate %>% dplyr::select(-Species)
+Xtest <- data_split$test %>% dplyr::select(-Species)
+ytrain <- data_split$train$Species
+yvalid <- data_split$validate$Species
+ytest <- data_split$test$Species
+
+######FIX need "splits" for tuning code
 X <- iris %>% dplyr::select(-Species)
 y <- iris$Species
 data_df <- dplyr::bind_cols(.y = y, X)
 splits <- rsample::initial_split(data_df)
 train_df <- rsample::training(splits)
 valid_df <- rsample::testing(splits)
-Xtrain <- X  # placeholders for now
-Xvalid <- X
-Xtest <- X
-ytrain <- y
-yvalid <- y
-ytest <- y
 ```
 
+###  {.unnumbered .tabset .tabset-pills .tabset-fade}
+
+#### X Comparison {.unnumbered}
+```{r compare-X}
+train = melt(data_split$train)
+train$split = "train"
+validation = melt(data_split$validate)
+validation$split = "validation"
+test = melt(data_split$test)
+test$split = "test"
+data_all = rbind(train,validation,test)
+data_all$split = factor(data_all$split,levels=c("train","validation","test"))
+fnt = 12
+fnt2=12
+#ggplot(data_all, aes(x=variable, y=value)) + 
+ # geom_boxplot() + 
+  ggplot(data_all, aes(x=value, fill=variable)) + geom_density(alpha=.3)+
+    theme_bw() + 
+  facet_wrap(. ~ split)+
+  theme(axis.title.x = element_text(size=fnt,face="bold")) + 
+  #theme(axis.title.y = element_text(size=fnt,face="bold")) +
+  theme(axis.title.y = element_blank())+
+  theme(strip.text.x = element_text(size = fnt2,face="bold")) +
+  #ylab("True Positives") +
+  xlab("") + 
+  theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
+  theme(legend.text=element_text(size=fnt2,face="bold"))
+  
+```
+
+#### Y Comparison {.unnumbered}
+```{r compare-Y}
+plot_data <- data_all %>% dplyr::select(c(Species,split)) %>%
+      count(Species,split) %>% 
+      group_by(split) %>% 
+      mutate(percent = n/sum(n))
+ggplot(plot_data, aes(x = split, y = percent, fill = Species)) + 
+  theme_bw() + 
+      geom_col(position = "fill") +
+  theme(axis.title.x = element_text(size=fnt,face="bold")) + 
+  #theme(axis.title.y = element_text(size=fnt,face="bold")) +
+  theme(axis.title.y = element_blank())+
+  theme(strip.text.x = element_text(size = fnt2,face="bold")) +
+  #ylab("True Positives") +
+  xlab("") + 
+  theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
+  theme(legend.text=element_text(size=fnt2,face="bold"))
+```
 ## Data Cleaning and Preprocessing
 
 <input type="checkbox" unchecked> What steps were taken to clean the data? More importantly, why was the data cleaned in this way?</input>
@@ -197,7 +235,9 @@ Insert narrative here.
 
 ## Data Exploration
 
-<input type="checkbox" unchecked> The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.</input>
+TODO: Add drag and drop feature in shiny version for other images
+
+The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.
 
 <input type="checkbox" unchecked> Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.</input>
 
@@ -304,15 +344,21 @@ For inspiration: [Shiny App](https://tiffanymtang.shinyapps.io/ShinyEDA/)
 
 # Prediction Modeling
 
+TODO: add advice on which models to select and why
+
 <input type="checkbox" unchecked> Discuss the prediction methods under consideration, and explain why these methods were chosen.</input>
-
-<input type="checkbox" unchecked> Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.</input>
-
-<input type="checkbox" unchecked> Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.</input>
 
 ::: {contenteditable="true" .panel .panel-default .padded-panel}
 Insert narrative here.
 :::
+
+<input type="checkbox" unchecked> Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.</input>
+
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
+
+Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.
 
 ## Prediction check
 
@@ -576,7 +622,94 @@ model_errs %>%
 Insert narrative here.
 :::
 
-TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks.
+TODO: Add results for tidymodels and h20 in addition to caret
+<!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
+
+###  {.unnumbered .tabset .tabset-pills .tabset-fade}
+
+#### tidymodels {.unnumbered}
+
+#### caret {.unnumbered}
+```{r caret-fits-stability, eval = FALSE }
+# bootstrap training
+bootstrap = sample(1:nrow(Xtrain),nrow(Xtrain))
+print(bootstrap)
+Xtrain_b = Xtrain[bootstrap,]
+ytrain_b = ytrain[bootstrap]
+
+# how to do cross validation
+trcontrol <- caret::trainControl(
+  method = "cv",
+  number = 5,
+  classProbs = if (is.factor(ytrain_b)) TRUE else FALSE,
+  summaryFunction = caret::defaultSummary,
+  allowParallel = FALSE,
+  verboseIter = FALSE
+)
+
+response <- "raw"
+model_list <- list(
+  ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain_b)), 
+                                                  ncol(Xtrain) / 3,
+                                                  length.out = 3),
+                                       splitrule = "gini",
+                                       min.node.size = 1),
+                importance = "impurity",
+                num.threads = 1),
+  xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
+                                        max_depth = c(3, 6),
+                                        colsample_bytree = 0.33,
+                                        eta = c(0.1, 0.3),
+                                        gamma = 0,
+                                        min_child_weight = 1,
+                                        subsample = 0.6),
+                 nthread = 1)
+)
+
+model_fits <- list()
+model_preds <- list()
+model_errs <- list()
+model_vimps <- list()
+for (model_name in names(model_list)) {
+  mod <- model_list[[model_name]]
+  if (identical(mod, list())) {
+    mod <- NULL
+  }
+  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain_b),
+                                                 y = ytrain_b,
+                                                 trControl = trcontrol,
+                                                 method = model_name),
+                                            mod))
+  model_fits[[model_name]] <- mod_fit
+  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
+                                       type = response)
+  model_errs[[model_name]] <- caret::postResample(
+    pred = model_preds[[model_name]], obs = yvalid
+  )
+  model_vimps[[model_name]] <- caret::varImp(mod_fit)
+}
+
+model_preds <- dplyr::bind_rows(model_preds, .id = "model")
+model_errs <- dplyr::bind_rows(model_errs, .id = "model")
+model_vimps <- purrr::map_dfr(model_vimps, 
+                              ~.x[["importance"]] %>% 
+                                tibble::rownames_to_column("variable"),
+                              .id = "model")
+
+```
+
+```{r results = "asis", echo = FALSE}
+# table of accuracy metrics
+model_errs %>%
+  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+           caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
+           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+           bold_scheme = c(F, rep(T, ncol(.) - 1)),
+           options = list(dom = 't'))
+
+```
+#### h20 {.unnumbered}
+
 
 ## Interpretability
 
@@ -588,7 +721,7 @@ TODO: Ana - Provide some example code here (for both fitting and visualizing res
 Insert narrative here.
 :::
 
-TODO: Tiffany - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models.
+<!-- TODO: Tiffany - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. -->
 
 ### Without stability
 
@@ -621,6 +754,10 @@ TODO
 
 <input type="checkbox" unchecked> Interpret and summarize the prediction and stability results.</input>
 
+::: {contenteditable="true" .panel .panel-default .padded-panel}
+Insert narrative here.
+:::
+
 <input type="checkbox" unchecked> Evaluate pipeline on test data.</input>
 
 <input type="checkbox" unchecked> Summarize test set prediction and/or interpretability results.</input>
@@ -629,7 +766,84 @@ TODO
 Insert narrative here.
 :::
 
-TODO: Ana - add template tables with interpretation
+<!-- TODO: Ana - add template tables with interpretation -->
+###  {.unnumbered .tabset .tabset-pills .tabset-fade}
+
+#### tidymodels {.unnumbered}
+
+#### caret {.unnumbered}
+```{r caret-finalfits, eval = FALSE }
+# how to do cross validation
+trcontrol <- caret::trainControl(
+  method = "cv",
+  number = 5,
+  classProbs = if (is.factor(ytrain)) TRUE else FALSE,
+  summaryFunction = caret::defaultSummary,
+  allowParallel = FALSE,
+  verboseIter = FALSE
+)
+
+response <- "raw"
+model_list <- list(
+  ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain)), 
+                                                  ncol(Xtrain) / 3,
+                                                  length.out = 3),
+                                       splitrule = "gini",
+                                       min.node.size = 1),
+                importance = "impurity",
+                num.threads = 1),
+  xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
+                                        max_depth = c(3, 6),
+                                        colsample_bytree = 0.33,
+                                        eta = c(0.1, 0.3),
+                                        gamma = 0,
+                                        min_child_weight = 1,
+                                        subsample = 0.6),
+                 nthread = 1)
+)
+
+model_fits <- list()
+model_preds <- list()
+model_errs <- list()
+model_vimps <- list()
+for (model_name in names(model_list)) {
+  mod <- model_list[[model_name]]
+  if (identical(mod, list())) {
+    mod <- NULL
+  }
+  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain),
+                                                 y = ytrain,
+                                                 trControl = trcontrol,
+                                                 method = model_name),
+                                            mod))
+  model_fits[[model_name]] <- mod_fit
+  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xtest),
+                                       type = response)
+  model_errs[[model_name]] <- caret::postResample(
+    pred = model_preds[[model_name]], obs = ytest
+  )
+  model_vimps[[model_name]] <- caret::varImp(mod_fit)
+}
+model_preds <- dplyr::bind_rows(model_preds, .id = "model")
+model_errs <- dplyr::bind_rows(model_errs, .id = "model")
+model_vimps <- purrr::map_dfr(model_vimps, 
+                              ~.x[["importance"]] %>% 
+                                tibble::rownames_to_column("variable"),
+                              .id = "model")
+
+```
+
+```{r results = "asis", echo = FALSE}
+# table of accuracy metrics
+model_errs %>%
+  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+           caption = "Test Prediction Accuracies", 
+           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+           bold_scheme = c(F, rep(T, ncol(.) - 1)),
+           options = list(dom = 't'))
+
+```
+#### h20 {.unnumbered}
 
 # Post hoc analysis
 
