@@ -22,7 +22,16 @@ css: css/custom_material_rmd_theme.css
 # runtime: shiny
 ---
 
+<!-- <script src="https://cdn.tiny.cloud/1/9fr4djfbaairyv7adays150tm9e8a80c0f12o4qgbxt4mxpd/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script> -->
+
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script src="js/tinymce.js"></script>
+
+<!-- <script src="js/download.js"></script> -->
+
 ```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+options(width = 10000)
 knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
@@ -53,93 +62,63 @@ chunk_idx <- 1
 
 # Domain problem formulation
 
-<input type="checkbox" unchecked> What is the real-world question? This could be hypothesis-driven or discovery-based.</input>
+<input type="checkbox" unchecked> **What is the real-world question? This could be hypothesis-driven or discovery-based.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Why is this question interesting and important? What are the implications of better understanding this data?</input>
+<input type="checkbox" unchecked> **Why is this question interesting and important? What are the implications of better understanding this data?**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Briefly describe any background information necessary to understand this problem.</input>
+<input type="checkbox" unchecked> **Briefly describe any background information necessary to understand this problem.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Briefly describe how this question can be answered in the context of a model or analysis.</input>
+<input type="checkbox" unchecked> **Briefly describe how this question can be answered in the context of a model or analysis.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Outline the rest of the report/analysis.</input>
+<input type="checkbox" unchecked> **Outline the rest of the report/analysis.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 
 # Data
 
-<input type="checkbox" unchecked> What is the data under investigation? Provide a brief overview/description of the data.</input>
+<input type="checkbox" unchecked> **What is the data under investigation? Provide a brief overview/description of the data.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Describe how your data connects to the domain problem.</input>
+<input type="checkbox" unchecked> **Describe how your data connects to the domain problem.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 ## Data Collection
 
-<input type="checkbox" unchecked> How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.</input>
+<input type="checkbox" unchecked> **How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Describe any limitations when using the data to answer the domain problem of interest.</input>
+<input type="checkbox" unchecked> **Describe any limitations when using the data to answer the domain problem of interest.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Where is the data stored, and how can it be accessed by others (if applicable)?</input>
+<input type="checkbox" unchecked> **Where is the data stored, and how can it be accessed by others (if applicable)?**</input>
 
-
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 ## Data splitting
 
 TODO: add advice for possible data splits
 
-<input type="checkbox" unchecked> Split the data into a training, validation, and test set.</input>
+<input type="checkbox" unchecked> **Decide on the proportion of data in each split.**</input>
 
-<input type="checkbox" unchecked> Decide on the proportion of data in each split.</input>
+<input type="checkbox" unchecked> **Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.**</input>
 
-<input type="checkbox" unchecked> Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.</input>
+<textarea class="tinymce-text"></textarea><br>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<input type="checkbox" unchecked> **Split the data into a training, validation, and test set.**</input>
 
-<input type="checkbox" unchecked> Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.</input>
-
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
-
-### Data Split Overview
 ```{r load-data}
 # TODO: pick more interesting datasets
 data = iris
@@ -167,7 +146,11 @@ train_df <- rsample::training(splits)
 valid_df <- rsample::testing(splits)
 ```
 
-###  {.unnumbered .tabset .tabset-pills .tabset-fade}
+<input type="checkbox" unchecked> **Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.**</input>
+
+<textarea class="tinymce-text"></textarea><br>
+
+### Data Split Overview {.tabset .tabset-pills .tabset-fade}
 
 #### X Comparison {.unnumbered}
 ```{r compare-X}
@@ -215,23 +198,22 @@ ggplot(plot_data, aes(x = split, y = percent, fill = Species)) +
   theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
   theme(legend.text=element_text(size=fnt2,face="bold"))
 ```
+
 ## Data Cleaning and Preprocessing
 
-<input type="checkbox" unchecked> What steps were taken to clean the data? More importantly, why was the data cleaned in this way?</input>
+<input type="checkbox" unchecked> **What steps were taken to clean the data? More importantly, why was the data cleaned in this way?**</input>
 
-<input type="checkbox" unchecked> Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).</input>
+<input type="checkbox" unchecked> **Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).**</input>
 
-<input type="checkbox" unchecked> Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your steps.</input>
+<input type="checkbox" unchecked> **Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your steps.**</input>
 
-<input type="checkbox" unchecked> It can be helpful to include relevant plots that explain/justify the choices that were made when cleaning the data.</input>
+<input type="checkbox" unchecked> **It can be helpful to include relevant plots that explain/justify the choices that were made when cleaning the data.**</input>
 
-<input type="checkbox" unchecked> If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.</input>
+<input type="checkbox" unchecked> **If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.**</input>
 
-<input type="checkbox" unchecked> Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.</input>
+<input type="checkbox" unchecked> **Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 ## Data Exploration
 
@@ -239,15 +221,13 @@ TODO: Add drag and drop feature in shiny version for other images
 
 The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.
 
-<input type="checkbox" unchecked> Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.</input>
+<input type="checkbox" unchecked> **Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.**</input>
 
-<input type="checkbox" unchecked> Provide additional plots representing remaining oddities after pre-processing if applicable.</input>
+<input type="checkbox" unchecked> **Provide additional plots representing remaining oddities after pre-processing if applicable.**</input>
 
-<input type="checkbox" unchecked> Add summary statistics in accompanying tables (or in figures) for quick comparisons.</input>
+<input type="checkbox" unchecked> **Add summary statistics in accompanying tables (or in figures) for quick comparisons.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 ### Data Overview
 
@@ -346,31 +326,25 @@ For inspiration: [Shiny App](https://tiffanymtang.shinyapps.io/ShinyEDA/)
 
 TODO: add advice on which models to select and why
 
-<input type="checkbox" unchecked> Discuss the prediction methods under consideration, and explain why these methods were chosen.</input>
+<input type="checkbox" unchecked> **Discuss the prediction methods under consideration, and explain why these methods were chosen.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.</input>
+<input type="checkbox" unchecked> **Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.
 
 ## Prediction check
 
-<input type="checkbox" unchecked> Carry out the prediction pipeline, outlined above.</input>
+<input type="checkbox" unchecked> **Carry out the prediction pipeline, outlined above.**</input>
 
-    -   Fit prediction methods on training data.
-    -   Evaluate prediction methods on validation data.
-    -   Compare results, and filter out poor models.
+  -   Fit prediction methods on training data.
+  -   Evaluate prediction methods on validation data.
+  -   Compare results, and filter out poor models.
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 ###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
@@ -610,17 +584,15 @@ model_errs %>%
 
 ## Stability check
 
-<input type="checkbox" unchecked> Taking the prediction methods that pass the prediction check, perform stability analysis.</input>
+<input type="checkbox" unchecked> **Taking the prediction methods that pass the prediction check, perform stability analysis.**</input>
 
-    -   Specify and justify the appropriate data perturbation(s).
-    -   Re-fit the prediction methods on these perturbed data sets.
-    -   Evaluate prediction methods on validation data.
-    -   Assess stability across the data perturbations as well as across the various methods.
-    -   Filter out poor models where necessary and interpret stability results.
+  -   Specify and justify the appropriate data perturbation(s).
+  -   Re-fit the prediction methods on these perturbed data sets.
+  -   Evaluate prediction methods on validation data.
+  -   Assess stability across the data perturbations as well as across the various methods.
+  -   Filter out poor models where necessary and interpret stability results.
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 TODO: Add results for tidymodels and h20 in addition to caret
 <!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
@@ -713,13 +685,11 @@ model_errs %>%
 
 ## Interpretability
 
-<input type="checkbox" unchecked> For the models that pass the prediction and stability checks,</input>
+<input type="checkbox" unchecked> **For the models that pass the prediction and stability checks,**</input>
 
-    -   Extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
+  -   Extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 <!-- TODO: Tiffany - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. -->
 
@@ -752,19 +722,15 @@ TODO
 
 # Main Results
 
-<input type="checkbox" unchecked> Interpret and summarize the prediction and stability results.</input>
+<input type="checkbox" unchecked> **Interpret and summarize the prediction and stability results.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
-<input type="checkbox" unchecked> Evaluate pipeline on test data.</input>
+<input type="checkbox" unchecked> **Evaluate pipeline on test data.**</input>
 
-<input type="checkbox" unchecked> Summarize test set prediction and/or interpretability results.</input>
+<input type="checkbox" unchecked> **Summarize test set prediction and/or interpretability results.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 <!-- TODO: Ana - add template tables with interpretation -->
 ###  {.unnumbered .tabset .tabset-pills .tabset-fade}
@@ -847,14 +813,12 @@ model_errs %>%
 
 # Post hoc analysis
 
-<input type="checkbox" unchecked> Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.</input>
+<input type="checkbox" unchecked> **Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.**</input>
 
-    -   Examine any points that had poor predictions.
-    -   Examine differences between prediction methods.
+  -   Examine any points that had poor predictions.
+  -   Examine differences between prediction methods.
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 TODO: Tiffany - Add examples with interesting observations of prediction accuracy metrics so the user knows what to look for.
 
@@ -869,10 +833,8 @@ model_preds %>%
 
 # Conclusions
 
-<input type="checkbox" unchecked> Reiterate main findings, note any caveats, and clearly translate findings/analysis back to the domain problem context.</input>
+<input type="checkbox" unchecked> **Reiterate main findings, note any caveats, and clearly translate findings/analysis back to the domain problem context.**</input>
 
-::: {contenteditable="true" .panel .panel-default .padded-panel}
-Insert narrative here.
-:::
+<textarea class="tinymce-text"></textarea><br>
 
 # Bibliography {.unnumbered}
