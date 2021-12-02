@@ -107,7 +107,7 @@ chunk_idx <- 1
 
 ## Data splitting
 
-TODO: add advice for possible data splits
+TODO: add advice for possible data splits, AK getting nice figure together
 
 <input type="checkbox" unchecked> **Decide on the proportion of data in each split.**</input>
 
@@ -346,10 +346,85 @@ Note: there should be multiple methods and metrics under consideration to paint 
 
 ###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
+#### caret {.unnumbered}
+
+```{r caret-fits, eval = TRUE }
+# how to do cross validation
+trcontrol <- caret::trainControl(
+  method = "cv",
+  number = 5,
+  classProbs = if (is.factor(ytrain)) TRUE else FALSE,
+  summaryFunction = caret::defaultSummary,
+  allowParallel = FALSE,
+  verboseIter = FALSE
+)
+
+response <- "raw"
+model_list <- list(
+  ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain)), 
+                                                  ncol(Xtrain) / 3,
+                                                  length.out = 3),
+                                       splitrule = "gini",
+                                       min.node.size = 1),
+                importance = "impurity",
+                num.threads = 1),
+  xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
+                                        max_depth = c(3, 6),
+                                        colsample_bytree = 0.33,
+                                        eta = c(0.1, 0.3),
+                                        gamma = 0,
+                                        min_child_weight = 1,
+                                        subsample = 0.6),
+                 nthread = 1)
+)
+
+model_fits <- list()
+model_preds <- list()
+model_errs <- list()
+model_vimps <- list()
+for (model_name in names(model_list)) {
+  mod <- model_list[[model_name]]
+  if (identical(mod, list())) {
+    mod <- NULL
+  }
+  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain),
+                                                 y = ytrain,
+                                                 trControl = trcontrol,
+                                                 method = model_name),
+                                            mod))
+  model_fits[[model_name]] <- mod_fit
+  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
+                                       type = response)
+  model_errs[[model_name]] <- caret::postResample(
+    pred = model_preds[[model_name]], obs = yvalid
+  )
+  model_vimps[[model_name]] <- caret::varImp(mod_fit)
+}
+model_preds <- dplyr::bind_rows(model_preds, .id = "model")
+model_errs <- dplyr::bind_rows(model_errs, .id = "model")
+model_vimps <- purrr::map_dfr(model_vimps, 
+                              ~.x[["importance"]] %>% 
+                                tibble::rownames_to_column("variable"),
+                              .id = "model")
+
+```
+
+```{r results = "asis", echo = FALSE}
+# table of accuracy metrics
+model_errs %>%
+  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+           caption = "Validation Prediction Accuracies", 
+           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+           bold_scheme = c(F, rep(T, ncol(.) - 1)),
+           options = list(dom = 't'))
+
+```
+
 #### tidymodels {.unnumbered}
 
-```{r tidymodels-fits}
+```{r tidymodels-fits, eval = TRUE}
 # TODO: add code for tuning parameters
+# AK: Once tuning is fixed, can adjust splits for stability
 mod_recipe <- recipes::recipe(.y ~., data = splits)
 
 # for classification
@@ -447,79 +522,6 @@ model_errs %>%
 
 ```
 
-#### caret {.unnumbered}
-
-```{r caret-fits, eval = FALSE }
-# how to do cross validation
-trcontrol <- caret::trainControl(
-  method = "cv",
-  number = 5,
-  classProbs = if (is.factor(ytrain)) TRUE else FALSE,
-  summaryFunction = caret::defaultSummary,
-  allowParallel = FALSE,
-  verboseIter = FALSE
-)
-
-response <- "raw"
-model_list <- list(
-  ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain)), 
-                                                  ncol(Xtrain) / 3,
-                                                  length.out = 3),
-                                       splitrule = "gini",
-                                       min.node.size = 1),
-                importance = "impurity",
-                num.threads = 1),
-  xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
-                                        max_depth = c(3, 6),
-                                        colsample_bytree = 0.33,
-                                        eta = c(0.1, 0.3),
-                                        gamma = 0,
-                                        min_child_weight = 1,
-                                        subsample = 0.6),
-                 nthread = 1)
-)
-
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]
-  if (identical(mod, list())) {
-    mod <- NULL
-  }
-  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain),
-                                                 y = ytrain,
-                                                 trControl = trcontrol,
-                                                 method = model_name),
-                                            mod))
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
-                                       type = response)
-  model_errs[[model_name]] <- caret::postResample(
-    pred = model_preds[[model_name]], obs = yvalid
-  )
-  model_vimps[[model_name]] <- caret::varImp(mod_fit)
-}
-model_preds <- dplyr::bind_rows(model_preds, .id = "model")
-model_errs <- dplyr::bind_rows(model_errs, .id = "model")
-model_vimps <- purrr::map_dfr(model_vimps, 
-                              ~.x[["importance"]] %>% 
-                                tibble::rownames_to_column("variable"),
-                              .id = "model")
-
-```
-
-```{r results = "asis", echo = FALSE}
-# table of accuracy metrics
-model_errs %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies", 
-           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           bold_scheme = c(F, rep(T, ncol(.) - 1)),
-           options = list(dom = 't'))
-
-```
 
 #### h20 {.unnumbered}
 
@@ -592,85 +594,235 @@ model_errs %>%
 
 <textarea class="tinymce-text"></textarea><br>
 
-TODO: Add results for tidymodels and h20 in addition to caret
+TODO: Add results for h20, tuning needs to be fixed for h20 + tidymodels
 <!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
 
 ###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
-#### tidymodels {.unnumbered}
-
 #### caret {.unnumbered}
-```{r caret-fits-stability, eval = FALSE }
-# bootstrap training
-bootstrap = sample(1:nrow(Xtrain),nrow(Xtrain))
-print(bootstrap)
-Xtrain_b = Xtrain[bootstrap,]
-ytrain_b = ytrain[bootstrap]
-
-# how to do cross validation
-trcontrol <- caret::trainControl(
-  method = "cv",
-  number = 5,
-  classProbs = if (is.factor(ytrain_b)) TRUE else FALSE,
-  summaryFunction = caret::defaultSummary,
-  allowParallel = FALSE,
-  verboseIter = FALSE
-)
-
-response <- "raw"
-model_list <- list(
-  ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain_b)), 
-                                                  ncol(Xtrain) / 3,
-                                                  length.out = 3),
-                                       splitrule = "gini",
-                                       min.node.size = 1),
-                importance = "impurity",
-                num.threads = 1),
-  xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
-                                        max_depth = c(3, 6),
-                                        colsample_bytree = 0.33,
-                                        eta = c(0.1, 0.3),
-                                        gamma = 0,
-                                        min_child_weight = 1,
-                                        subsample = 0.6),
-                 nthread = 1)
-)
-
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]
-  if (identical(mod, list())) {
-    mod <- NULL
-  }
-  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain_b),
-                                                 y = ytrain_b,
-                                                 trControl = trcontrol,
-                                                 method = model_name),
-                                            mod))
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
-                                       type = response)
-  model_errs[[model_name]] <- caret::postResample(
-    pred = model_preds[[model_name]], obs = yvalid
+```{r caret-fits-stability}
+nrep = 5 # increase for better stability measures when not testing code
+model_preds_b <- list()
+model_errs_b <- list()
+model_vimps_b <- list()
+for (b in 1:nrep){
+  # bootstrap training
+  bootstrap = sample(1:nrow(Xtrain),nrow(Xtrain))
+  Xtrain_b = Xtrain[bootstrap,]
+  ytrain_b = ytrain[bootstrap]
+  
+  # how to do cross validation
+  trcontrol <- caret::trainControl(
+    method = "cv",
+    number = 5,
+    classProbs = if (is.factor(ytrain_b)) TRUE else FALSE,
+    summaryFunction = caret::defaultSummary,
+    allowParallel = FALSE,
+    verboseIter = FALSE
   )
-  model_vimps[[model_name]] <- caret::varImp(mod_fit)
+  
+  response <- "raw"
+  model_list <- list(
+    ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain_b)), 
+                                                    ncol(Xtrain_b) / 3,
+                                                    length.out = 3),
+                                         splitrule = "gini",
+                                         min.node.size = 1),
+                  importance = "impurity",
+                  num.threads = 1),
+    xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
+                                          max_depth = c(3, 6),
+                                          colsample_bytree = 0.33,
+                                          eta = c(0.1, 0.3),
+                                          gamma = 0,
+                                          min_child_weight = 1,
+                                          subsample = 0.6),
+                   nthread = 1)
+  )
+  
+  model_fits_temp <- list()
+  model_preds_temp <- list()
+  model_errs_temp <- list()
+  model_vimps_temp <- list()
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+    if (identical(mod, list())) {
+      mod <- NULL
+    }
+    mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain_b),
+                                                   y = ytrain_b,
+                                                   trControl = trcontrol,
+                                                   method = model_name),
+                                              mod))
+    model_fits_temp[[model_name]] <- mod_fit
+    model_preds_temp[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
+                                         type = response)
+    model_errs_temp[[model_name]] <- caret::postResample(
+      pred = model_preds_temp[[model_name]], obs = yvalid
+    )
+    model_vimps_temp[[model_name]] <- caret::varImp(mod_fit)
+  }
+  
+  model_preds_temp <- dplyr::bind_rows(model_preds_temp, .id = "model")
+  model_errs_temp <- dplyr::bind_rows(model_errs_temp, .id = "model")
+  model_vimps_temp <- purrr::map_dfr(model_vimps_temp, 
+                                ~.x[["importance"]] %>% 
+                                  tibble::rownames_to_column("variable"),
+                                .id = "model")
+  model_preds_b[[b]] <- model_preds_temp
+  model_errs_b[[b]] <- model_errs_temp
+  model_vimps_b[[b]] <- model_vimps_temp
 }
 
-model_preds <- dplyr::bind_rows(model_preds, .id = "model")
-model_errs <- dplyr::bind_rows(model_errs, .id = "model")
-model_vimps <- purrr::map_dfr(model_vimps, 
-                              ~.x[["importance"]] %>% 
-                                tibble::rownames_to_column("variable"),
-                              .id = "model")
+model_errs_b <- bind_rows(model_errs_b, .id = "column_label")
+model_errs_b_tmp <- model_errs_b
+model_errs_b <- model_errs_b %>%
+                group_by(model) %>%
+                summarise(mean_accuracy = mean(Accuracy), sd_accuracy =  sd(Accuracy),
+                          mean_kappa = mean(Kappa), sd_kappa = sd(Kappa))
+
 
 ```
 
 ```{r results = "asis", echo = FALSE}
 # table of accuracy metrics
-model_errs %>%
+model_errs_b %>%
+  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+           caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
+           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+           bold_scheme = c(F,T,F,T,F),#c(F, rep(T, ncol(.) - 1)),
+           options = list(dom = 't'))
+
+# boxplots
+data_plot = data.frame(model_errs_b_tmp[1:2], stack(model_errs_b_tmp[3:ncol(model_errs_b_tmp)]))
+fnt = 12
+fnt2=12
+ggplot(data_plot, aes(x=model, y=values)) + 
+  theme_bw() + 
+  facet_wrap(. ~ ind, scales="free_y")+
+  geom_boxplot() + 
+  theme(axis.title.x = element_text(size=fnt,face="bold")) + 
+  #theme(axis.title.y = element_text(size=fnt,face="bold")) +
+  theme(axis.title.y = element_blank())+
+  theme(strip.text.x = element_text(size = fnt2,face="bold")) +
+  #ylab("True Positives") +
+  xlab("") + 
+  theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
+  theme(legend.text=element_text(size=fnt2,face="bold"))
+
+```
+
+#### tidymodels {.unnumbered}
+```{r tidymodels-fits-stability, eval = TRUE}
+
+nrep = 1 # increase for better stability measures when not testing code
+model_preds_b <- list()
+model_errs_b <- list()
+model_vimps_b <- list()
+for (b in 1:nrep){
+  # TODO: add code for tuning parameters
+  mod_recipe <- recipes::recipe(.y ~., data = splits)
+  
+  # for classification
+  rf_model <- parsnip::rand_forest() %>%
+    parsnip::set_args(mtry = tune::tune()) %>%
+    parsnip::set_engine("ranger", importance = "impurity") %>%
+    parsnip::set_mode("classification")
+  rf_grid <- tidyr::crossing(mtry = 1:4)
+  
+  svm_model <- parsnip::svm_rbf() %>%
+    parsnip::set_engine("kernlab") %>%
+    parsnip::set_mode("classification")
+  
+  knn_model <- parsnip::nearest_neighbor() %>%
+     parsnip::set_args(neighbors = tune(), weight_func = tune()) %>% 
+     parsnip::set_engine("kknn") %>% 
+     parsnip::set_mode("classification")
+  
+  # models <- workflowsets::workflow_set(
+  #   preproc = list(Base = mod_recipe),
+  #   models = list(RF = rf_model, SVM = svm_model, KNN = knn_model),
+  #   cross = TRUE
+  # ) %>%
+  #   workflowsets::option_add(grid = rf_grid, id = "Base_RF")
+  # model_fits <- workflowsets::workflow_map(
+  #   object = models,
+  #   fn = "tune_grid"
+  # )
+  
+  model_list <- list(RF = list(model = rf_model,
+                               grid = rf_grid), 
+                     SVM = list(model = svm_model,
+                                grid = NULL), 
+                     KNN = list(model = knn_model,
+                                grid = 4))
+  model_fits_temp <- list()
+  model_preds_temp <- list()
+  model_errs_temp <- list()
+  model_vimps_temp <- list()
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]$model
+    grid <- model_list[[model_name]]$grid
+    if (!is.null(grid)) {
+      mod_fit <- workflows::workflow() %>%
+        workflows::add_recipe(mod_recipe) %>%
+        workflows::add_model(mod)
+      best_params <- mod_fit %>%
+        tune::tune_grid(resamples = rsample::vfold_cv(train_df), 
+                        grid = grid) %>%
+        tune::select_best(metric = "accuracy")
+      mod_fit <- mod_fit %>%
+        tune::finalize_workflow(best_params) %>%
+        tune::last_fit(splits)
+    } else {
+      mod_fit <- workflows::workflow() %>%
+        workflows::add_recipe(mod_recipe) %>%
+        workflows::add_model(mod) %>%
+        tune::last_fit(splits)
+    }
+    model_fits_temp[[model_name]] <- mod_fit
+    model_preds_temp[[model_name]] <- mod_fit %>%
+      tune::collect_predictions()
+    model_errs_temp[[model_name]] <- mod_fit %>%
+      tune::collect_metrics()
+    model_vimps_temp[[model_name]] <- tryCatch({
+      # model-specific variable importance
+      mod_fit %>%
+        workflows::extract_fit_parsnip() %>%
+        vip::vi()
+    }, error = function(e) {
+      # model-agnostic permutation variable importance
+      mod_fit %>%
+        workflows::extract_fit_parsnip() %>%
+        vip::vi(method = "permute", train = train_df, target = ".y",
+                feature_names = setdiff(colnames(train_df), ".y"), 
+                pred_wrapper = predict, metric = "accuracy")
+    })
+  }
+  model_preds_temp <- dplyr::bind_rows(model_preds_temp, .id = "model")
+  model_errs_temp <- dplyr::bind_rows(model_errs_temp, .id = "model")
+  model_vimps_temp <- dplyr::bind_rows(model_vimps_temp, .id = "model")
+
+  model_preds_b[[b]] <- model_preds_temp
+  model_errs_b[[b]] <- model_errs_temp
+  model_vimps_b[[b]] <- model_vimps_temp
+}
+
+model_errs_b <- bind_rows(model_errs_b, .id = "column_label")
+
+#FIX summary
+# model_errs_b <- model_errs_b %>%
+#                 group_by(model) %>%
+#                 summarise(mean_accuracy = mean(Accuracy), sd_accuracy =  sd(Accuracy),
+#                           mean_kappa = mean(Kappa), sd_kappa = sd(Kappa))
+
+```
+
+```{r results = "asis", echo = FALSE}
+# table of accuracy metrics
+model_errs_b %>%
+  dplyr::select(-.estimator, -.config) %>%
+  tidyr::pivot_wider(names_from = .metric, values_from = .estimate) %>%
   prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
            caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
            bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
@@ -678,6 +830,8 @@ model_errs %>%
            options = list(dom = 't'))
 
 ```
+
+
 #### h20 {.unnumbered}
 
 
@@ -733,10 +887,8 @@ TODO
 <!-- TODO: Ana - add template tables with interpretation -->
 ###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
-#### tidymodels {.unnumbered}
-
 #### caret {.unnumbered}
-```{r caret-finalfits, eval = FALSE }
+```{r caret-finalfits, eval = TRUE }
 # how to do cross validation
 trcontrol <- caret::trainControl(
   method = "cv",
@@ -807,6 +959,92 @@ model_errs %>%
            options = list(dom = 't'))
 
 ```
+#### tidymodels {.unnumbered}
+```{r tidymodels-finalfits, eval = TRUE}
+# TODO: add code for tuning parameters
+mod_recipe <- recipes::recipe(.y ~., data = splits)
+
+# for classification
+rf_model <- parsnip::rand_forest() %>%
+  parsnip::set_args(mtry = tune::tune()) %>%
+  parsnip::set_engine("ranger", importance = "impurity") %>%
+  parsnip::set_mode("classification")
+rf_grid <- tidyr::crossing(mtry = 1:4)
+
+svm_model <- parsnip::svm_rbf() %>%
+  parsnip::set_engine("kernlab") %>%
+  parsnip::set_mode("classification")
+
+knn_model <- parsnip::nearest_neighbor() %>%
+   parsnip::set_args(neighbors = tune(), weight_func = tune()) %>% 
+   parsnip::set_engine("kknn") %>% 
+   parsnip::set_mode("classification")
+
+# models <- workflowsets::workflow_set(
+#   preproc = list(Base = mod_recipe),
+#   models = list(RF = rf_model, SVM = svm_model, KNN = knn_model),
+#   cross = TRUE
+# ) %>%
+#   workflowsets::option_add(grid = rf_grid, id = "Base_RF")
+# model_fits <- workflowsets::workflow_map(
+#   object = models,
+#   fn = "tune_grid"
+# )
+
+model_list <- list(RF = list(model = rf_model,
+                             grid = rf_grid), 
+                   SVM = list(model = svm_model,
+                              grid = NULL), 
+                   KNN = list(model = knn_model,
+                              grid = 4))
+model_fits <- list()
+model_preds <- list()
+model_errs <- list()
+model_vimps <- list()
+for (model_name in names(model_list)) {
+  mod <- model_list[[model_name]]$model
+  grid <- model_list[[model_name]]$grid
+  if (!is.null(grid)) {
+    mod_fit <- workflows::workflow() %>%
+      workflows::add_recipe(mod_recipe) %>%
+      workflows::add_model(mod)
+    best_params <- mod_fit %>%
+      tune::tune_grid(resamples = rsample::vfold_cv(train_df), 
+                      grid = grid) %>%
+      tune::select_best(metric = "accuracy")
+    mod_fit <- mod_fit %>%
+      tune::finalize_workflow(best_params) %>%
+      tune::last_fit(splits)
+  } else {
+    mod_fit <- workflows::workflow() %>%
+      workflows::add_recipe(mod_recipe) %>%
+      workflows::add_model(mod) %>%
+      tune::last_fit(splits)
+  }
+  model_fits[[model_name]] <- mod_fit
+  model_preds[[model_name]] <- mod_fit %>%
+    tune::collect_predictions()
+  model_errs[[model_name]] <- mod_fit %>%
+    tune::collect_metrics()
+  model_vimps[[model_name]] <- tryCatch({
+    # model-specific variable importance
+    mod_fit %>%
+      workflows::extract_fit_parsnip() %>%
+      vip::vi()
+  }, error = function(e) {
+    # model-agnostic permutation variable importance
+    mod_fit %>%
+      workflows::extract_fit_parsnip() %>%
+      vip::vi(method = "permute", train = train_df, target = ".y",
+              feature_names = setdiff(colnames(train_df), ".y"), 
+              pred_wrapper = predict, metric = "accuracy")
+  })
+}
+model_preds <- dplyr::bind_rows(model_preds, .id = "model")
+model_errs <- dplyr::bind_rows(model_errs, .id = "model")
+model_vimps <- dplyr::bind_rows(model_vimps, .id = "model")
+```
+
 #### h20 {.unnumbered}
 
 # Post hoc analysis
