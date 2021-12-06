@@ -1,17 +1,83 @@
 /* make left navigation bar smaller */
-.col-xs-3 {
-	width: 15%;
+.menu {
+	width: 20%;
 }
-.col-xs-9 {
-	width: 85%;
+.pages {
+	width: 80%;
+	/*margin-top: 140px;*/
+}
+.pages>.row>.col-xs-10 {
+	width: 95%; 
+	padding-left: 0px;
 }
 
-/* make right margin bar smaller */
-.col-xs-2 {
-	width: 10%;
+/* style header */
+.header-panel {
+	background-color: #3B7EA1;
 }
-.col-xs-10 {
-	width: 90%; 
+.header-panel h1 {
+	font-size: 40px;
+	font-weight: 600;
+}
+.header-panel .col-xs-12 {
+	text-align: center;
+}
+.header-panel #header {
+	/*justify-content: unset;*/
+	margin-bottom: 20px;
+}
+.pages>div {
+	padding-top: 90px;
+	/*padding-top: 0;*/
+}
+
+/* style toc  */
+#toc>.nav>li>a {
+	padding: unset;
+	font-size: 14pt;
+	color: #6c7586;
+}
+#toc>.nav>li.active>a {
+	color: #003262;
+}
+#toc>.nav>li.active {
+	border-left: 7px solid #FDB515;
+	margin-left: 0px;
+}
+#toc>.nav>li {
+	margin-left: 7px;
+}
+
+/* settings button */
+.btn-toolbar {
+	position: fixed;
+	top: 5px;
+	right: 15px;
+}
+.btn-toolbar>.btn-group>a {
+	font-size: 36px;
+	font-weight: 900;
+	padding: 2px;
+	border-radius: 50%;
+	height: 35px;
+	width: 35px;
+	color: #969696;
+}
+.btn-toolbar>.btn-group>a>span {
+	top: -12px;
+	position: relative;
+}
+.btn-toolbar>.btn-group>ul>li>a:hover,
+.btn-toolbar>.btn-group>ul>li>a:focus {
+	color: #003262;
+}
+
+/* customize headers */
+.pages h1, .pages h2, .pages h3,
+.pages h4, .pages h5, .pages h6,
+.pages legend{
+    color: #003262;
+    font-weight: 550;
 }
 
 /* bold navigation bar text */
@@ -20,44 +86,90 @@
 	font-size: 12pt;
 }
 
-/* bold text of active tab */
-.pages .nav-tabs>li.active>a {
-	font-weight: bold !important;
-}
-
-/* color text of active tab white */
-.nav-tabs>li.active>a {
-	color: #fff !important;
-}
-
-/* color text of inactive tab gray */
-.nav-tabs>li>a {
-	color: #DADADA !important;
-}
-
 /* reduce vertical space between tabs */
 .pages ul.nav {
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
 
-/* make horizontal navigation tab bar darker */
-.nav-tabs {
-	background: #009284;
+/* style navigation pill */
+.pages .nav-pills>li.active>a {
+	background-color: #3B7EA1;
+	color: white;
+}
+.pages .nav-pills>li>a {
+	color: #78909c;
 }
 
-/*Add box around each step in recipe*/
-.padded-panel {
-    padding: 15px;
-    position: relative;
+/* style navigation tabs */
+.pages .nav-tabs>li.active>a {
+	font-weight: bold !important;
+}
+.pages .nav-tabs>li.active>a {
+	color: #fff !important;
+}
+.pages .nav-tabs>li>a {
+	color: #78909c;
+	font-weight: bold !important;
 }
 
-/* change font family */
-/*body, h1, h2, h3, h4, h5, h6 {
-    font-family: "Fira Sans", sans-serif;
-}*/
+/* style custom navigation tabs*/
+.pages .custom-nav-tabs {
+    border-bottom: 1px solid #ecf0f1;
+    background-color: white;
+}
+.pages .custom-nav-tabs>li {
+    float: left;
+    margin-bottom: -1px;
+}
+.pages .custom-nav-tabs>li>a, 
+.pages .custom-nav-tabs>li>a:hover, 
+.pages .custom-nav-tabs>li>a:focus {
+    box-shadow: 0 1px 6px -4px rgb(0 0 0 / 12%);
+}
+.pages .custom-nav-tabs>li>a {
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+}
+.pages .custom-nav-tabs>li.active>a, 
+.pages .custom-nav-tabs>li.active>a:hover, 
+.pages .custom-nav-tabs>li.active>a:focus {
+    /*color: #003262 !important;*/
+    color: #106fa0 !important;
+    /*color: #3B7EA1 !important;*/
+    background-color: #ffffff !important;
+    border: 1px solid #ecf0f1;
+    border-bottom-color: transparent;
+    cursor: default;
+    font-weight: 900;
+    border-top-color: #FDB515;
+    border-top-width: 5px;
+    box-shadow: 0 0 0 0;
+}
+.pages .custom-nav-tabs>li>a {
+    color: #78909c !important;
+    background-color: white;
+}
 
-/* .h1, .h2, .h3, .h4, body, h1, h2, h3, h4, h5, h6 {
-    font-family: Roboto,Helvetica,Arial,sans-serif;
-    font-weight: 300;
-} */
+/* style blockquote */
+blockquote {
+    padding: 5px 13px;
+    margin: 3px 30px 10px;
+    font-size: inherit;
+    border-left: 5px solid #eee;
+}
+
+/* style help button */
+.help-btn {
+	display: inline;
+	color: #b9b9b9;
+	cursor: pointer;
+}
+
+/* remove bottom statusbar from tinymce */
+.tox-statusbar {
+	display: none !important;
+}
+

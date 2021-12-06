@@ -8,8 +8,6 @@ header-includes:
     - \usepackage{amsmath}
     - \usepackage{gensymb}
 output:
-  # rmdformats::html_clean:
-  # rmdformats::readthedown:
   rmdformats::material:
     fig_caption: true
     code_folding: hide
@@ -18,6 +16,9 @@ output:
     fig_width: 10
     fig_height: 8
     lightbox: true
+    code_download: true
+    includes:
+      before_body: html/setup.html
 params:
   X_filepath:
     label: "X Data"
@@ -50,29 +51,12 @@ params:
     label: "Random Seed"
     value: 12345
     input: numeric
-css: css/custom_material_rmd_theme.css
+css: [css/custom_material_rmd_theme.css, css/custom_checkbox.css]
 # runtime: shiny
 ---
 
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-<script src="js/tinymce.js"></script>
-
-<style>
-    .tox-notifications-container {display: none !important;}
-</style>
-
 ```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
-options(width = 10000)
-knitr::opts_chunk$set(
-  echo = TRUE,
-  warning = FALSE,
-  message = FALSE,
-  collapse = TRUE,
-  fig.align = "center",
-  fig.pos = "H",
-  fig.show = "hold",
-  comment = "#>"
-)
+source("R/rmd-setup.R", local = knitr::knit_global())
 
 # load in packages
 library(tidyverse)
@@ -108,62 +92,91 @@ chunk_idx <- 1
 
 # Domain problem formulation
 
-<input type="checkbox" unchecked> **What is the real-world question? This could be hypothesis-driven or discovery-based.**</input>
+What is the real-world question? This could be hypothesis-driven or discovery-based.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, help = TRUE}
+Some advice
+```
 
-<input type="checkbox" unchecked> **Why is this question interesting and important? What are the implications of better understanding this data?**</input>
+```{asis, interactive_text = TRUE}
 
-<textarea class="tinymce-text"></textarea><br>
+```
 
-<input type="checkbox" unchecked> **Briefly describe any background information necessary to understand this problem.**</input>
+Why is this question interesting and important? What are the implications of better understanding this data?
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-<input type="checkbox" unchecked> **Briefly describe how this question can be answered in the context of a model or analysis.**</input>
+```
 
-<textarea class="tinymce-text"></textarea><br>
+Briefly describe any background information necessary to understand this problem.
 
-<input type="checkbox" unchecked> **Outline the rest of the report/analysis.**</input>
+```{asis, help = TRUE}
+Some advice
+```
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
+```
+
+Briefly describe how this question can be answered in the context of a model or analysis.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Outline the rest of the report/analysis.
+
+```{asis, interactive_text = TRUE}
+
+```
 
 # Data
 
-<input type="checkbox" unchecked> **What is the data under investigation? Provide a brief overview/description of the data.**</input>
+What is the data under investigation? Provide a brief overview/description of the data.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-<input type="checkbox" unchecked> **Describe how your data connects to the domain problem.**</input>
+```
 
-<textarea class="tinymce-text"></textarea><br>
+Describe how your data connects to the domain problem.
+
+```{asis, interactive_text = TRUE}
+
+```
 
 ## Data Collection
 
-<input type="checkbox" unchecked> **How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.**</input>
+How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-<input type="checkbox" unchecked> **Describe any limitations when using the data to answer the domain problem of interest.**</input>
+```
 
-<textarea class="tinymce-text"></textarea><br>
+Describe any limitations when using the data to answer the domain problem of interest.
 
-<input type="checkbox" unchecked> **Where is the data stored, and how can it be accessed by others (if applicable)?**</input>
+```{asis, interactive_text = TRUE}
 
-<textarea class="tinymce-text"></textarea><br>
+```
+
+Where is the data stored, and how can it be accessed by others (if applicable)?
+
+```{asis, interactive_text = TRUE}
+
+```
 
 ## Data Splitting
 
 TODO: add advice for possible data splits, AK getting nice figure together
 
-<input type="checkbox" unchecked> **Decide on the proportion of data in each split.**</input>
+Decide on the proportion of data in each split.
 
-<input type="checkbox" unchecked> **Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.**</input>
+Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-<input type="checkbox" unchecked> **Split the data into a training, validation, and test set.**</input>
+```
+
+Split the data into a training, validation, and test set.
 
 ```{r split-data}
 data_split <- basicDataSplit(X = X, y = y, 
@@ -178,11 +191,13 @@ yvalid <- data_split$y$validate
 ytest <- data_split$y$test
 ```
 
-<input type="checkbox" unchecked> **Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.**</input>
+Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-### Data Splitting Overview {.tabset .tabset-pills .tabset-fade}
+```
+
+### Data Splitting Overview {.tabset .custom-tabs}
 
 #### X Data Split {.unnumbered}
 
@@ -198,19 +213,21 @@ plot_y_datasplit(ytrain, yvalid, ytest)
 
 ## Data Cleaning and Preprocessing
 
-<input type="checkbox" unchecked> **What steps were taken to clean the data? More importantly, why was the data cleaned in this way?**</input>
+What steps were taken to clean the data? More importantly, why was the data cleaned in this way?
 
-<input type="checkbox" unchecked> **Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).**</input>
+Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).
 
-<input type="checkbox" unchecked> **Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your steps.**</input>
+Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your steps.
 
-<input type="checkbox" unchecked> **It can be helpful to include relevant plots that explain/justify the choices that were made when cleaning the data.**</input>
+It can be helpful to include relevant plots that explain/justify the choices that were made when cleaning the data.
 
-<input type="checkbox" unchecked> **If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.**</input>
+If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.
 
-<input type="checkbox" unchecked> **Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.**</input>
+Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 ## Data Exploration
 
@@ -218,15 +235,17 @@ TODO: Add drag and drop feature in shiny version for other images
 
 The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.
 
-<input type="checkbox" unchecked> **Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.**</input>
+Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.
 
-<input type="checkbox" unchecked> **Provide additional plots representing remaining oddities after pre-processing if applicable.**</input>
+Provide additional plots representing remaining oddities after pre-processing if applicable.
 
-<input type="checkbox" unchecked> **Add summary statistics in accompanying tables (or in figures) for quick comparisons.**</input>
+Add summary statistics in accompanying tables (or in figures) for quick comparisons.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-### Training Data Overview {.tabset .tabset-pills .tabset-fade}
+```
+
+### Training Data Overview {.tabset .custom-tabs}
 
 ```{r echo = FALSE}
 dataOverview(Xtrain = Xtrain, ytrain = ytrain) %>%
@@ -280,7 +299,7 @@ plotPairs(data = Xtrain, columns = col_ids,
           color = ytrain, color_label = "y")
 ```
 
-#### Marginal Association Plots {.unnumbered}
+#### Marginal Associations {.unnumbered}
 
 ```{r}
 caret::featurePlot(x = Xtrain,
@@ -291,7 +310,7 @@ caret::featurePlot(x = Xtrain,
                                  y = list(relation = "free")))
 ```
 
-#### PCA Plots {.unnumbered}
+#### PCA {.unnumbered}
 
 ```{r}
 # dimension reduction plots
@@ -299,30 +318,35 @@ plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
         center = T, scale = FALSE)$plot
 ```
 
-
 # Prediction Modeling
 
 TODO: add advice on which models to select and why
 
-<input type="checkbox" unchecked> **Discuss the prediction methods under consideration, and explain why these methods were chosen.**</input>
+Discuss the prediction methods under consideration, and explain why these methods were chosen.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-<input type="checkbox" unchecked> **Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.**</input>
+```
 
-<textarea class="tinymce-text"></textarea><br>
+Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.
+
+```{asis, interactive_text = TRUE}
+
+```
 
 Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.
 
-## Prediction check {.tabset .tabset-pills .tabset-fade}
+## Prediction check
 
-<input type="checkbox" unchecked> **Carry out the prediction pipeline, outlined above.**</input>
+Carry out the prediction pipeline, outlined above.
 
 -   Fit prediction methods on training data.
 -   Evaluate prediction methods on validation data.
 -   Compare results, and filter out poor models.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 ```{r caret-fits, eval = params$modeling_pkg == "caret", echo = params$modeling_pkg == "caret"}
 tr_control <- caret::trainControl(
@@ -412,7 +436,7 @@ model_results$errors %>%
 
 ## Stability check
 
-<input type="checkbox" unchecked> **Taking the prediction methods that pass the prediction check, perform stability analysis.**</input>
+Taking the prediction methods that pass the prediction check, perform stability analysis.
 
 -   Specify and justify the appropriate data perturbation(s).
 -   Re-fit the prediction methods on these perturbed data sets.
@@ -420,10 +444,11 @@ model_results$errors %>%
 -   Assess stability across the data perturbations as well as across the various methods.
 -   Filter out poor models where necessary and interpret stability results.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 TODO: Add results for h20, tuning needs to be fixed for h20 + tidymodels <!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
-
 
 ```{r stability-check}
 n_reps <- 5 # increase for better stability measures when not testing code
@@ -492,14 +517,15 @@ bootstrap_model_errs %>%
                 title = "Validation Prediction Accuracies Over Bootstrapped Training Fits")
 ```
 
-
 ## Interpretability
 
-<input type="checkbox" unchecked> **For the models that pass the prediction and stability checks,**</input>
+For the models that pass the prediction and stability checks,
 
 -   Extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 <!-- TODO: Tiffany - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. -->
 
@@ -534,11 +560,13 @@ TODO: TT
 
 # Main Results
 
-<input type="checkbox" unchecked> **Interpret and summarize the prediction and stability results.**</input>
+Interpret and summarize the prediction and stability results.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
 
-<input type="checkbox" unchecked> **Evaluate pipeline on test data.**</input>
+```
+
+Evaluate pipeline on test data.
 
 ```{r final-fits, eval = TRUE }
 Xtrain_final <- dplyr::bind_rows(Xtrain, Xvalid)
@@ -562,9 +590,11 @@ if (params$modeling_pkg == "caret") {
 
 ```
 
-<input type="checkbox" unchecked> **Summarize test set prediction and/or interpretability results.**</input>
+Summarize test set prediction and/or interpretability results.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 <!-- TODO: Ana - add template tables with interpretation -->
 
@@ -578,15 +608,16 @@ final_model_results$errors %>%
            options = list(dom = 't'))
 ```
 
-
 # Post hoc analysis
 
-<input type="checkbox" unchecked> **Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.**</input>
+Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.
 
 -   Examine any points that had poor predictions.
 -   Examine differences between prediction methods.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 TODO: Tiffany - Add examples with interesting observations of prediction accuracy metrics so the user knows what to look for.
 
@@ -598,8 +629,10 @@ plotPairs(model_results$predictions,
 
 # Conclusions
 
-<input type="checkbox" unchecked> **Reiterate main findings, note any caveats, and clearly translate findings/analysis back to the domain problem context.**</input>
+Reiterate main findings, note any caveats, and clearly translate findings/analysis back to the domain problem context.
 
-<textarea class="tinymce-text"></textarea><br>
+```{asis, interactive_text = TRUE}
+
+```
 
 # Bibliography {.unnumbered}
