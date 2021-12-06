@@ -18,15 +18,48 @@ output:
     fig_width: 10
     fig_height: 8
     lightbox: true
+params:
+  X_filepath:
+    label: "X Data"
+    # value: NULL
+    value: data/iris_X.rds
+    input: file 
+  y_filepath:
+    label: "y data"
+    # value: NULL
+    value: data/iris_y.rds
+    input: file
+  train_prop:
+    label: "Training data proportion"
+    value: 0.6
+    input: numeric
+  valid_prop:
+    label: "Validation data proportion"
+    value: 0.2
+    input: numeric
+  test_prop:
+    label: "Test data proportion"
+    value: 0.2
+    input: numeric
+  modeling_pkg:
+    label: "Modeling Package"
+    value: "caret"
+    input: select
+    choices: ["caret", "h2o", "tidymodels"]
+  seed:
+    label: "Random Seed"
+    value: 12345
+    input: numeric
 css: css/custom_material_rmd_theme.css
 # runtime: shiny
 ---
 
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-
 <script src="js/tinymce.js"></script>
 
-<!-- <script src="js/download.js"></script> -->
+<style>
+    .tox-notifications-container {display: none !important;}
+</style>
 
 ```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
 options(width = 10000)
@@ -34,7 +67,6 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
   message = FALSE,
-  # cache = TRUE,
   collapse = TRUE,
   fig.align = "center",
   fig.pos = "H",
@@ -55,6 +87,22 @@ for (f in list.files("R", pattern = ".R", full.names = TRUE)) {
   source(f, chdir = T)
 }
 
+# set seed
+set.seed(params$seed)
+
+# validate inputs
+validateDataSplit(params$train_prop, params$valid_prop, params$test_prop)
+if (params$modeling_pkg != "caret") {
+  stop("Only caret modeling backend has been implemented.")
+}
+
+# load data in
+X <- uploadFile(params$X_filepath)
+y <- uploadFile(params$y_filepath)
+#TODO: validate data better
+validateData(X, y)
+
+# initialize counter for subchunkify
 chunk_idx <- 1
 ```
 
@@ -105,7 +153,7 @@ chunk_idx <- 1
 
 <textarea class="tinymce-text"></textarea><br>
 
-## Data splitting
+## Data Splitting
 
 TODO: add advice for possible data splits, AK getting nice figure together
 
@@ -117,84 +165,35 @@ TODO: add advice for possible data splits, AK getting nice figure together
 
 <input type="checkbox" unchecked> **Split the data into a training, validation, and test set.**</input>
 
-```{r load-data}
-# TODO: pick more interesting datasets
-data = iris
-breakdown = c(train = 0.6, validate = 0.2, test = 0.2)
-labels = sample(cut(
-  seq(nrow(data)), 
-  nrow(data)*cumsum(c(0,breakdown)),
-  labels = names(breakdown)
-))
-data_split = split(data, labels)
-
-Xtrain <- data_split$train %>% dplyr::select(-Species)
-Xvalid <- data_split$validate %>% dplyr::select(-Species)
-Xtest <- data_split$test %>% dplyr::select(-Species)
-ytrain <- data_split$train$Species
-yvalid <- data_split$validate$Species
-ytest <- data_split$test$Species
-
-######FIX need "splits" for tuning code
-X <- iris %>% dplyr::select(-Species)
-y <- iris$Species
-data_df <- dplyr::bind_cols(.y = y, X)
-splits <- rsample::initial_split(data_df)
-train_df <- rsample::training(splits)
-valid_df <- rsample::testing(splits)
+```{r split-data}
+data_split <- basicDataSplit(X = X, y = y, 
+                             train_prop = params$train_prop, 
+                             valid_prop = params$valid_prop, 
+                             test_prop = params$test_prop)
+Xtrain <- data_split$X$train
+Xvalid <- data_split$X$validate
+Xtest <- data_split$X$test
+ytrain <- data_split$y$train
+yvalid <- data_split$y$validate
+ytest <- data_split$y$test
 ```
 
 <input type="checkbox" unchecked> **Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.**</input>
 
 <textarea class="tinymce-text"></textarea><br>
 
-### Data Split Overview {.tabset .tabset-pills .tabset-fade}
+### Data Splitting Overview {.tabset .tabset-pills .tabset-fade}
 
-#### X Comparison {.unnumbered}
-```{r compare-X}
-train = melt(data_split$train)
-train$split = "train"
-validation = melt(data_split$validate)
-validation$split = "validation"
-test = melt(data_split$test)
-test$split = "test"
-data_all = rbind(train,validation,test)
-data_all$split = factor(data_all$split,levels=c("train","validation","test"))
-fnt = 12
-fnt2=12
-#ggplot(data_all, aes(x=variable, y=value)) + 
- # geom_boxplot() + 
-  ggplot(data_all, aes(x=value, fill=variable)) + geom_density(alpha=.3)+
-    theme_bw() + 
-  facet_wrap(. ~ split)+
-  theme(axis.title.x = element_text(size=fnt,face="bold")) + 
-  #theme(axis.title.y = element_text(size=fnt,face="bold")) +
-  theme(axis.title.y = element_blank())+
-  theme(strip.text.x = element_text(size = fnt2,face="bold")) +
-  #ylab("True Positives") +
-  xlab("") + 
-  theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
-  theme(legend.text=element_text(size=fnt2,face="bold"))
-  
+#### X Data Split {.unnumbered}
+
+```{r X-data-split}
+plot_X_datasplit(Xtrain, Xvalid, Xtest)
 ```
 
-#### Y Comparison {.unnumbered}
-```{r compare-Y}
-plot_data <- data_all %>% dplyr::select(c(Species,split)) %>%
-      count(Species,split) %>% 
-      group_by(split) %>% 
-      mutate(percent = n/sum(n))
-ggplot(plot_data, aes(x = split, y = percent, fill = Species)) + 
-  theme_bw() + 
-      geom_col(position = "fill") +
-  theme(axis.title.x = element_text(size=fnt,face="bold")) + 
-  #theme(axis.title.y = element_text(size=fnt,face="bold")) +
-  theme(axis.title.y = element_blank())+
-  theme(strip.text.x = element_text(size = fnt2,face="bold")) +
-  #ylab("True Positives") +
-  xlab("") + 
-  theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
-  theme(legend.text=element_text(size=fnt2,face="bold"))
+#### Y Data Split {.unnumbered}
+
+```{r y-data-split}
+plot_y_datasplit(ytrain, yvalid, ytest)
 ```
 
 ## Data Cleaning and Preprocessing
@@ -227,44 +226,26 @@ The main goal of this section is to give the reader a feel for what the data "lo
 
 <textarea class="tinymce-text"></textarea><br>
 
-### Data Overview
+### Training Data Overview {.tabset .tabset-pills .tabset-fade}
 
 ```{r echo = FALSE}
-if (length(ytrain) != nrow(Xtrain)) {
-  text_out <- paste0(
-    "Warning: Number of samples in Xtrain (n = ", nrow(Xtrain), ") ",
-    "not equal to number of samples in ytrain (n = ", length(ytrain), ")."
-  )
-} else {
-  text_out <- paste0(
-    paste0("Number of samples: ", nrow(Xtrain), "\n"),
-    paste0("Number of features: ", ncol(Xtrain), "\n"),
-    paste0("Number of NAs in training y: ", sum(is.na(ytrain)), "\n"),
-    paste0("Number of NAs in training X: ", sum(is.na(Xtrain)), "\n"),
-    paste0("Number of columns in training X with NAs: ", 
-           sum(apply(Xtrain, 2, FUN = function(x) any(is.na(x)))), 
-           "\n"),
-    paste0("Number of constant columns in training X: ",
-           sum(apply(Xtrain, 2,
-                     FUN = function(x) {
-                       all(x == x[!is.na(x)][1], na.rm = T)
-                     }), na.rm = T)))
-}
-cat(text_out)
+dataOverview(Xtrain = Xtrain, ytrain = ytrain) %>%
+  cat()
 ```
-
-###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
 #### Summary Tables {.unnumbered}
 
 ```{r results="asis"}
+# summary of types of features in training X
 data_types(Xtrain = Xtrain, ytrain = ytrain)
 ```
 
 ```{r results="asis"}
+# summary of features in training X, sorted by type
 dt_ls <- data_summary(Xtrain = Xtrain, ytrain = ytrain, digits = 2, sigfig = F)
 for (dt_name in names(dt_ls)) {
-  subchunkify(dt_ls[[dt_name]], i = chunk_idx, other_args = "results='asis'")
+  simChef:::subchunkify(dt_ls[[dt_name]], i = chunk_idx, 
+                        other_args = "results='asis'")
   chunk_idx <- chunk_idx + 1
 }
 ```
@@ -287,7 +268,7 @@ plot_y_distribution(ytrain, "bar")
 
 ```{r}
 # correlation heatmap
-plotCorHeatmap(X = Xtrain, cor.type = "pearson", clust = TRUE, text.size = 8)
+plotCorHeatmap(X = Xtrain, cor_type = "pearson", clust = TRUE, text_size = 8)
 ```
 
 #### Feature Pair Plots {.unnumbered}
@@ -296,7 +277,7 @@ plotCorHeatmap(X = Xtrain, cor.type = "pearson", clust = TRUE, text.size = 8)
 # pair plots
 col_ids <- 1:min(ncol(Xtrain), 6)
 plotPairs(data = Xtrain, columns = col_ids, 
-          color = ytrain, color.label = "y")
+          color = ytrain, color_label = "y")
 ```
 
 #### Marginal Association Plots {.unnumbered}
@@ -314,11 +295,10 @@ caret::featurePlot(x = Xtrain,
 
 ```{r}
 # dimension reduction plots
-plotPCA(X = Xtrain, npcs = 3, color = ytrain, color.label = "y",
+plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
         center = T, scale = FALSE)$plot
 ```
 
-For inspiration: [Shiny App](https://tiffanymtang.shinyapps.io/ShinyEDA/)
 
 # Prediction Modeling
 
@@ -334,23 +314,18 @@ TODO: add advice on which models to select and why
 
 Note: there should be multiple methods and metrics under consideration to paint a more holistic picture of the data. At least one method should be a baseline, common approach that may not be optimal for the problem setting, but serves as a helpful comparison.
 
-## Prediction check
+## Prediction check {.tabset .tabset-pills .tabset-fade}
 
 <input type="checkbox" unchecked> **Carry out the prediction pipeline, outlined above.**</input>
 
-  -   Fit prediction methods on training data.
-  -   Evaluate prediction methods on validation data.
-  -   Compare results, and filter out poor models.
+-   Fit prediction methods on training data.
+-   Evaluate prediction methods on validation data.
+-   Compare results, and filter out poor models.
 
 <textarea class="tinymce-text"></textarea><br>
 
-###  {.unnumbered .tabset .tabset-pills .tabset-fade}
-
-#### caret {.unnumbered}
-
-```{r caret-fits, eval = TRUE }
-# how to do cross validation
-trcontrol <- caret::trainControl(
+```{r caret-fits, eval = params$modeling_pkg == "caret", echo = params$modeling_pkg == "caret"}
+tr_control <- caret::trainControl(
   method = "cv",
   number = 5,
   classProbs = if (is.factor(ytrain)) TRUE else FALSE,
@@ -359,7 +334,7 @@ trcontrol <- caret::trainControl(
   verboseIter = FALSE
 )
 
-response <- "raw"
+response_type <- "raw"
 model_list <- list(
   ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain)), 
                                                   ncol(Xtrain) / 3,
@@ -378,56 +353,18 @@ model_list <- list(
                  nthread = 1)
 )
 
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]
-  if (identical(mod, list())) {
-    mod <- NULL
-  }
-  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain),
-                                                 y = ytrain,
-                                                 trControl = trcontrol,
-                                                 method = model_name),
-                                            mod))
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
-                                       type = response)
-  model_errs[[model_name]] <- caret::postResample(
-    pred = model_preds[[model_name]], obs = yvalid
-  )
-  model_vimps[[model_name]] <- caret::varImp(mod_fit)
-}
-model_preds <- dplyr::bind_rows(model_preds, .id = "model")
-model_errs <- dplyr::bind_rows(model_errs, .id = "model")
-model_vimps <- purrr::map_dfr(model_vimps, 
-                              ~.x[["importance"]] %>% 
-                                tibble::rownames_to_column("variable"),
-                              .id = "model")
+model_results <- fitCaret(Xtrain = Xtrain, ytrain = ytrain, 
+                          Xtest = Xvalid, ytest = yvalid, 
+                          model_list = model_list, tr_control = tr_control, 
+                          response_type = response_type)
 
 ```
 
-```{r results = "asis", echo = FALSE}
-# table of accuracy metrics
-model_errs %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies", 
-           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           bold_scheme = c(F, rep(T, ncol(.) - 1)),
-           options = list(dom = 't'))
-
-```
-
-#### tidymodels {.unnumbered}
-
-```{r tidymodels-fits, eval = TRUE}
+```{r tidymodels-fits, eval = params$modeling_pkg == "tidymodels", echo = params$modeling_pkg == "tidymodels"}
 # TODO: add code for tuning parameters
 # AK: Once tuning is fixed, can adjust splits for stability
-mod_recipe <- recipes::recipe(.y ~., data = splits)
 
-# for classification
+# as is, only works for classification
 rf_model <- parsnip::rand_forest() %>%
   parsnip::set_args(mtry = tune::tune()) %>%
   parsnip::set_engine("ranger", importance = "impurity") %>%
@@ -443,403 +380,124 @@ knn_model <- parsnip::nearest_neighbor() %>%
    parsnip::set_engine("kknn") %>% 
    parsnip::set_mode("classification")
 
-# models <- workflowsets::workflow_set(
-#   preproc = list(Base = mod_recipe),
-#   models = list(RF = rf_model, SVM = svm_model, KNN = knn_model),
-#   cross = TRUE
-# ) %>%
-#   workflowsets::option_add(grid = rf_grid, id = "Base_RF")
-# model_fits <- workflowsets::workflow_map(
-#   object = models,
-#   fn = "tune_grid"
-# )
-
 model_list <- list(RF = list(model = rf_model,
                              grid = rf_grid), 
                    SVM = list(model = svm_model,
                               grid = NULL), 
                    KNN = list(model = knn_model,
                               grid = 4))
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]$model
-  grid <- model_list[[model_name]]$grid
-  if (!is.null(grid)) {
-    mod_fit <- workflows::workflow() %>%
-      workflows::add_recipe(mod_recipe) %>%
-      workflows::add_model(mod)
-    best_params <- mod_fit %>%
-      tune::tune_grid(resamples = rsample::vfold_cv(train_df), 
-                      grid = grid) %>%
-      tune::select_best(metric = "accuracy")
-    mod_fit <- mod_fit %>%
-      tune::finalize_workflow(best_params) %>%
-      tune::last_fit(splits)
-  } else {
-    mod_fit <- workflows::workflow() %>%
-      workflows::add_recipe(mod_recipe) %>%
-      workflows::add_model(mod) %>%
-      tune::last_fit(splits)
-  }
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- mod_fit %>%
-    tune::collect_predictions()
-  model_errs[[model_name]] <- mod_fit %>%
-    tune::collect_metrics()
-  model_vimps[[model_name]] <- tryCatch({
-    # model-specific variable importance
-    mod_fit %>%
-      workflows::extract_fit_parsnip() %>%
-      vip::vi()
-  }, error = function(e) {
-    # model-agnostic permutation variable importance
-    mod_fit %>%
-      workflows::extract_fit_parsnip() %>%
-      vip::vi(method = "permute", train = train_df, target = ".y",
-              feature_names = setdiff(colnames(train_df), ".y"), 
-              pred_wrapper = predict, metric = "accuracy")
-  })
-}
-model_preds <- dplyr::bind_rows(model_preds, .id = "model")
-model_errs <- dplyr::bind_rows(model_errs, .id = "model")
-model_vimps <- dplyr::bind_rows(model_vimps, .id = "model")
+kfolds <- 5
 
+model_results <- fitTidyModels(Xtrain = Xtrain, ytrain = ytrain, 
+                               Xtest = Xvalid, ytest = yvalid,
+                               model_list = model_list, kfolds = kfolds)
 ```
 
-```{r results = "asis", echo = FALSE}
-# table of accuracy metrics
-model_errs %>%
-  dplyr::select(-.estimator, -.config) %>%
-  tidyr::pivot_wider(names_from = .metric, values_from = .estimate) %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies", 
-           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           bold_scheme = c(F, rep(T, ncol(.) - 1)),
-           options = list(dom = 't'))
-
-```
-
-
-#### h20 {.unnumbered}
-
-```{r h2o-fits, eval = FALSE}
-library(h2o)
-h2o.init(nthreads = 1)
-iris.hex <- as.h2o(iris)
-splits <- h2o.splitFrame(data = iris.hex,
-                         ratios = c(0.8))
-train_df <- splits[[1]]
-valid_df <- splits[[2]]
-
+```{r h2o-fits, eval = params$modeling_pkg == "h2o", echo = params$modeling_pkg == "h2o"}
 model_list <- list(randomForest = list(ntrees = 500), 
                    xgboost = list())
 
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]
-  if (identical(mod, list())) {
-    mod <- NULL
-  }
-  mod_fit <- do.call(paste0("h2o.", model_name),
-                     args = c(list(x = colnames(Xtrain),
-                                   y = "Species",
-                                   training_frame = train_df,
-                                   model_id = model_name),
-                              mod))
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- h2o.predict(mod_fit, valid_df)
-  model_errs[[model_name]] <- h2o.performance(mod_fit, valid_df)
-  model_vimps[[model_name]] <- h2o.varimp(mod_fit)
-}
-model_preds <- purrr::map_dfr(model_preds, ~attr(.x, "data"), .id = "model")
-model_errs <- purrr::map_dfr(
-  model_errs, 
-  function(err) {
-    rm_objs <- c("model", "model_checksum", "frame", "frame_checksum",
-                 "description", "scoring_time", "predictions")
-    simChef:::simplify_tibble(simChef:::list_to_tibble_row(
-      err@metrics[setdiff(names(err@metrics), rm_objs)]
-    ))
-  }, 
-  .id = "model"
-)
-model_vimps <- dplyr::bind_rows(model_vimps, .id = "model")
-
+model_results <- fith2o(Xtrain = Xtrain, ytrain = ytrain,
+                        Xtest = Xvalid, ytest = yvalid,
+                        model_list = model_list)
 ```
 
-```{r results = "asis", echo = FALSE}
+```{r prediction-accuracy, results = "asis", echo = FALSE}
 # table of accuracy metrics
-model_errs %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+model_results$errors %>%
+  simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
            caption = "Validation Prediction Accuracies", 
            options = list(dom = 't'))
-
 ```
 
 ## Stability check
 
 <input type="checkbox" unchecked> **Taking the prediction methods that pass the prediction check, perform stability analysis.**</input>
 
-  -   Specify and justify the appropriate data perturbation(s).
-  -   Re-fit the prediction methods on these perturbed data sets.
-  -   Evaluate prediction methods on validation data.
-  -   Assess stability across the data perturbations as well as across the various methods.
-  -   Filter out poor models where necessary and interpret stability results.
+-   Specify and justify the appropriate data perturbation(s).
+-   Re-fit the prediction methods on these perturbed data sets.
+-   Evaluate prediction methods on validation data.
+-   Assess stability across the data perturbations as well as across the various methods.
+-   Filter out poor models where necessary and interpret stability results.
 
 <textarea class="tinymce-text"></textarea><br>
 
-TODO: Add results for h20, tuning needs to be fixed for h20 + tidymodels
-<!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
+TODO: Add results for h20, tuning needs to be fixed for h20 + tidymodels <!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
 
-###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
-#### caret {.unnumbered}
-```{r caret-fits-stability}
-nrep = 5 # increase for better stability measures when not testing code
-model_preds_b <- list()
-model_errs_b <- list()
-model_vimps_b <- list()
-for (b in 1:nrep){
-  # bootstrap training
-  bootstrap = sample(1:nrow(Xtrain),nrow(Xtrain))
-  Xtrain_b = Xtrain[bootstrap,]
-  ytrain_b = ytrain[bootstrap]
-  
-  # how to do cross validation
-  trcontrol <- caret::trainControl(
-    method = "cv",
-    number = 5,
-    classProbs = if (is.factor(ytrain_b)) TRUE else FALSE,
-    summaryFunction = caret::defaultSummary,
-    allowParallel = FALSE,
-    verboseIter = FALSE
-  )
-  
-  response <- "raw"
-  model_list <- list(
-    ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain_b)), 
-                                                    ncol(Xtrain_b) / 3,
-                                                    length.out = 3),
-                                         splitrule = "gini",
-                                         min.node.size = 1),
-                  importance = "impurity",
-                  num.threads = 1),
-    xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
-                                          max_depth = c(3, 6),
-                                          colsample_bytree = 0.33,
-                                          eta = c(0.1, 0.3),
-                                          gamma = 0,
-                                          min_child_weight = 1,
-                                          subsample = 0.6),
-                   nthread = 1)
-  )
-  
-  model_fits_temp <- list()
-  model_preds_temp <- list()
-  model_errs_temp <- list()
-  model_vimps_temp <- list()
-  for (model_name in names(model_list)) {
-    mod <- model_list[[model_name]]
-    if (identical(mod, list())) {
-      mod <- NULL
+```{r stability-check}
+n_reps <- 5 # increase for better stability measures when not testing code
+
+# p <- progressr::progressor(steps = n_reps)
+# future::plan(multisession, workers = min(n_reps, parallel::detectCores() - 1))
+bootstrap_model_results <- future.apply::future_replicate(
+  n = n_reps,
+  expr = {
+    bootstrap <- sample(1:nrow(Xtrain), nrow(Xtrain), replace = TRUE)
+    Xtrain_b <- Xtrain[bootstrap, ]
+    ytrain_b <- ytrain[bootstrap]
+    
+    if (params$modeling_pkg == "caret") {
+      model_results_b <- fitCaret(Xtrain = Xtrain_b, ytrain = ytrain_b, 
+                                  Xtest = Xvalid, ytest = yvalid, 
+                                  model_list = model_list, 
+                                  tr_control = tr_control, 
+                                  response_type = response_type)
+    } else if (params$modeling_pkg == "tidymodels") {
+      model_results_b <- fitTidyModels(Xtrain = Xtrain_b, ytrain = ytrain_b, 
+                                       Xtest = Xvalid, ytest = yvalid,
+                                       model_list = model_list, kfolds = kfolds)
+    } else if (params$modeling_pkg == "h2o") {
+      model_results_b <- fith2o(Xtrain = Xtrain_b, ytrain = ytrain_b,
+                                Xtest = Xvalid, ytest = yvalid,
+                                model_list = model_list)
     }
-    mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain_b),
-                                                   y = ytrain_b,
-                                                   trControl = trcontrol,
-                                                   method = model_name),
-                                              mod))
-    model_fits_temp[[model_name]] <- mod_fit
-    model_preds_temp[[model_name]] <- predict(mod_fit, as.data.frame(Xvalid),
-                                         type = response)
-    model_errs_temp[[model_name]] <- caret::postResample(
-      pred = model_preds_temp[[model_name]], obs = yvalid
-    )
-    model_vimps_temp[[model_name]] <- caret::varImp(mod_fit)
-  }
-  
-  model_preds_temp <- dplyr::bind_rows(model_preds_temp, .id = "model")
-  model_errs_temp <- dplyr::bind_rows(model_errs_temp, .id = "model")
-  model_vimps_temp <- purrr::map_dfr(model_vimps_temp, 
-                                ~.x[["importance"]] %>% 
-                                  tibble::rownames_to_column("variable"),
-                                .id = "model")
-  model_preds_b[[b]] <- model_preds_temp
-  model_errs_b[[b]] <- model_errs_temp
-  model_vimps_b[[b]] <- model_vimps_temp
-}
+    return(model_results_b)
+  },
+  simplify = FALSE
+)
 
-model_errs_b <- bind_rows(model_errs_b, .id = "column_label")
-model_errs_b_tmp <- model_errs_b
-model_errs_b <- model_errs_b %>%
-                group_by(model) %>%
-                summarise(mean_accuracy = mean(Accuracy), sd_accuracy =  sd(Accuracy),
-                          mean_kappa = mean(Kappa), sd_kappa = sd(Kappa))
+bootstrap_model_errs <- purrr::map_dfr(bootstrap_model_results, "errors", 
+                                       .id = "bootstrap_id")
+bootstrap_model_preds <- purrr::map(bootstrap_model_results, "predictions",
+                                    .id = "bootstrap_id")
+bootstrap_model_imps <- purrr::map(bootstrap_model_results, "importance",
+                                   .id = "bootstrap_id")
 
-
+bootstrap_model_errs_summary <- bootstrap_model_errs %>%
+  dplyr::group_by(model) %>%
+  dplyr::summarise(dplyr::across(-bootstrap_id, list(mean = mean, sd = sd)))
 ```
 
-```{r results = "asis", echo = FALSE}
+```{r stability-check-table, results = "asis"}
 # table of accuracy metrics
-model_errs_b %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
-           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           bold_scheme = c(F,T,F,T,F),#c(F, rep(T, ncol(.) - 1)),
-           options = list(dom = 't'))
+bootstrap_model_errs_summary %>%
+  simChef::pretty_DT(
+    digits = 2, sigfig = F, rownames = FALSE, 
+    caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
+    bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+    bold_scheme = c(F, T, F, T, F),
+    options = list(dom = 't')
+  )
+```
 
+```{r stability-check-boxplot}
 # boxplots
-data_plot = data.frame(model_errs_b_tmp[1:2], stack(model_errs_b_tmp[3:ncol(model_errs_b_tmp)]))
-fnt = 12
-fnt2=12
-ggplot(data_plot, aes(x=model, y=values)) + 
-  theme_bw() + 
-  facet_wrap(. ~ ind, scales="free_y")+
-  geom_boxplot() + 
-  theme(axis.title.x = element_text(size=fnt,face="bold")) + 
-  #theme(axis.title.y = element_text(size=fnt,face="bold")) +
-  theme(axis.title.y = element_blank())+
-  theme(strip.text.x = element_text(size = fnt2,face="bold")) +
-  #ylab("True Positives") +
-  xlab("") + 
-  theme(legend.title = element_blank())+#element_text(size=fnt,face="bold")) +
-  theme(legend.text=element_text(size=fnt2,face="bold"))
-
+bootstrap_model_errs %>%
+  tidyr::pivot_longer(cols = -c(model, bootstrap_id), 
+                      names_to = "Metric", values_to = "Value") %>%
+  plotBoxplot(x_str = "Value", y_str = "model", horizontal = FALSE) +
+  ggplot2::facet_wrap(~ Metric) +
+  ggplot2::labs(x = "Method", 
+                title = "Validation Prediction Accuracies Over Bootstrapped Training Fits")
 ```
-
-#### tidymodels {.unnumbered}
-```{r tidymodels-fits-stability, eval = TRUE}
-
-nrep = 1 # increase for better stability measures when not testing code
-model_preds_b <- list()
-model_errs_b <- list()
-model_vimps_b <- list()
-for (b in 1:nrep){
-  # TODO: add code for tuning parameters
-  mod_recipe <- recipes::recipe(.y ~., data = splits)
-  
-  # for classification
-  rf_model <- parsnip::rand_forest() %>%
-    parsnip::set_args(mtry = tune::tune()) %>%
-    parsnip::set_engine("ranger", importance = "impurity") %>%
-    parsnip::set_mode("classification")
-  rf_grid <- tidyr::crossing(mtry = 1:4)
-  
-  svm_model <- parsnip::svm_rbf() %>%
-    parsnip::set_engine("kernlab") %>%
-    parsnip::set_mode("classification")
-  
-  knn_model <- parsnip::nearest_neighbor() %>%
-     parsnip::set_args(neighbors = tune(), weight_func = tune()) %>% 
-     parsnip::set_engine("kknn") %>% 
-     parsnip::set_mode("classification")
-  
-  # models <- workflowsets::workflow_set(
-  #   preproc = list(Base = mod_recipe),
-  #   models = list(RF = rf_model, SVM = svm_model, KNN = knn_model),
-  #   cross = TRUE
-  # ) %>%
-  #   workflowsets::option_add(grid = rf_grid, id = "Base_RF")
-  # model_fits <- workflowsets::workflow_map(
-  #   object = models,
-  #   fn = "tune_grid"
-  # )
-  
-  model_list <- list(RF = list(model = rf_model,
-                               grid = rf_grid), 
-                     SVM = list(model = svm_model,
-                                grid = NULL), 
-                     KNN = list(model = knn_model,
-                                grid = 4))
-  model_fits_temp <- list()
-  model_preds_temp <- list()
-  model_errs_temp <- list()
-  model_vimps_temp <- list()
-  for (model_name in names(model_list)) {
-    mod <- model_list[[model_name]]$model
-    grid <- model_list[[model_name]]$grid
-    if (!is.null(grid)) {
-      mod_fit <- workflows::workflow() %>%
-        workflows::add_recipe(mod_recipe) %>%
-        workflows::add_model(mod)
-      best_params <- mod_fit %>%
-        tune::tune_grid(resamples = rsample::vfold_cv(train_df), 
-                        grid = grid) %>%
-        tune::select_best(metric = "accuracy")
-      mod_fit <- mod_fit %>%
-        tune::finalize_workflow(best_params) %>%
-        tune::last_fit(splits)
-    } else {
-      mod_fit <- workflows::workflow() %>%
-        workflows::add_recipe(mod_recipe) %>%
-        workflows::add_model(mod) %>%
-        tune::last_fit(splits)
-    }
-    model_fits_temp[[model_name]] <- mod_fit
-    model_preds_temp[[model_name]] <- mod_fit %>%
-      tune::collect_predictions()
-    model_errs_temp[[model_name]] <- mod_fit %>%
-      tune::collect_metrics()
-    model_vimps_temp[[model_name]] <- tryCatch({
-      # model-specific variable importance
-      mod_fit %>%
-        workflows::extract_fit_parsnip() %>%
-        vip::vi()
-    }, error = function(e) {
-      # model-agnostic permutation variable importance
-      mod_fit %>%
-        workflows::extract_fit_parsnip() %>%
-        vip::vi(method = "permute", train = train_df, target = ".y",
-                feature_names = setdiff(colnames(train_df), ".y"), 
-                pred_wrapper = predict, metric = "accuracy")
-    })
-  }
-  model_preds_temp <- dplyr::bind_rows(model_preds_temp, .id = "model")
-  model_errs_temp <- dplyr::bind_rows(model_errs_temp, .id = "model")
-  model_vimps_temp <- dplyr::bind_rows(model_vimps_temp, .id = "model")
-
-  model_preds_b[[b]] <- model_preds_temp
-  model_errs_b[[b]] <- model_errs_temp
-  model_vimps_b[[b]] <- model_vimps_temp
-}
-
-model_errs_b <- bind_rows(model_errs_b, .id = "column_label")
-
-#FIX summary
-# model_errs_b <- model_errs_b %>%
-#                 group_by(model) %>%
-#                 summarise(mean_accuracy = mean(Accuracy), sd_accuracy =  sd(Accuracy),
-#                           mean_kappa = mean(Kappa), sd_kappa = sd(Kappa))
-
-```
-
-```{r results = "asis", echo = FALSE}
-# table of accuracy metrics
-model_errs_b %>%
-  dplyr::select(-.estimator, -.config) %>%
-  tidyr::pivot_wider(names_from = .metric, values_from = .estimate) %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
-           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           bold_scheme = c(F, rep(T, ncol(.) - 1)),
-           options = list(dom = 't'))
-
-```
-
-
-#### h20 {.unnumbered}
 
 
 ## Interpretability
 
 <input type="checkbox" unchecked> **For the models that pass the prediction and stability checks,**</input>
 
-  -   Extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
+-   Extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
 
 <textarea class="tinymce-text"></textarea><br>
 
@@ -848,29 +506,31 @@ model_errs_b %>%
 ### Without stability
 
 ```{r}
-prettyDT(model_vimps, digits = 2, sigfig = F, caption = "Variable Importances")
+simChef::pretty_DT(model_results$importance, digits = 2, sigfig = F, 
+                   caption = "Variable Importances")
 ```
 
 ```{r}
-# bar plot
-vip::vip(model_vimps,
-         num_features = 10,
-         geom = "col") +
-  prettyGGplotTheme()
+# TODO: bar plot that works for all modeling backends
+# plotFeatureImportance(model_results$importance)
+# vip::vip(model_results$importance,
+#          num_features = 10,
+#          geom = "col") +
+#   simChef::pretty_ggplot_theme()
 ```
 
 ```{r}
-# scatter plot
-plt <- model_vimps %>%
-  tidyr::pivot_wider(names_from = "model", values_from = "Importance") %>%
-  plotPairs(columns = which(!(colnames(.) %in% "Variable"))) +
-  ggplot2::theme_bw() 
-plotly::ggplotly(plt)
+# TODO: scatter plot that works for all modeling backends
+# plt <- model_results$importance %>%
+#   tidyr::pivot_wider(names_from = "model", values_from = "Importance") %>%
+#   plotPairs(columns = which(!(colnames(.) %in% "Variable"))) +
+#   ggplot2::theme_bw() 
+# plotly::ggplotly(plt)
 ```
 
 ### With stability
 
-TODO
+TODO: TT
 
 # Main Results
 
@@ -880,190 +540,59 @@ TODO
 
 <input type="checkbox" unchecked> **Evaluate pipeline on test data.**</input>
 
+```{r final-fits, eval = TRUE }
+Xtrain_final <- dplyr::bind_rows(Xtrain, Xvalid)
+ytrain_final <- c(ytrain, yvalid)
+if (params$modeling_pkg == "caret") {
+  final_model_results <- fitCaret(Xtrain = Xtrain_final, ytrain = ytrain_final, 
+                                  Xtest = Xtest, ytest = ytest, 
+                                  model_list = model_list, 
+                                  tr_control = tr_control, 
+                                  response_type = response_type)
+} else if (params$modeling_pkg == "tidymodels") {
+  final_model_results <- fitTidyModels(Xtrain = Xtrain_final, 
+                                       ytrain = ytrain_final, 
+                                       Xtest = Xtest, ytest = ytest,
+                                       model_list = model_list, kfolds = kfolds)
+} else if (params$modeling_pkg == "h2o") {
+  final_model_results <- fith2o(Xtrain = Xtrain_final, ytrain = ytrain_final,
+                                Xtest = Xtest, ytest = ytest,
+                                model_list = model_list)
+}
+
+```
+
 <input type="checkbox" unchecked> **Summarize test set prediction and/or interpretability results.**</input>
 
 <textarea class="tinymce-text"></textarea><br>
 
 <!-- TODO: Ana - add template tables with interpretation -->
-###  {.unnumbered .tabset .tabset-pills .tabset-fade}
 
-#### caret {.unnumbered}
-```{r caret-finalfits, eval = TRUE }
-# how to do cross validation
-trcontrol <- caret::trainControl(
-  method = "cv",
-  number = 5,
-  classProbs = if (is.factor(ytrain)) TRUE else FALSE,
-  summaryFunction = caret::defaultSummary,
-  allowParallel = FALSE,
-  verboseIter = FALSE
-)
-
-response <- "raw"
-model_list <- list(
-  ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain)), 
-                                                  ncol(Xtrain) / 3,
-                                                  length.out = 3),
-                                       splitrule = "gini",
-                                       min.node.size = 1),
-                importance = "impurity",
-                num.threads = 1),
-  xgbTree = list(tuneGrid = expand.grid(nrounds = c(10, 25, 50, 100, 150),
-                                        max_depth = c(3, 6),
-                                        colsample_bytree = 0.33,
-                                        eta = c(0.1, 0.3),
-                                        gamma = 0,
-                                        min_child_weight = 1,
-                                        subsample = 0.6),
-                 nthread = 1)
-)
-
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]
-  if (identical(mod, list())) {
-    mod <- NULL
-  }
-  mod_fit <- do.call(caret::train, args = c(list(x = as.data.frame(Xtrain),
-                                                 y = ytrain,
-                                                 trControl = trcontrol,
-                                                 method = model_name),
-                                            mod))
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xtest),
-                                       type = response)
-  model_errs[[model_name]] <- caret::postResample(
-    pred = model_preds[[model_name]], obs = ytest
-  )
-  model_vimps[[model_name]] <- caret::varImp(mod_fit)
-}
-model_preds <- dplyr::bind_rows(model_preds, .id = "model")
-model_errs <- dplyr::bind_rows(model_errs, .id = "model")
-model_vimps <- purrr::map_dfr(model_vimps, 
-                              ~.x[["importance"]] %>% 
-                                tibble::rownames_to_column("variable"),
-                              .id = "model")
-
-```
-
-```{r results = "asis", echo = FALSE}
+```{r test-accuracy-table, results = "asis"}
 # table of accuracy metrics
-model_errs %>%
-  prettyDT(digits = 2, sigfig = F, rownames = FALSE, 
+final_model_results$errors %>%
+  simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
            caption = "Test Prediction Accuracies", 
-           bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           bold_scheme = c(F, rep(T, ncol(.) - 1)),
+           # bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+           # bold_scheme = c(F, rep(T, ncol(.) - 1)),
            options = list(dom = 't'))
-
-```
-#### tidymodels {.unnumbered}
-```{r tidymodels-finalfits, eval = TRUE}
-# TODO: add code for tuning parameters
-mod_recipe <- recipes::recipe(.y ~., data = splits)
-
-# for classification
-rf_model <- parsnip::rand_forest() %>%
-  parsnip::set_args(mtry = tune::tune()) %>%
-  parsnip::set_engine("ranger", importance = "impurity") %>%
-  parsnip::set_mode("classification")
-rf_grid <- tidyr::crossing(mtry = 1:4)
-
-svm_model <- parsnip::svm_rbf() %>%
-  parsnip::set_engine("kernlab") %>%
-  parsnip::set_mode("classification")
-
-knn_model <- parsnip::nearest_neighbor() %>%
-   parsnip::set_args(neighbors = tune(), weight_func = tune()) %>% 
-   parsnip::set_engine("kknn") %>% 
-   parsnip::set_mode("classification")
-
-# models <- workflowsets::workflow_set(
-#   preproc = list(Base = mod_recipe),
-#   models = list(RF = rf_model, SVM = svm_model, KNN = knn_model),
-#   cross = TRUE
-# ) %>%
-#   workflowsets::option_add(grid = rf_grid, id = "Base_RF")
-# model_fits <- workflowsets::workflow_map(
-#   object = models,
-#   fn = "tune_grid"
-# )
-
-model_list <- list(RF = list(model = rf_model,
-                             grid = rf_grid), 
-                   SVM = list(model = svm_model,
-                              grid = NULL), 
-                   KNN = list(model = knn_model,
-                              grid = 4))
-model_fits <- list()
-model_preds <- list()
-model_errs <- list()
-model_vimps <- list()
-for (model_name in names(model_list)) {
-  mod <- model_list[[model_name]]$model
-  grid <- model_list[[model_name]]$grid
-  if (!is.null(grid)) {
-    mod_fit <- workflows::workflow() %>%
-      workflows::add_recipe(mod_recipe) %>%
-      workflows::add_model(mod)
-    best_params <- mod_fit %>%
-      tune::tune_grid(resamples = rsample::vfold_cv(train_df), 
-                      grid = grid) %>%
-      tune::select_best(metric = "accuracy")
-    mod_fit <- mod_fit %>%
-      tune::finalize_workflow(best_params) %>%
-      tune::last_fit(splits)
-  } else {
-    mod_fit <- workflows::workflow() %>%
-      workflows::add_recipe(mod_recipe) %>%
-      workflows::add_model(mod) %>%
-      tune::last_fit(splits)
-  }
-  model_fits[[model_name]] <- mod_fit
-  model_preds[[model_name]] <- mod_fit %>%
-    tune::collect_predictions()
-  model_errs[[model_name]] <- mod_fit %>%
-    tune::collect_metrics()
-  model_vimps[[model_name]] <- tryCatch({
-    # model-specific variable importance
-    mod_fit %>%
-      workflows::extract_fit_parsnip() %>%
-      vip::vi()
-  }, error = function(e) {
-    # model-agnostic permutation variable importance
-    mod_fit %>%
-      workflows::extract_fit_parsnip() %>%
-      vip::vi(method = "permute", train = train_df, target = ".y",
-              feature_names = setdiff(colnames(train_df), ".y"), 
-              pred_wrapper = predict, metric = "accuracy")
-  })
-}
-model_preds <- dplyr::bind_rows(model_preds, .id = "model")
-model_errs <- dplyr::bind_rows(model_errs, .id = "model")
-model_vimps <- dplyr::bind_rows(model_vimps, .id = "model")
 ```
 
-#### h20 {.unnumbered}
 
 # Post hoc analysis
 
 <input type="checkbox" unchecked> **Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.**</input>
 
-  -   Examine any points that had poor predictions.
-  -   Examine differences between prediction methods.
+-   Examine any points that had poor predictions.
+-   Examine differences between prediction methods.
 
 <textarea class="tinymce-text"></textarea><br>
 
 TODO: Tiffany - Add examples with interesting observations of prediction accuracy metrics so the user knows what to look for.
 
 ```{r}
-
-model_preds %>%
-  tidyr::pivot_wider(names_from = "model", values_from = ".pred_setosa", 
-                     id_cols = c("id", ".row")) %>%
-  plotPairs(columns = which(!(colnames(.) %in% c("id", ".row"))))
+plotPairs(model_results$predictions, 
+          columns = 1:ncol(model_results$predictions))
 
 ```
 

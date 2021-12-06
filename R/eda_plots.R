@@ -1,3 +1,86 @@
+plot_X_datasplit <- function(Xtrain, Xvalid, Xtest, 
+                             by_feature = if (ncol(Xtrain) < 10) TRUE else FALSE,
+                             type = "auto", ...) {
+  type <- match.arg(type, choices = c("density", "histogram", "boxplot", 
+                                      "auto"))
+  if (identical(type, "auto")) {
+    type <- "density"
+  }
+  
+  X <- dplyr::bind_rows(Xtrain, Xvalid, Xtest) %>%
+    dplyr::mutate(.split = c(rep("Training", nrow(Xtrain)),
+                             rep("Validation", nrow(Xvalid)),
+                             rep("Test", nrow(Xtest)))) %>%
+    tidyr::pivot_longer(-.split, names_to = "name", values_to = "value")
+  if (by_feature) {
+    title <- "Feature Distribution"
+  } else {
+    title <- "Overall X Distribution"
+  }
+  
+  # make plot
+  if (type == "histogram") {
+    plt <- plotHistogram(data = X, x_str = "value", fill_str = ".split", 
+                         position = "identity", ...) +
+      ggplot2::labs(x = "X", y = "Frequency", fill = "Split", title = title)
+  }
+  if (type == "density") {
+    plt <- plotDensity(data = X, x_str = "value", fill_str = ".split", ...) +
+      ggplot2::labs(x = "X", y = "Density", fill = "Split", title = title)
+  }
+  if (type == "boxplot") {
+    plt <- plotBoxplot(data = X, x_str = "value", fill_str = ".split", 
+                       horizontal = T, ...) +
+      ggplot2::labs(y = "X", y = "", fill = "Split", title = title)
+  }
+  if (by_feature) {
+    plt <- plt +
+      ggplot2::facet_wrap(~ name, scales = "free")
+  }
+  return(plt)
+}
+
+plot_y_datasplit <- function(ytrain, yvalid, ytest, type = "auto", ...) {
+  type <- match.arg(type, choices = c("density", "histogram", "boxplot", "bar", 
+                                      "auto"))
+  if (identical(type, "auto")) {
+    if (is.numeric(ytrain)) {
+      type <- "density"
+    } else {
+      type <- "bar"
+    }
+  }
+  
+  y <- data.frame(y = c(ytrain, yvalid, ytest)) %>%
+    dplyr::mutate(.split = c(rep("Training", length(ytrain)),
+                             rep("Validation", length(yvalid)),
+                             rep("Test", length(ytest))))
+  title <- "Overall Y Distribution"
+  
+  # make plot
+  if (type == "histogram") {
+    plt <- plotHistogram(data = y, x_str = "y", fill_str = ".split", 
+                         position = "identity", ...) +
+      ggplot2::labs(x = "y", y = "Frequency", fill = "Split", title = title)
+  }
+  if (type == "density") {
+    plt <- plotDensity(data = y, x_str = "y", fill_str = ".split", ...) +
+      ggplot2::labs(x = "y", y = "Density", fill = "Split", title = title)
+  }
+  if (type == "boxplot") {
+    plt <- plotBoxplot(data = y, x_str = "y", fill_str = ".split", ...) +
+      ggplot2::labs(y = "y", y = "", fill = "Split", title = title)
+  }
+  if (type == "bar") {
+    plt <- plotBarplot(data = y, x_str = "y", ...) +
+      ggplot2::facet_wrap(~ .split, scales = "free") +
+      ggplot2::labs(x = "y", y = "Frequency", title = title) +
+      simChef::pretty_ggplot_theme(x_text_angle = TRUE)
+  }
+  
+  return(plt)
+}
+
 plot_X_distribution <- function(X, type = c("density", "histogram", "boxplot"),
                                 ...) {
   type <- match.arg(type)#, several.ok = TRUE)
@@ -25,16 +108,16 @@ plot_y_distribution <- function(y, type = c("density", "histogram", "boxplot",
   y <- data.frame(y = y)
   # make plot
   if (type == "histogram") {
-    plt <- plotHistogram(data = y, x.str = "y", position = "identity", ...) +
+    plt <- plotHistogram(data = y, x_str = "y", position = "identity", ...) +
       ggplot2::labs(x = "y", y = "Frequency", title = "Overall y Distribution")
   } else if (type == "density") {
-    plt <- plotDensity(data = y, x.str = "y", ...) +
+    plt <- plotDensity(data = y, x_str = "y", ...) +
       ggplot2::labs(x = "y", y = "Density", title = "Overall y Distribution")
   } else if (type == "boxplot") {
-    plt <- plotBoxplot(data = y, x.str = "y", horizontal = T, ...) +
+    plt <- plotBoxplot(data = y, x_str = "y", horizontal = T, ...) +
       ggplot2::labs(y = "y", title = "Overall y Distribution")
   } else if (type == "bar") {
-    plt <- plotBarplot(data = y, x.str = "y", 
+    plt <- plotBarplot(data = y, x_str = "y", 
                        position = "fill", stat = "count", ...) +
       ggplot2::labs(x = "y", y = "Frequency", title = "Overall y Distribution")
   }
@@ -49,29 +132,29 @@ plot_y_distribution <- function(y, type = c("density", "histogram", "boxplot",
 #' @param data Data frame to use for plot.
 #' @param columns Vector of column indicies or names to plot.
 #' @param color (Optional) Data vector to use as colors for lower ggplot panels.
-#' @param color.upper (Optional) Data vector to use as colors for upper ggplot 
+#' @param color_upper (Optional) Data vector to use as colors for upper ggplot 
 #'   panels.
-#' @param color.label Character string. Label for color legend title (used in
+#' @param color_label Character string. Label for color legend title (used in
 #'   lower ggplot panels).
-#' @param color.upper.label Character string for color.upper legend title (used
+#' @param color_upper_label Character string for color_upper legend title (used
 #'   in upper ggplot panels).
-#' @param manual.color Vector of colors to set manual color scheme corresponding 
+#' @param manual_color Vector of colors to set manual color scheme corresponding 
 #'   to color argument (i.e., the color scheme in the lower panels).
-#' @param manual.color.upper Vector of colors to set manual color scheme 
-#'   corresponding to color.upper argument (i.e., the color scheme in the upper 
+#' @param manual_color_upper Vector of colors to set manual color scheme 
+#'   corresponding to color_upper argument (i.e., the color scheme in the upper 
 #'   panels).
-#' @param columnLabels Label names to be displayed on strips.
+#' @param column_labels Label names to be displayed on strips.
 #' @param size Point size for [ggplot2::geom_point()].
 #' @param alpha Alpha value for [ggplot2::geom_point()].
-#' @param cor.text.size Size of correlation text.
-#' @param show.upper Logical. Show we show subplots in upper panels?
+#' @param cor_text_size Size of correlation text.
+#' @param show_upper Logical. Show we show subplots in upper panels?
 #' @param subsample Proportion of points to subsample and plot.
 #' @param title Character string. Title of plot.
 #' @param drop Logical. Whether or not to drop factors with no observations.
 #' @param theme_function function which adds theme() to ggpairs() object. If 
-#'   \code{NULL}, add \code{prettyGGplotTheme()} to [GGally::ggpairs()] object.
-#' @param show.plot Logical. Should this plot be printed? Default \code{FALSE}.
-#' @param ... Other arguments to pass to \code{prettyGGplotTheme()} or 
+#'   \code{NULL}, add \code{simChef::pretty_ggplot_theme()} to [GGally::ggpairs()] object.
+#' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
+#' @param ... Other arguments to pass to \code{simChef::pretty_ggplot_theme()} or 
 #'   \code{theme_function()}
 #'   
 #' @return A [GGally::ggpairs] object.
@@ -79,13 +162,13 @@ plot_y_distribution <- function(y, type = c("density", "histogram", "boxplot",
 #' @examples
 #' plotPairs(data = iris, columns = 1:ncol(iris), color = iris$Species)
 #' 
-plotPairs <- function(data, columns, color = NULL, color.upper = NULL, 
-                      color.label = "", color.upper.label = "",
-                      manual.color = NULL, manual.color.upper = NULL,
-                      columnLabels = colnames(data[, columns]), title = "",
-                      size = .5, alpha = .5, cor.text.size = 3.5, subsample = 1,
-                      show.upper = T, drop = F, theme_function = NULL,
-                      show.plot = F, ...) {
+plotPairs <- function(data, columns, color = NULL, color_upper = NULL, 
+                      color_label = "", color_upper_label = "",
+                      manual_color = NULL, manual_color_upper = NULL,
+                      column_labels = colnames(data[, columns]), title = "",
+                      size = .5, alpha = .5, cor_text_size = 3.5, subsample = 1,
+                      show_upper = T, drop = F, theme_function = NULL,
+                      show_plot = F, ...) {
   
   # adding labels for colors
   plt_df <- as.data.frame(data)
@@ -93,9 +176,9 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
     plt_df <- plt_df %>%
       dplyr::mutate(color = color)
   }
-  if (!is.null(color.upper)) {
+  if (!is.null(color_upper)) {
     plt_df <- plt_df %>%
-      dplyr::mutate(color.upper = color.upper)
+      dplyr::mutate(color_upper = color_upper)
   }
   
   # subsample points
@@ -104,8 +187,8 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
   }
   
   # check if show correlations in upper panel
-  if (show.upper) {
-    plot_cor <- GGally::wrap("cor", size = cor.text.size)
+  if (show_upper) {
+    plot_cor <- GGally::wrap("cor", size = cor_text_size)
   } else {
     plot_cor <- "blank"
   }
@@ -119,7 +202,7 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
   plot_points <- GGally::wrap("points", size = size, alpha = alpha)
   plot_density <- GGally::wrap("densityDiag", alpha = .5)
   
-  if (is.null(color) & is.null(color.upper)) {  # no colors
+  if (is.null(color) & is.null(color_upper)) {  # no colors
     plt <- GGally::ggpairs(
       data = plt_df,
       columns = columns,
@@ -127,15 +210,15 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
       lower = list(continuous = plot_points),
       upper = list(continuous = plot_cor),
       title = title,
-      columnLabels = columnLabels
+      columnLabels = column_labels
     )
     if (is.null(theme_function)) {
-      plt <- plt + prettyGGplotTheme(...)
+      plt <- plt + simChef::pretty_ggplot_theme(...)
     } else {
       plt <- theme_function(plt, ...)
     }
     
-  } else if (is.null(color.upper)) {  # one color
+  } else if (is.null(color_upper)) {  # one color
     # grab subplot for legend
     if (length(columns) == 1) {
       if (is.factor(color)) {
@@ -148,15 +231,15 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
         ggplot2::ggplot() +
         ggplot2::aes(x = legend_x, y = legend_x, color = color) +
         ggplot2::geom_point() +
-        ggplot2::labs(color = color.label)
-      if (is.null(manual.color)) {
-        legend_plt <- legend_plt + prettyGGplotColor(color = color, drop = drop)
+        ggplot2::labs(color = color_label)
+      if (is.null(manual_color)) {
+        legend_plt <- legend_plt + simChef::pretty_ggplot_color(color = color, drop = drop)
       } else {
         legend_plt <- legend_plt +
-          ggplot2::scale_color_manual(values = manual.color, drop = drop)
+          ggplot2::scale_color_manual(values = manual_color, drop = drop)
       }
       if (is.null(theme_function)) {
-        legend_plt <- legend_plt + prettyGGplotTheme(...)
+        legend_plt <- legend_plt + simChef::pretty_ggplot_theme(...)
       } else {
         legend_plt <- theme_function(legend_plt, ...)
       }
@@ -166,7 +249,7 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
     if (is.factor(color)) {
       upper_ls <- list(continuous = plot_cor)
     } else {
-      if (show.upper) {
+      if (show_upper) {
         upper_ls <- list(continuous = plot_points)
       } else {
         upper_ls <- list(continuous = "blank")
@@ -181,27 +264,27 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
       upper = upper_ls,
       title = title,
       legend = legend,
-      columnLabels = columnLabels
+      columnLabels = column_labels
     ) 
     
     # change color palette for all panels
     for (i in 1:plt$nrow) {
       for (j in 1:plt$ncol) {
-        if (is.null(manual.color)) {
+        if (is.null(manual_color)) {
           plt[i, j] <- plt[i, j] +
-            prettyGGplotColor(color = color, drop = drop) +
-            prettyGGplotFill(fill = color, drop = drop)
+            simChef::pretty_ggplot_color(color = color, drop = drop) +
+            simChef::pretty_ggplot_fill(fill = color, drop = drop)
         } else {
           plt[i, j] <- plt[i, j] +
-            ggplot2::scale_color_manual(values = manual.color, drop = drop) +
-            ggplot2::scale_fill_manual(values = manual.color, drop = drop)
+            ggplot2::scale_color_manual(values = manual_color, drop = drop) +
+            ggplot2::scale_fill_manual(values = manual_color, drop = drop)
         }
       }
     }
     
-    plt <- plt + ggplot2::labs(color = color.label, fill = color.label)
+    plt <- plt + ggplot2::labs(color = color_label, fill = color_label)
     if (is.null(theme_function)) {
-      plt <- plt + prettyGGplotTheme(...)
+      plt <- plt + simChef::pretty_ggplot_theme(...)
     } else {
       plt <- theme_function(plt, ...)
     }
@@ -218,61 +301,61 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
       return(p)
     }
     
-    # make upper scatter plots and color by color.upper for the ggpairs plots
+    # make upper scatter plots and color by color_upper for the ggpairs plots
     upperContinuous <- function(data, mapping, ...) {
       x_str <- as.character(mapping$x[2])
       y_str <- as.character(mapping$y[2])
       p <- ggplot2::ggplot(data) +
         ggplot2::aes(x = .data[[x_str]], y = .data[[y_str]], 
-                     color = color.upper) +
+                     color = color_upper) +
         ggplot2::geom_point(size = size, alpha = alpha)
       return(p)
     }
     
-    # make upper boxplots and color by color.upper for the ggpairs plots
+    # make upper boxplots and color by color_upper for the ggpairs plots
     upperCombo <- function(data, mapping, ...) {
       x_str <- as.character(mapping$x[2])
       y_str <- as.character(mapping$y[2])
       if (is.factor(data[[x_str]])) {
         p <- ggplot2::ggplot(data) +
           ggplot2::aes(x = .data[[x_str]], y = .data[[y_str]], 
-                       fill = color.upper) +
+                       fill = color_upper) +
           ggplot2::geom_boxplot()
       } else {
         p <- ggplot2::ggplot(data) +
           ggplot2::aes(x = .data[[y_str]], y = .data[[x_str]], 
-                       fill = color.upper) +
+                       fill = color_upper) +
           ggplot2::geom_boxplot() +
           ggplot2::coord_flip()
       }
       return(p)
     }
     
-    # make upper bar plots and color by color.upper for the ggpairs plots
+    # make upper bar plots and color by color_upper for the ggpairs plots
     upperDiscrete <- function(data, mapping, ...) {
       x_str <- as.character(mapping$x[2])
       y_str <- as.character(mapping$y[2])
       p <- ggplot2::ggplot(data) +
-        ggplot2::aes(x = .data[[x_str]], fill = color.upper) +
+        ggplot2::aes(x = .data[[x_str]], fill = color_upper) +
         ggplot2::facet_grid(.data[[y]] ~ .) +
         ggplot2::geom_bar()
       return(p)
     }
     
     # number of color factors
-    nfactors <- is.factor(color) + is.factor(color.upper)
+    nfactors <- is.factor(color) + is.factor(color_upper)
     
     if (length(columns) == 1) {  # in this case, plot density
       if (nfactors == 0) {
         plt <- GGally::ggpairs(data = plt_df, columns = columns, 
                                title = title, legend = c(1, 1), 
-                               columnLabels = columnLabels) + 
-          ggplot2::labs(color = color.label, fill = color.label)
+                               columnLabels = column_labels) + 
+          ggplot2::labs(color = color_label, fill = color_label)
       } else {
         if (is.factor(color)) {
           plt_df$plt_color <- color
         } else {
-          plt_df$plt_color <- color.upper
+          plt_df$plt_color <- color_upper
         }
         plt <- GGally::ggpairs(
           data = plt_df,
@@ -281,52 +364,52 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
           diag = list(continuous = plot_density),
           title = title,
           legend = c(1, 1),
-          columnLabels = columnLabels
-        ) + ggplot2::labs(color = color.label, fill = color.label)
-        if (is.null(manual.color)) {
+          columnLabels = column_labels
+        ) + ggplot2::labs(color = color_label, fill = color_label)
+        if (is.null(manual_color)) {
           plt[1, 1] <- plt[1, 1] +
-            prettyGGplotColor(color = plt_df$plt_color, drop = drop) +
-            prettyGGplotFill(fill = plt_df$plt_color, drop = drop)
+            simChef::pretty_ggplot_color(color = plt_df$plt_color, drop = drop) +
+            simChef::pretty_ggplot_fill(fill = plt_df$plt_color, drop = drop)
         } else {
           plt[1, 1] <- plt[1, 1] +
-            ggplot2::scale_color_manual(values = manual.color, drop = drop) +
-            ggplot2::scale_fill_manual(values = manual.color, drop = drop)
+            ggplot2::scale_color_manual(values = manual_color, drop = drop) +
+            ggplot2::scale_fill_manual(values = manual_color, drop = drop)
         }
       }
       
     } else {
-      # grab color and color.upper legends
+      # grab color and color_upper legends
       legend_plt_df <- plt_df %>%
         dplyr::mutate(legend_x = data[, columns[1]],
                       legend_y = data[, columns[2]])
       legend_plt1 <- ggplot2::ggplot(legend_plt_df) +
         ggplot2::geom_point(ggplot2::aes(x = legend_x, y = legend_y,
                                          color = color)) +
-        ggplot2::labs(color = color.label, fill = color.label) +
+        ggplot2::labs(color = color_label, fill = color_label) +
         ggplot2::theme(legend.position = "bottom")
       legend_plt2 <- ggplot2::ggplot(legend_plt_df) +
         ggplot2::geom_point(ggplot2::aes(x = legend_x, y = legend_y,
-                                         color = color.upper)) +
-        ggplot2::labs(color = color.upper.label, fill = color.upper.label) +
+                                         color = color_upper)) +
+        ggplot2::labs(color = color_upper_label, fill = color_upper_label) +
         ggplot2::theme(legend.position = "bottom")
-      if (is.null(manual.color)) {
+      if (is.null(manual_color)) {
         legend_plt1 <- legend_plt1 +
-          prettyGGplotColor(color = color, drop = drop)
+          simChef::pretty_ggplot_color(color = color, drop = drop)
       } else {
         legend_plt1 <- legend_plt1 +
-          ggplot2::scale_color_manual(values = manual.color, drop = drop)
+          ggplot2::scale_color_manual(values = manual_color, drop = drop)
       }
-      if (is.null(manual.color.upper)) {
+      if (is.null(manual_color_upper)) {
         legend_plt2 <- legend_plt2 +
-          prettyGGplotColor(color = color.upper, option = "D",
+          simChef::pretty_ggplot_color(color = color_upper, option = "D",
                             viridis = T, drop = drop)
       } else {
         legend_plt2 <- legend_plt2 +
-          ggplot2::scale_color_manual(values = manual.color.upper, drop = drop)
+          ggplot2::scale_color_manual(values = manual_color_upper, drop = drop)
       }
       if (is.null(theme_function)) {
-        legend_plt1 <- legend_plt1 + prettyGGplotTheme(...)
-        legend_plt2 <- legend_plt2 + prettyGGplotTheme(...)
+        legend_plt1 <- legend_plt1 + simChef::pretty_ggplot_theme(...)
+        legend_plt2 <- legend_plt2 + simChef::pretty_ggplot_theme(...)
       } else {
         legend_plt1 <- theme_function(legend_plt1, ...)
         legend_plt2 <- theme_function(legend_plt2, ...)
@@ -344,7 +427,7 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
           lower = list(continuous = plot_points),
           upper = list(continuous = upperContinuous),
           title = title,
-          columnLabels = columnLabels
+          columnLabels = column_labels
         )
       } else if (nfactors == 2) {
         plt <- GGally::ggpairs(
@@ -357,13 +440,13 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
                        combo = upperCombo,
                        discrete = upperDiscrete),
           title = title,
-          columnLabels = columnLabels
+          columnLabels = column_labels
         )
       } else {
         if (is.factor(color)) {
           plt_df$plt_color <- color
         } else {
-          plt_df$plt_color <- color.upper
+          plt_df$plt_color <- color_upper
         }
         plt <- GGally::ggpairs(
           data = plt_df,
@@ -373,7 +456,7 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
           lower = list(continuous = lowerContinuous),
           upper = list(continuous = upperContinuous),
           title = title,
-          columnLabels = columnLabels
+          columnLabels = column_labels
         )
       }
       
@@ -386,22 +469,22 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
             if (plt_fill %in% names(plt_df)) {
               if (all(as.character(plt_df[, plt_fill]) == 
                       as.character(color))) {
-                if (is.null(manual.color)) {
+                if (is.null(manual_color)) {
                   plt[i, j] <- plt[i, j] +
-                    prettyGGplotFill(fill = color, drop = drop)
+                    simChef::pretty_ggplot_fill(fill = color, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
-                    ggplot2::scale_fill_manual(values = manual.color,
+                    ggplot2::scale_fill_manual(values = manual_color,
                                                drop = drop)
                 }
               } else {
-                if (is.null(manual.color.upper)) {
+                if (is.null(manual_color_upper)) {
                   plt[i, j] <- plt[i, j] +
-                    prettyGGplotFill(fill = color.upper, option = "D", 
+                    simChef::pretty_ggplot_fill(fill = color_upper, option = "D", 
                                      viridis = T, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
-                    ggplot2::scale_fill_manual(values = manual.color.upper, 
+                    ggplot2::scale_fill_manual(values = manual_color_upper, 
                                                drop = drop)
                 }
               }
@@ -418,22 +501,22 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
                              as.character(color))
               }
               if (ptr) {
-                if (is.null(manual.color)) {
+                if (is.null(manual_color)) {
                   plt[i, j] <- plt[i, j] +
-                    prettyGGplotColor(color = color, drop = drop)
+                    simChef::pretty_ggplot_color(color = color, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
-                    ggplot2::scale_color_manual(values = manual.color,
+                    ggplot2::scale_color_manual(values = manual_color,
                                                 drop = drop)
                 }
               } else {
-                if (is.null(manual.color.upper)) {
+                if (is.null(manual_color_upper)) {
                   plt[i, j] <- plt[i, j] +
-                    prettyGGplotColor(color = color.upper, option = "D", 
+                    simChef::pretty_ggplot_color(color = color_upper, option = "D", 
                                       viridis = T, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
-                    ggplot2::scale_color_manual(values = manual.color.upper,
+                    ggplot2::scale_color_manual(values = manual_color_upper,
                                                 drop = drop)
                 }
               }
@@ -446,7 +529,7 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
     if (length(columns) != 1) {
       if (is.null(theme_function)) {
         plt <- cowplot::plot_grid(
-          GGally::ggmatrix_gtable(plt + prettyGGplotTheme(...)),
+          GGally::ggmatrix_gtable(plt + simChef::pretty_ggplot_theme(...)),
           legend1, legend2, 
           nrow = 3, rel_heights = c(10, 1, 1)
         )
@@ -459,14 +542,14 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
       }
     } else {
       if (is.null(theme_function)) {
-        plt <- plt + prettyGGplotTheme(...)
+        plt <- plt + simChef::pretty_ggplot_theme(...)
       } else {
         plt <- theme_function(plt, ...)
       }
     }
   }
   
-  if (show.plot) {
+  if (show_plot) {
     print(plt)
   }
   return(plt)
@@ -478,36 +561,36 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
 #'   specified principal components.
 #'
 #' @param X Data matrix or data.frame on which to perform PCA. Must specify 
-#'   either \code{X} or \code{pca.out}.
-#' @param pca.out Output of previous run of plotPCA() to avoid re-computing SVDs 
+#'   either \code{X} or \code{pca_obj}.
+#' @param pca_obj Output of previous run of plotPCA() to avoid re-computing SVDs 
 #'   (i.e., the PC loadings and scores) again. Must specify either \code{X} or
-#'   \code{pca.out}. Ignored if \code{X} is provided.
+#'   \code{pca_obj}. Ignored if \code{X} is provided.
 #' @param npcs Number of top PCs to plot. Must specify either \code{npcs} or
 #'   \code{pcs}.
 #' @param pcs Vector of which PCs to show. Must specify either \code{npcs} or
 #'   \code{pcs}. Ignored if \code{npcs} is provided.
 #' @param color (Optional) Data vector to use as colors for lower ggplot panels.
-#' @param color.upper (Optional) Data vector to use as colors for upper ggplot 
+#' @param color_upper (Optional) Data vector to use as colors for upper ggplot 
 #'   panels.
-#' @param color.label Character string. Label for color legend title (used in
+#' @param color_label Character string. Label for color legend title (used in
 #'   lower ggplot panels).
-#' @param color.upper.label Character string for color.upper legend title (used
+#' @param color_upper_label Character string for color_upper legend title (used
 #'   in upper ggplot panels).
-#' @param manual.color Vector of colors to set manual color scheme corresponding 
+#' @param manual_color Vector of colors to set manual color scheme corresponding 
 #'   to color argument (i.e., the color scheme in the lower panels).
-#' @param manual.color.upper Vector of colors to set manual color scheme 
-#'   corresponding to color.upper argument (i.e., the color scheme in the upper 
+#' @param manual_color_upper Vector of colors to set manual color scheme 
+#'   corresponding to color_upper argument (i.e., the color scheme in the upper 
 #'   panels).
 #' @param size Point size for [ggplot2::geom_point()].
 #' @param alpha Alpha value for [ggplot2::geom_point()].
 #' @param subsample Proportion of points to subsample and plot.
-#' @param show.var Logical. Whether or not to show the proportion of variance
+#' @param show_var Logical. Whether or not to show the proportion of variance
 #'   explained in axes labels.
 #' @param center Logical. Whether or not to center data for PCA.
 #' @param scale Logical. Whether or not to scale data for PCA.
 #' @param title Character string. Title for ggplot.
-#' @param show.plot Logical. Should this plot be printed? Default \code{FALSE}.
-#' @param ... Other arguments to pass to \code{prettyGGplotTheme()}
+#' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
+#' @param ... Other arguments to pass to \code{simChef::pretty_ggplot_theme()}
 #'
 #' @returns A list of four:
 #' \describe{
@@ -522,16 +605,16 @@ plotPairs <- function(data, columns, color = NULL, color.upper = NULL,
 #' out$plot
 #' iris2 <- data.frame(iris, z = rep(letters[1:2], length.out = nrow(iris)))
 #' out <- plotPCA(X = iris2[, -c(5, 6)], npcs = 3,
-#'                color = iris2$Species, color.upper = iris2$z)
+#'                color = iris2$Species, color_upper = iris2$z)
 #' out$plot
 #' 
-plotPCA <- function(X, pca.out, npcs, pcs, 
-                    color = NULL, color.upper = NULL, 
-                    color.label = "", color.upper.label = "",
-                    manual.color = NULL, manual.color.upper = NULL,
+plotPCA <- function(X, pca_obj, npcs, pcs, 
+                    color = NULL, color_upper = NULL, 
+                    color_label = "", color_upper_label = "",
+                    manual_color = NULL, manual_color_upper = NULL,
                     size = .5, alpha = 1, subsample = 1,
-                    show.var = T, center = T, scale = F,
-                    title = "", show.plot = F, ...) {
+                    show_var = T, center = T, scale = F,
+                    title = "", show_plot = F, ...) {
   if (!missing(X)) {
     X <- scale(as.matrix(X), center = center, scale = scale)
     if (sum(is.na(X)) > 0) { # error checking
@@ -556,15 +639,15 @@ plotPCA <- function(X, pca.out, npcs, pcs,
     d <- X_svd$d
   } else {
     X_svd <- list(
-      u = pca.out$scores,
-      v = pca.out$loadings,
-      var_explained = pca.out$var.explained
+      u = pca_obj$scores,
+      v = pca_obj$loadings,
+      var_explained = pca_obj$var.explained
     )
-    d <- pca.out$d
+    d <- pca_obj$d
   }
   
   # compute and show proportion of variance
-  if (show.var) { 
+  if (show_var) { 
     if (!missing(X)) {
       total_var <- norm(X, "F")^2
       var_explained <- X_svd$d^2 / total_var
@@ -584,8 +667,8 @@ plotPCA <- function(X, pca.out, npcs, pcs,
   if (!is.null(color)) {
     plt_df <- plt_df %>% dplyr::mutate(color = color)
   }
-  if (!is.null(color.upper)) {
-    plt_df <- plt_df %>% dplyr::mutate(color.upper = color.upper)
+  if (!is.null(color_upper)) {
+    plt_df <- plt_df %>% dplyr::mutate(color_upper = color_upper)
   }
     
   # subsample points
@@ -601,13 +684,13 @@ plotPCA <- function(X, pca.out, npcs, pcs,
         labs(
           x = paste0("PC1", var_explained_str[1]),
           y = paste0("PC2", var_explained_str[2]),
-          color = color.label, title = title
+          color = color_label, title = title
         ) +
-        prettyGGplotTheme(...)
-      if (is.null(manual.color)) {
-        plt <- plt + prettyGGplotColor(color = plt_df$color)
+        simChef::pretty_ggplot_theme(...)
+      if (is.null(manual_color)) {
+        plt <- plt + simChef::pretty_ggplot_color(color = plt_df$color)
       } else {
-        plt <- plt + scale_color_manual(values = manual.color)
+        plt <- plt + scale_color_manual(values = manual_color)
       }
     } else {  # plot without color
       plt <- ggplot(plt_df) +
@@ -618,20 +701,20 @@ plotPCA <- function(X, pca.out, npcs, pcs,
           y = paste0("PC2", var_explained_str[2]),
           title = title
         ) +
-        prettyGGplotTheme(...)
+        simChef::pretty_ggplot_theme(...)
     }
   } else {
     plt <- plotPairs(data = plt_df, columns = pcs, title = title, 
-                     size = size, alpha = alpha, show.upper = F, drop = F, 
-                     color = color, color.upper = color.upper, 
-                     color.label = color.label, 
-                     color.upper.label = color.upper.label,
-                     manual.color = manual.color, 
-                     manual.color.upper = manual.color.upper,
-                     columnLabels = paste0("PC", pcs, var_explained_str[pcs]),
+                     size = size, alpha = alpha, show_upper = F, drop = F, 
+                     color = color, color_upper = color_upper, 
+                     color_label = color_label, 
+                     color_upper_label = color_upper_label,
+                     manual_color = manual_color, 
+                     manual_color_upper = manual_color_upper,
+                     column_labels = paste0("PC", pcs, var_explained_str[pcs]),
                      ...)
   }
-  if (show.plot) {
+  if (show_plot) {
     print(plt)
   }
 
@@ -644,23 +727,23 @@ plotPCA <- function(X, pca.out, npcs, pcs,
 #' @description Generates nice heatmaps of a data matrix.
 #' 
 #' @param X Data matrix or data frame to use for heatmap.
-#' @param y.labels y-axis labels in heatmap.
-#' @param x.labels x-axis labels in heatmap.
-#' @param y.labels.num Logical; whether or not y labels are numeric/continuous.
-#' @param x.labels.num Logical; whether or not x labels are numeric/continuous.
-#' @param y.label.colors (Optional) Data vector to use for coloring y-axis text.
-#' @param x.label.colors (Optional) Data vector to use for coloring x-axis text.
-#' @param y.groups Data vector of group ids to use for grouping rows in heatmap.
-#' @param x.groups Data vector of group ids to use for grouping columns in 
+#' @param y_labels y-axis labels in heatmap.
+#' @param x_labels x-axis labels in heatmap.
+#' @param y_labels_num Logical; whether or not y labels are numeric/continuous.
+#' @param x_labels_num Logical; whether or not x labels are numeric/continuous.
+#' @param y_label_colors (Optional) Data vector to use for coloring y-axis text.
+#' @param x_label_colors (Optional) Data vector to use for coloring x-axis text.
+#' @param y_groups Data vector of group ids to use for grouping rows in heatmap.
+#' @param x_groups Data vector of group ids to use for grouping columns in 
 #'   heatmap.
 #' @param center Logical; whether or not to center columns of \code{X}.
 #' @param scale Logical; whether or not to scale columns of \code{X}.
-#' @param z.range Vector of length 2 with the min and max of the fill color 
+#' @param z_range Vector of length 2 with the min and max of the fill color 
 #'   range for heatmap. Used to set bounds for fill legend.
-#' @param text.size Numeric; size of text on heatmap. If \code{text.size} = 0 
+#' @param text_size Numeric; size of text on heatmap. If \code{text_size} = 0 
 #'   (default), no text is shown.
 #' @param theme One of "default" or "blank", which specifies ggplot theme.
-#' @param y.orient One of "identity" or "ordered". If "identity", plots heatmap
+#' @param y_orient One of "identity" or "ordered". If "identity", plots heatmap
 #'   of \code{X} as if it is an image. If "ordered", plots first row of \code{X}
 #'   at the bottom of the heatmap and the last row of \code{X} on top.
 #' @param size Size argument in [ggplot2::geom_tile()] to avoid white lines in
@@ -671,38 +754,38 @@ plotPCA <- function(X, pca.out, npcs, pcs,
 #'   fill color scale. Deafult is \code{FALSE}.
 #' @param n_quantiles Number of quantiles for color scheme. Used only if
 #'   \code{col_quantile = TRUE}.
-#' @param manual.fill (Optional) Either "temperature" or a data vector of colors 
+#' @param maual_color (Optional) Either "temperature" or a data vector of colors 
 #'   for the fill color scale.
-#' @param show.plot Logical. Should this plot be printed? Default \code{FALSE}.
-#' @param ... Other arguments to pass to \code{prettyGGplotTheme()}.
+#' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
+#' @param ... Other arguments to pass to \code{simChef::pretty_ggplot_theme()}.
 #' 
 #' @return A ggplot object.
 #' 
 #' @examples 
 #' df <- as.data.frame(matrix(1:100, nrow = 10, byrow = 10)) 
-#' plotHeatmap(df,  y.orient = "identity")
-#' plotHeatmap(df,  y.orient = "ordered")
+#' plotHeatmap(df,  y_orient = "identity")
+#' plotHeatmap(df,  y_orient = "ordered")
 #' 
-plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
-                        y.labels.num = FALSE, x.labels.num = FALSE,
-                        y.label.colors = NULL, x.label.colors = NULL,
-                        y.groups = NULL, x.groups = NULL,
-                        center = FALSE, scale = FALSE, z.range = NULL,
-                        text.size = 0, theme = "default", y.orient = "identity",
+plotHeatmap <- function(X, y_labels = rownames(X), x_labels = colnames(X),
+                        y_labels_num = FALSE, x_labels_num = FALSE,
+                        y_label_colors = NULL, x_label_colors = NULL,
+                        y_groups = NULL, x_groups = NULL,
+                        center = FALSE, scale = FALSE, z_range = NULL,
+                        text_size = 0, theme = "default", y_orient = "identity",
                         size = 0, viridis = T, option = "C", 
                         col_quantile = F, n_quantiles = 5,
-                        manual.fill = NULL, show.plot = F, ...) {
+                        maual_color = NULL, show_plot = F, ...) {
   if (!all(sapply(X, is.numeric))) {
     stop("X must contain only numeric data. Please remove non-numeric columns.")
   }
   
-  y.labels <- y.labels
-  x.labels <- x.labels
-  y.label.colors <- y.label.colors
-  x.label.colors <- x.label.colors
+  y_labels <- y_labels
+  x_labels <- x_labels
+  y_label_colors <- y_label_colors
+  x_label_colors <- x_label_colors
 
-  if (any(duplicated(y.labels)) | any(duplicated(x.labels))) {
-    stop("x.labels and y.labels cannot contain duplicates.")
+  if (any(duplicated(y_labels)) | any(duplicated(x_labels))) {
+    stop("x_labels and y_labels cannot contain duplicates.")
   }
   
   # center/scale X if specified
@@ -711,48 +794,48 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
   }
   
   # get range
-  if (is.null(z.range)) {
+  if (is.null(z_range)) {
     z.min <- min(X, na.rm = T)
     z.max <- max(X, na.rm = T)
   } else {
-    z.min <- z.range[1]
-    z.max <- z.range[2]
+    z.min <- z_range[1]
+    z.max <- z_range[2]
   }
   
   # convert to long df to plot
   X_long <- as.data.frame(X) %>%
-    setNames(x.labels)
-  if (y.labels.num) {
+    setNames(x_labels)
+  if (y_labels_num) {
     X_long <- X_long %>%
-      dplyr::mutate(y = as.numeric(y.labels)) %>%
+      dplyr::mutate(y = as.numeric(y_labels)) %>%
       tidyr::gather(key = "x", value = "fill", -y) 
   } else {
     X_long <- X_long %>%
-      dplyr::mutate(y = forcats::fct_rev(forcats::fct_inorder(y.labels))) %>%
+      dplyr::mutate(y = forcats::fct_rev(forcats::fct_inorder(y_labels))) %>%
       tidyr::gather(key = "x", value = "fill", -y) 
   }
-  if (x.labels.num) {
+  if (x_labels_num) {
     X_long <- X_long %>% dplyr::mutate(x = as.numeric(x))
   } else {
-    X_long <- X_long %>% dplyr::mutate(x = factor(x, levels = x.labels))
+    X_long <- X_long %>% dplyr::mutate(x = factor(x, levels = x_labels))
   }
   
   # add group labels to data frame
-  if (!is.null(x.groups)) {
+  if (!is.null(x_groups)) {
     X_long$x.group <- X_long %>%
-      dplyr::left_join(y = data.frame(x = x.labels, x.group = x.groups), 
+      dplyr::left_join(y = data.frame(x = x_labels, x.group = x_groups), 
                        by = "x") %>%
       dplyr::pull(x.group)
   }
-  if (!is.null(y.groups)) {
+  if (!is.null(y_groups)) {
     X_long$y.group <- X_long %>%
-      dplyr::left_join(y = data.frame(y = y.labels, y.group = y.groups),
+      dplyr::left_join(y = data.frame(y = y_labels, y.group = y_groups),
                        by = "y") %>%
       dplyr::pull(y.group)
   }
   
   # base plot
-  if (x.labels.num | y.labels.num) {
+  if (x_labels_num | y_labels_num) {
     plt <- ggplot2::ggplot(X_long) +
       ggplot2::geom_tile(ggplot2::aes(x = x, y = y, fill = fill, color = fill), 
                          size = size) +
@@ -763,27 +846,27 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
   }
   
   # add group labels to plot
-  if (!is.null(x.groups) & !is.null(y.groups)) {
+  if (!is.null(x_groups) & !is.null(y_groups)) {
     plt <- plt +
       ggplot2::facet_grid(y.group ~ x.group, space = "free", scales = "free")
-  } else if (!is.null(x.groups)) {
+  } else if (!is.null(x_groups)) {
     plt <- plt +
       ggplot2::facet_grid(~ x.group, space = "free", scales = "free")
-  } else if (!is.null(y.groups)) {
+  } else if (!is.null(y_groups)) {
     plt <- plt +
       ggplot2::facet_grid(y.group ~., space = "free", scales = "free")
   }
   
   # add text if specified
-  if (text.size > 0) {
+  if (text_size > 0) {
     plt <- plt +
       ggplot2::geom_text(ggplot2::aes(x = x, y = y, label = fill), 
-                         color = "black", size = text.size)
+                         color = "black", size = text_size)
   }
   
   # add theme
   if (identical(theme, "default")) {
-    plt <- plt + prettyGGplotTheme(...)
+    plt <- plt + simChef::pretty_ggplot_theme(...)
   } else if (identical(theme, "blank")) {
     plt <- plt + ggplot2::theme_void()
   } else {
@@ -796,12 +879,12 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
   
   # add color
   if (!col_quantile | is.factor(X_long$fill)) {
-    if (is.null(manual.fill)) {
+    if (is.null(maual_color)) {
       plt <- plt +
-        prettyGGplotFill(fill = fill, viridis = viridis, option = option) +
-        prettyGGplotColor(color = fill, viridis = viridis, option = option)
+        simChef::pretty_ggplot_fill(fill = fill, viridis = viridis, option = option) +
+        simChef::pretty_ggplot_color(color = fill, viridis = viridis, option = option)
     } else {
-      if (manual.fill == "temperature") {
+      if (maual_color == "temperature") {
         plt <- plt + 
           ggplot2::scale_fill_gradient2(
             low = "blue", high = "red", mid = "white", 
@@ -812,7 +895,7 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
             midpoint = (z.min + z.max) / 2,
             limit = c(z.min, z.max)
           )
-      } else if (manual.fill == "cor_temperature") {
+      } else if (maual_color == "cor_temperature") {
         plt <- plt + 
           ggplot2::scale_fill_gradient2(
             low = "blue", high = "red", mid = "white", 
@@ -824,16 +907,16 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
           )
       } else {
         plt <- plt +
-          ggplot2::scale_fill_manual(values = manual.fill) +
-          ggplot2::scale_color_manual(values = manual.fill)
+          ggplot2::scale_fill_manual(values = maual_color) +
+          ggplot2::scale_color_manual(values = maual_color)
       }
     }
   } else {
-    if (!is.null(manual.fill)) {
-      if (manual.fill == "temperature") {
+    if (!is.null(maual_color)) {
+      if (maual_color == "temperature") {
         heat_pal <- c("blue", "white", "red")
       } else {
-        heat_pal <- manual.fill
+        heat_pal <- maual_color
       }
     } else {
       heat_pal <- viridis::viridis(n = n_quantiles, option = option)
@@ -850,15 +933,15 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
   }
   
   # y axis orientation
-  if (!x.labels.num) {
+  if (!x_labels_num) {
     plt <- plt + ggplot2::scale_x_discrete(expand = c(0, 0))
   } else {
     plt <- plt + ggplot2::scale_x_continuous(expand = c(0, 0))
   }
-  if (!y.labels.num) {
-    if (identical(y.orient, "identity")) {
+  if (!y_labels_num) {
+    if (identical(y_orient, "identity")) {
       plt <- plt + ggplot2::scale_y_discrete(expand = c(0, 0))
-    } else if (identical(y.orient, "ordered")) {
+    } else if (identical(y_orient, "ordered")) {
       plt <- plt + ggplot2::scale_y_discrete(expand = c(0, 0), limits = rev)
     }
   } else {
@@ -867,12 +950,12 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
   
   # add color to x and y axis text
   plt <- plt %>%
-    add_axis_text_colors(labels = y.labels, label.colors = y.label.colors,
+    add_axis_text_colors(labels = y_labels, label_colors = y_label_colors,
                          axis = "y") %>%
-    add_axis_text_colors(labels = x.labels, label.colors = x.label.colors,
+    add_axis_text_colors(labels = x_labels, label_colors = x_label_colors,
                          axis = "x")
   
-  if (show.plot) {
+  if (show_plot) {
     print(plt)
   }
   return(plt)
@@ -883,30 +966,30 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
 #' @description Generates nice clustered heatmaps of a data matrix.
 #
 #' @param X Data matrix or data frame to use for heatmap.
-#' @param y.labels y-axis labels in heatmap.
-#' @param x.labels x-axis labels in heatmap.
-#' @param y.labels.num Logical; whether or not y labels are numeric/continuous.
-#' @param x.labels.num Logical; whether or not x labels are numeric/continuous.
-#' @param y.label.colors (Optional) Data vector to use for coloring y-axis text.
-#' @param x.label.colors (Optional) Data vector to use for coloring x-axis text.
-#' @param y.groups Data vector of group ids to use for grouping rows in heatmap.
-#' @param x.groups Data vector of group ids to use for grouping columns in 
+#' @param y_labels y-axis labels in heatmap.
+#' @param x_labels x-axis labels in heatmap.
+#' @param y_labels_num Logical; whether or not y labels are numeric/continuous.
+#' @param x_labels_num Logical; whether or not x labels are numeric/continuous.
+#' @param y_label_colors (Optional) Data vector to use for coloring y-axis text.
+#' @param x_label_colors (Optional) Data vector to use for coloring x-axis text.
+#' @param y_groups Data vector of group ids to use for grouping rows in heatmap.
+#' @param x_groups Data vector of group ids to use for grouping columns in 
 #'   heatmap.
-#' @param clust.x Logical; whether or not to cluster columns.
-#' @param clust.y Logical; whether or not to cluster rows.
-#' @param clust.x.wi.group Logical; whether or not cluster within x.groups.
-#' @param clust.y.wi.group Logical; whether or not cluster within y.groups.
-#' @param dist.metric.x Distance metric for clustering columns (see 
+#' @param clust_x Logical; whether or not to cluster columns.
+#' @param clust_y Logical; whether or not to cluster rows.
+#' @param clust_x_wi_group Logical; whether or not cluster within x_groups.
+#' @param clust_y_wi_group Logical; whether or not cluster within y_groups.
+#' @param dist_metric_x Distance metric for clustering columns (see 
 #'   [stats::dist()]).
-#' @param dist.metric.y Distance metric for clustering rows (see 
+#' @param dist_metric_y Distance metric for clustering rows (see 
 #'   [stats::dist()]).
-#' @param dist.mat.x Distance matrix for clustering columns (optional). Must 
-#'   provide either \code{dist.metric} or \code{dist.mat} if \code{clust.x = T}.
-#' @param dist.mat.x Distance matrix for clustering rows (optional). Must 
-#'   provide either \code{dist.metric} or \code{dist.mat} if \code{clust.y = T}.
-#' @param linkage.x Type of linkage for clustering columns (see 
+#' @param dist_mat_x Distance matrix for clustering columns (optional). Must 
+#'   provide either \code{dist_metric} or \code{dist_mat} if \code{clust_x = T}.
+#' @param dist_mat_x Distance matrix for clustering rows (optional). Must 
+#'   provide either \code{dist_metric} or \code{dist_mat} if \code{clust_y = T}.
+#' @param linkage_x Type of linkage for clustering columns (see 
 #'   [stats::hclust()]).
-#' @param linkage.y Type of linkage for clustering rows (see [stats::hclust()]).
+#' @param linkage_y Type of linkage for clustering rows (see [stats::hclust()]).
 #' @inheritParams plotHeatmap
 #' 
 #' @return A ggplot object.
@@ -915,59 +998,59 @@ plotHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
 #' df <- as.data.frame(matrix(1:100, nrow = 10, byrow = 10))
 #' plotHclustHeatmap(df)
 #' 
-plotHclustHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
-                              y.labels.num = FALSE, x.labels.num = FALSE,
-                              y.label.colors = NULL, x.label.colors = NULL,
-                              y.groups = NULL, x.groups = NULL,
-                              clust.x = TRUE, clust.y = TRUE,
-                              clust.x.wi.group = TRUE, clust.y.wi.group = TRUE,
-                              dist.metric.x = "euclidean",
-                              dist.metric.y = "euclidean",
-                              dist.mat.x = NULL, dist.mat.y = NULL,
-                              linkage.x = "ward.D", linkage.y = "ward.D",
-                              center = FALSE, scale = FALSE, z.range = NULL,
-                              text.size = 0, theme = "default", size = 0,
+plotHclustHeatmap <- function(X, y_labels = rownames(X), x_labels = colnames(X),
+                              y_labels_num = FALSE, x_labels_num = FALSE,
+                              y_label_colors = NULL, x_label_colors = NULL,
+                              y_groups = NULL, x_groups = NULL,
+                              clust_x = TRUE, clust_y = TRUE,
+                              clust_x_wi_group = TRUE, clust_y_wi_group = TRUE,
+                              dist_metric_x = "euclidean",
+                              dist_metric_y = "euclidean",
+                              dist_mat_x = NULL, dist_mat_y = NULL,
+                              linkage_x = "ward.D", linkage_y = "ward.D",
+                              center = FALSE, scale = FALSE, z_range = NULL,
+                              text_size = 0, theme = "default", size = 0,
                               viridis = T, option = "C", 
                               col_quantile = F, n_quantiles = 5,
-                              manual.fill = NULL, show.plot = F, ...) {
+                              maual_color = NULL, show_plot = F, ...) {
   
   if (!all(sapply(X, is.numeric))) {
     stop("X must contain only numeric data. Please remove non-numeric columns.")
   }
-  if (any(is.na(X)) & (clust.x | clust.y)) {
+  if (any(is.na(X)) & (clust_x | clust_y)) {
     stop("NAs found in data. Please remove NAs.")
   }
   
-  y.labels <- y.labels
-  x.labels <- x.labels
-  y.label.colors <- y.label.colors
-  x.label.colors <- x.label.colors
+  y_labels <- y_labels
+  x_labels <- x_labels
+  y_label_colors <- y_label_colors
+  x_label_colors <- x_label_colors
   
   if (center | scale) {
     X <- scale(X, center = center, scale = scale)
   }
   
   # helper function to do the clustering and returns index order
-  get_clust_order <- function(dist.mat, dist.metric, linkage, groups,
-                              clust.wi.group, axis = c("x", "y")) {
+  get_clust_order <- function(dist_mat, dist_metric, linkage, groups,
+                              clust_wi.group, axis = c("x", "y")) {
     axis <- match.arg(axis)
-    if (is.null(dist.mat)) {
+    if (is.null(dist_mat)) {
       if (identical(axis, "x")) {
-        Dmat <- dist(t(X), method = dist.metric)
+        Dmat <- dist(t(X), method = dist_metric)
       } else if (identical(axis, "y")) {
-        Dmat <- dist(X, method = dist.metric)
+        Dmat <- dist(X, method = dist_metric)
       }
     } else {
-      if (!("dist" %in% class(dist.mat))) {
-        Dmat <- as.dist(dist.mat)
+      if (!("dist" %in% class(dist_mat))) {
+        Dmat <- as.dist(dist_mat)
       } else {
-        Dmat <- dist.mat
+        Dmat <- dist_mat
       }
     }
     if (is.null(groups)) {
       hclust_out <- hclust(Dmat, method = linkage)
       order_idx <- hclust_out$order
-    } else if (!clust.wi.group) {
+    } else if (!clust_wi.group) {
       hclust_out <- hclust(Dmat, method = linkage)
       order_idx <- hclust_out$order
     } else {
@@ -988,33 +1071,33 @@ plotHclustHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
     return(order_idx)
   }
   
-  if (clust.x) {
-    order_idx <- get_clust_order(dist.mat.x, dist.metric.x, linkage.x, 
-                                 x.groups, clust.x.wi.group, axis = "x")
+  if (clust_x) {
+    order_idx <- get_clust_order(dist_mat_x, dist_metric_x, linkage_x, 
+                                 x_groups, clust_x_wi_group, axis = "x")
     X <- X[, order_idx]
-    x.groups <- x.groups[order_idx]
-    x.labels <- x.labels[order_idx]
-    x.label.colors <- x.label.colors[order_idx]
+    x_groups <- x_groups[order_idx]
+    x_labels <- x_labels[order_idx]
+    x_label_colors <- x_label_colors[order_idx]
   }
-  if (clust.y) {
-    order_idx <- get_clust_order(dist.mat.y, dist.metric.y, linkage.y, 
-                                 y.groups, clust.y.wi.group, axis = "y")
+  if (clust_y) {
+    order_idx <- get_clust_order(dist_mat_y, dist_metric_y, linkage_y, 
+                                 y_groups, clust_y_wi_group, axis = "y")
     X <- X[order_idx, ]
-    y.groups <- y.groups[order_idx]
-    y.labels <- y.labels[order_idx]
-    y.label.colors <- y.label.colors[order_idx]
+    y_groups <- y_groups[order_idx]
+    y_labels <- y_labels[order_idx]
+    y_label_colors <- y_label_colors[order_idx]
   }
   
-  plt <- plotHeatmap(X = X, y.labels = y.labels, x.labels = x.labels, 
-                     y.labels.num = y.labels.num, x.labels.num = x.labels.num,
-                     y.label.colors = y.label.colors, 
-                     x.label.colors = x.label.colors,
-                     y.groups = y.groups, x.groups = x.groups,
-                     z.range = z.range, text.size = text.size, theme = theme, 
-                     y.orient = "identity", size = size,
+  plt <- plotHeatmap(X = X, y_labels = y_labels, x_labels = x_labels, 
+                     y_labels_num = y_labels_num, x_labels_num = x_labels_num,
+                     y_label_colors = y_label_colors, 
+                     x_label_colors = x_label_colors,
+                     y_groups = y_groups, x_groups = x_groups,
+                     z_range = z_range, text_size = text_size, theme = theme, 
+                     y_orient = "identity", size = size,
                      viridis = viridis, option = option, 
                      col_quantile = col_quantile, n_quantiles = n_quantiles, 
-                     manual.fill = manual.fill, show.plot = show.plot, ...)
+                     maual_color = maual_color, show_plot = show_plot, ...)
   return(plt)
 }
 
@@ -1023,10 +1106,10 @@ plotHclustHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
 #' @description Generates nice correlation heatmaps of a data matrix.
 #
 #' @param X Data matrix or data frame to use for heatmap.
-#' @param cor.type Type of correlation. Must be one of "pearson", "kendall", 
+#' @param cor_type Type of correlation. Must be one of "pearson", "kendall", 
 #'   or "spearman"
-#' @param axis.labels Axis labels for correlation heatmap.
-#' @param axis.label.colors (Optional) Data vector to use for coloring axis
+#' @param axis_labels Axis labels for correlation heatmap.
+#' @param axis_label_colors (Optional) Data vector to use for coloring axis
 #'   text labels.
 #' @param clust Logical; whether or not to cluster columns and rows.
 #' @param linkage Type of linkage for clustering columns (see 
@@ -1039,43 +1122,43 @@ plotHclustHeatmap <- function(X, y.labels = rownames(X), x.labels = colnames(X),
 #' df <- as.data.frame(matrix(1:100, nrow = 10, byrow = 10))
 #' plotCorHeatmap(df)
 #' 
-plotCorHeatmap <- function(X, cor.type = "pearson",
-                           axis.labels = colnames(X), axis.label.colors = NULL,
-                           clust = TRUE, linkage = "ward.D", z.range = c(-1, 1),
-                           text.size = 0, theme = "default",
+plotCorHeatmap <- function(X, cor_type = "pearson",
+                           axis_labels = colnames(X), axis_label_colors = NULL,
+                           clust = TRUE, linkage = "ward.D", z_range = c(-1, 1),
+                           text_size = 0, theme = "default",
                            viridis = T, option = "C", 
                            col_quantile = F, n_quantiles = 5,
-                           manual.fill = "cor_temperature", show.plot = F, 
+                           maual_color = "cor_temperature", show_plot = F, 
                            ...) {
   
   if (!all(sapply(X, is.numeric))) {
     stop("X must contain only numeric data. Please remove non-numeric columns.")
   }
   
-  axis.labels <- axis.labels
-  axis.label.colors <- axis.label.colors
+  axis_labels <- axis_labels
+  axis_label_colors <- axis_label_colors
 
-  cor_mat <- cor(X, method = cor.type, use = "pairwise.complete.obs")
+  cor_mat <- cor(X, method = cor_type, use = "pairwise.complete.obs")
   cor_dist <- as.dist(1 - abs(cor_mat))
   
   # cluster
   if (clust) {
     hclust_out <- hclust(cor_dist, method = linkage)
     cor_mat <- cor_mat[hclust_out$order, hclust_out$order]
-    axis.labels <- axis.labels[hclust_out$order]
-    axis.label.colors <- axis.label.colors[hclust_out$order]
+    axis_labels <- axis_labels[hclust_out$order]
+    axis_label_colors <- axis_label_colors[hclust_out$order]
   }
   
   cor_mat <- round(cor_mat, 2)
   
   plt <- plotHeatmap(X = cor_mat, 
-                     y.labels = axis.labels, x.labels = axis.labels, 
-                     y.label.colors = axis.label.colors, 
-                     x.label.colors = axis.label.colors,
-                     z.range = z.range, text.size = text.size, theme = theme, 
-                     y.orient = "identity", viridis = viridis, option = option, 
+                     y_labels = axis_labels, x_labels = axis_labels, 
+                     y_label_colors = axis_label_colors, 
+                     x_label_colors = axis_label_colors,
+                     z_range = z_range, text_size = text_size, theme = theme, 
+                     y_orient = "identity", viridis = viridis, option = option, 
                      col_quantile = col_quantile, n_quantiles = n_quantiles, 
-                     manual.fill = manual.fill, show.plot = show.plot, ...)
+                     maual_color = maual_color, show_plot = show_plot, ...)
   return(plt)
 }
 
@@ -1087,20 +1170,20 @@ plotCorHeatmap <- function(X, cor.type = "pearson",
 #'
 #' @param data Data matrix or data.frame on which to perform hierarchical
 #'   clustering.
-#' @param leaf.labels (Optional) Text labels for leaf nodes (e.g., 
+#' @param leaf_labels (Optional) Text labels for leaf nodes (e.g., 
 #'   class/outcome labels).
-#' @param leaf.colors (Optional) Data vector to use for coloring leaf nodes.
-#' @param dist.metric Distance metric for clustering (see [stats::dist()]).
-#' @param dist.mat (Optional) Distance matrix for clustering. Must provide 
-#'   either \code{dist.metric} or \code{dist.mat}.
+#' @param leaf_colors (Optional) Data vector to use for coloring leaf nodes.
+#' @param dist_metric Distance metric for clustering (see [stats::dist()]).
+#' @param dist_mat (Optional) Distance matrix for clustering. Must provide 
+#'   either \code{dist_metric} or \code{dist_mat}.
 #' @param linkage Rype of linkage for hierarchical clustering (see 
 #'   [stats::hclust()]).
-#' @param text.size Numeric; size of text for leaf node labels. 
-#' @param manual.color Vector of colors to set manual color scheme corresponding
-#'   to the \code{leaf.labels}. This sets the color scheme of the leaf text 
+#' @param text_size Numeric; size of text for leaf node labels. 
+#' @param manual_color Vector of colors to set manual color scheme corresponding
+#'   to the \code{leaf_labels}. This sets the color scheme of the leaf text 
 #'   labels.
 #' @param title Character string. Title of plot.
-#' @param show.plot Logical. Should this plot be printed? Default \code{FALSE}.
+#' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' 
 #' @returns A list of three:
 #' \describe{
@@ -1111,15 +1194,15 @@ plotCorHeatmap <- function(X, cor.type = "pearson",
 #' }
 #' 
 #' @examples 
-#' out <- plotHclust(data = iris[, -5], leaf.labels = iris$Species,
-#'                   leaf.colors = iris$Species)
+#' out <- plotHclust(data = iris[, -5], leaf_labels = iris$Species,
+#'                   leaf_colors = iris$Species)
 #' out$plot
 #' 
 plotHclust <- function(data, 
-                       leaf.labels = rownames(data), leaf.colors = NULL, 
-                       dist.metric = "euclidean", dist.mat = NULL, 
-                       linkage = "ward.D", text.size = 10, 
-                       manual.color = NULL, title = NULL, show.plot = F) {
+                       leaf_labels = rownames(data), leaf_colors = NULL, 
+                       dist_metric = "euclidean", dist_mat = NULL, 
+                       linkage = "ward.D", text_size = 10, 
+                       manual_color = NULL, title = NULL, show_plot = F) {
 
   data <- as.matrix(data)
   if (sum(is.na(data)) > 0) {
@@ -1127,13 +1210,13 @@ plotHclust <- function(data,
   }
   
   # distance matrix
-  if (is.null(dist.mat)) {
-    Dmat <- dist(data, method = dist.metric)
+  if (is.null(dist_mat)) {
+    Dmat <- dist(data, method = dist_metric)
   } else {
-    if (!("dist" %in% class(dist.mat))) {
-      Dmat <- as.dist(dist.mat)
+    if (!("dist" %in% class(dist_mat))) {
+      Dmat <- as.dist(dist_mat)
     } else {
-      Dmat <- dist.mat
+      Dmat <- dist_mat
     }
   }
   
@@ -1141,28 +1224,28 @@ plotHclust <- function(data,
   hclust_out <- hclust(Dmat, method = linkage)
   hclust_dend <- as.dendrogram(hclust_out)
   
-  if (!is.null(leaf.colors)) {  # annotate tree leaves
-    palette_out <- get_custom_color_palette(leaf.colors, TRUE)
+  if (!is.null(leaf_colors)) {  # annotate tree leaves
+    palette_out <- get_custom_color_palette(leaf_colors, TRUE)
     lab_colors <- palette_out$colors
     color_palette <- palette_out$palette
     lab_colors <- lab_colors[order.dendrogram(hclust_dend)]
-    lab_df <- data.frame(x = 0, y = 0, color = leaf.colors)
+    lab_df <- data.frame(x = 0, y = 0, color = leaf_colors)
   } else {
     lab_colors <- "black"
   }
   
   # get leaf labels
-  if (is.null(leaf.labels)) {
+  if (is.null(leaf_labels)) {
     dendextend::labels(hclust_dend) <- rep(
       "------", length(dendextend::labels(hclust_dend))
     )
   } else {
-    dendextend::labels(hclust_dend) <- leaf.labels[order.dendrogram(hclust_dend)]
+    dendextend::labels(hclust_dend) <- leaf_labels[order.dendrogram(hclust_dend)]
   }
   
   if (is.null(title)) {
     title <- sprintf("Hierarchical Clustering: %s Linkage, %s Distance",
-                     linkage, dist.metric)
+                     linkage, dist_metric)
   }
   
   # convert to ggplot object
@@ -1177,13 +1260,13 @@ plotHclust <- function(data,
                                     expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                        axis.text.x = ggplot2::element_text(color = lab_colors, 
-                                                           size = text.size))
+                                                           size = text_size))
     )
   )
   
   # add legend
-  if (!is.null(leaf.colors)) {  
-    if (is.factor(leaf.colors)) {
+  if (!is.null(leaf_colors)) {  
+    if (is.factor(leaf_colors)) {
       hclust_plt <- hclust_plt +
         ggplot2::geom_point(ggplot2::aes(x = x, y = y, color = color), 
                             data = lab_df, size = -1) +
@@ -1199,7 +1282,7 @@ plotHclust <- function(data,
     }
   }
   
-  if (show.plot) {
+  if (show_plot) {
     print(hclust_plt)
   }
   return(list(plot = hclust_plt, hclust = hclust_out, dend = hclust_dend))
