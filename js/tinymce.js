@@ -3,16 +3,40 @@ tinymce.init({
   height: 150,
   menubar: false,
   placeholder: "Insert narrative here.",
-  skin: "outside",
-  plugins: [
-    'save image',
-    'advlist autolink lists link image charmap print preview anchor',
-    'searchreplace visualblocks code fullscreen',
-    'insertdatetime media table paste code help wordcount'
-  ],
-  toolbar: 'save | undo redo | styleselect | fontselect fontsizeselect |' +
-  'bold italic backcolor | alignleft aligncenter ' +
-  'alignright alignjustify | bullist numlist | image table | help',
+  // plugins: [
+  //   'save image',
+  //   'advlist autolink lists link image charmap',// print preview anchor',
+  //   'visualblocks code fullscreen',
+  //   'table paste'
+  // ],
+  // toolbar: 'undo redo | styleselect | fontselect fontsizeselect |' +
+  // 'bold italic backcolor | alignleft aligncenter ' +
+  // 'alignright alignjustify | bullist numlist | image table | help',
+  plugins: "advlist autolink lists link image charmap visualblocks code table paste hr save", 
+  toolbar: "save | undo redo | formatgroup paragraphgroup insertgroup",
+
+  toolbar_groups: {
+    formatgroup: {
+      icon: 'format',
+      tooltip: 'Formatting',
+      items: 'fontselect fontsizeselect | bold italic underline strikethrough | forecolor backcolor | superscript subscript | removeformat'
+    },
+    paragraphgroup: {
+      icon: 'paragraph',
+      tooltip: 'Paragraph format',
+      items: 'styleselect | bullist numlist | alignleft aligncenter alignright alignjustify | indent outdent'
+    },
+    insertgroup: {
+      icon: 'plus',
+      tooltip: 'Insert',
+      items: 'image table link charmap hr'
+    }
+  },
+
+  save_onsavecallback: function () {
+    localStorage.setItem(tinymce.activeEditor.id, tinymce.activeEditor.getContent())
+  },
+
   /*
     URL of our upload handler (for more details check: https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_url)
     images_upload_url: 'postAcceptor.php',
@@ -58,14 +82,13 @@ tinymce.init({
     input.click();
   },
 
-  //TODO: Save button call back function
-  // save_onsavecallback: function () {  
-  //   var FileSaver = require('file-saver');
-  //   var content = tinymce.activeEditor.getContent();
-  //   // tinymce.activeEditor.execCommand('mceSave');
-  //   var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  //   // downloadToFile(textArea.value, 'my-new-file.txt', 'text/plain');
-  //   FileSaver.saveAs(blob, "/Users/Tiffany/test.txt");
-  // },
-  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+  setup: function (editor) {
+    // retrieve stored text from localStorage
+    editor.on('init', function () {
+      editor.setContent(localStorage.getItem(editor.id));
+    });
+  },
+
+  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+  toolbar_location: 'bottom'
 });
