@@ -27,7 +27,8 @@ fitCaret <- function(Xtrain, ytrain, Xtest, ytest, model_list, tr_control,
   model_errs <- dplyr::bind_rows(model_errs, .id = "model")
   model_vimps <- purrr::map_dfr(model_vimps, 
                                 ~.x[["importance"]] %>% 
-                                  tibble::rownames_to_column("variable"),
+                                  tibble::rownames_to_column("variable") %>%
+                                  dplyr::rename("importance" = "Overall"),
                                 .id = "model")
   
   return(list(errors = model_errs,

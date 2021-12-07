@@ -2,7 +2,6 @@
 title: "PCS Documentation"
 author: ""
 date: "`r format(Sys.time(), '%B %d, %Y')`"
-# bibliography: bibliography.bib
 header-includes:
     - \usepackage{float}
     - \usepackage{amsmath}
@@ -349,6 +348,7 @@ Carry out the prediction pipeline, outlined above.
 ```
 
 ```{r caret-fits, eval = params$modeling_pkg == "caret", echo = params$modeling_pkg == "caret"}
+## Pick models and fitting backend for caret
 tr_control <- caret::trainControl(
   method = "cv",
   number = 5,
@@ -388,6 +388,8 @@ model_results <- fitCaret(Xtrain = Xtrain, ytrain = ytrain,
 # TODO: add code for tuning parameters
 # AK: Once tuning is fixed, can adjust splits for stability
 
+## Pick models and fitting backend for tidymodels
+
 # as is, only works for classification
 rf_model <- parsnip::rand_forest() %>%
   parsnip::set_args(mtry = tune::tune()) %>%
@@ -418,6 +420,7 @@ model_results <- fitTidyModels(Xtrain = Xtrain, ytrain = ytrain,
 ```
 
 ```{r h2o-fits, eval = params$modeling_pkg == "h2o", echo = params$modeling_pkg == "h2o"}
+## Pick models and fitting backend for h2o
 model_list <- list(randomForest = list(ntrees = 500), 
                    xgboost = list())
 
@@ -487,7 +490,8 @@ bootstrap_model_errs <- purrr::map_dfr(bootstrap_model_results, "errors",
 bootstrap_model_preds <- purrr::map(bootstrap_model_results, "predictions",
                                     .id = "bootstrap_id")
 bootstrap_model_imps <- purrr::map(bootstrap_model_results, "importance",
-                                   .id = "bootstrap_id")
+                                   .id = "bootstrap_id") %>%
+  dplyr::bind_rows(.id = "bootstrap_id")
 
 bootstrap_model_errs_summary <- bootstrap_model_errs %>%
   dplyr::group_by(model) %>%
@@ -517,7 +521,7 @@ bootstrap_model_errs %>%
                 title = "Validation Prediction Accuracies Over Bootstrapped Training Fits")
 ```
 
-## Interpretability
+## Interpretability {.tabset .custom-tabs}
 
 For the models that pass the prediction and stability checks,
 
@@ -529,34 +533,56 @@ For the models that pass the prediction and stability checks,
 
 <!-- TODO: Tiffany - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. -->
 
-### Without stability
+### Full Model (without stability) {.unnumbered .tabset .tabset-pills}
+
+#### Table {.unnumbered}
 
 ```{r}
 simChef::pretty_DT(model_results$importance, digits = 2, sigfig = F, 
                    caption = "Variable Importances")
 ```
 
+#### Plots {.unnumbered}
+
 ```{r}
-# TODO: bar plot that works for all modeling backends
-# plotFeatureImportance(model_results$importance)
-# vip::vip(model_results$importance,
-#          num_features = 10,
-#          geom = "col") +
-#   simChef::pretty_ggplot_theme()
+plotFeatureImportance(model_results$importance,
+                      use_rankings = FALSE,
+                      use_facets = TRUE,
+                      interactive = TRUE)
 ```
 
 ```{r}
-# TODO: scatter plot that works for all modeling backends
-# plt <- model_results$importance %>%
-#   tidyr::pivot_wider(names_from = "model", values_from = "Importance") %>%
-#   plotPairs(columns = which(!(colnames(.) %in% "Variable"))) +
-#   ggplot2::theme_bw() 
-# plotly::ggplotly(plt)
+plotFeatureImportancePair(model_results$importance,
+                          use_rankings = TRUE,
+                          interactive = TRUE)
 ```
 
-### With stability
+### Bootstrapped Model (with stability) {.unnumbered .tabset .tabset-pills}
 
-TODO: TT
+#### Table {.unnumbered}
+
+```{r}
+bootstrap_model_imps_summary <- bootstrap_model_imps %>%
+  dplyr::group_by(model, variable) %>%
+  dplyr::summarise(`Mean Importance` = mean(importance),
+                   `Median Importance` = median(importance),
+                   `SD Importance` = sd(importance),
+                   `Min Importance` = min(importance),
+                   `Max Importance` = max(importance))
+  
+simChef::pretty_DT(bootstrap_model_imps_summary, 
+                   digits = 2, sigfig = F, 
+                   caption = "Summary of variable importances across bootstrapped models")
+```
+
+#### Plots {.unnumbered}
+
+```{r}
+plotFeatureImportanceStability(bootstrap_model_imps,
+                               use_rankings = FALSE,
+                               use_facets = FALSE,
+                               interactive = FALSE)
+```
 
 # Main Results
 
@@ -635,4 +661,3 @@ Reiterate main findings, note any caveats, and clearly translate findings/analys
 
 ```
 
-# Bibliography {.unnumbered}
