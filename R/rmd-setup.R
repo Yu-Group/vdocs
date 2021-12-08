@@ -38,12 +38,18 @@ if (knitr::is_html_output()) {
     }
   )
 } else if (knitr::is_latex_output()) {
-  # knitr hook for interactive textboxes (tinyMCE) and collapsible help sections
   knitr::knit_hooks$set(
+    # knitr hook for styled textboxes
     interactive_text = function(before, options) {
       if (before) {
         out <- sprintf('\\begin{tcolorbox} %s \\end{tcolorbox}',
                        options$code)
+      }
+    },
+    # hack to fix missing new line after some subsections
+    add_new_line = function(before, options) {
+      if (before) {
+        out <- "\\phantom{.}"  
       }
     }
   )
@@ -53,6 +59,7 @@ if (knitr::is_html_output()) {
       return(options)
     },
     help = function(options) {
+      # don't show help info/tips in pdf output
       options$echo <- FALSE
       options$eval <- FALSE
       return(options)
