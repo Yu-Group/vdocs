@@ -6,6 +6,7 @@ header-includes:
     - \usepackage{float}
     - \usepackage{amsmath}
     - \usepackage{gensymb}
+    - \usepackage{tcolorbox}
 output:
   rmdformats::material:
     fig_caption: true
@@ -18,6 +19,7 @@ output:
     code_download: true
     includes:
       before_body: html/setup.html
+  pdf_document:
 params:
   X_filepath:
     label: "X Data"
@@ -260,9 +262,9 @@ data_types(Xtrain = Xtrain, ytrain = ytrain)
 
 ```{r results="asis"}
 # summary of features in training X, sorted by type
-dt_ls <- data_summary(Xtrain = Xtrain, ytrain = ytrain, digits = 2, sigfig = F)
-for (dt_name in names(dt_ls)) {
-  simChef:::subchunkify(dt_ls[[dt_name]], i = chunk_idx, 
+tab_ls <- data_summary(Xtrain = Xtrain, ytrain = ytrain, digits = 2, sigfig = F)
+for (dt_name in names(tab_ls)) {
+  simChef:::subchunkify(tab_ls[[dt_name]], i = chunk_idx, 
                         other_args = "results='asis'")
   chunk_idx <- chunk_idx + 1
 }
@@ -431,10 +433,18 @@ model_results <- fith2o(Xtrain = Xtrain, ytrain = ytrain,
 
 ```{r prediction-accuracy, results = "asis", echo = FALSE}
 # table of accuracy metrics
-model_results$errors %>%
-  simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies", 
-           options = list(dom = 't'))
+if (knitr::is_html_output()) {
+  model_results$errors %>%
+    simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
+             caption = "Validation Prediction Accuracies", 
+             options = list(dom = 't'))
+} else if (knitr::is_latex_output()) {
+  model_results$errors %>%
+    simChef::pretty_kable(digits = 2, sigfig = F, row.names = FALSE, 
+             caption = "Validation Prediction Accuracies",
+             format = "latex")
+}
+
 ```
 
 ## Stability check
@@ -495,19 +505,32 @@ bootstrap_model_imps <- purrr::map(bootstrap_model_results, "importance",
 
 bootstrap_model_errs_summary <- bootstrap_model_errs %>%
   dplyr::group_by(model) %>%
-  dplyr::summarise(dplyr::across(-bootstrap_id, list(mean = mean, sd = sd)))
+  dplyr::summarise(dplyr::across(-bootstrap_id, list(mean = mean, sd = sd))) %>%
+  setNames(stringr::str_replace(colnames(.), "_", " "))
 ```
 
 ```{r stability-check-table, results = "asis"}
 # table of accuracy metrics
-bootstrap_model_errs_summary %>%
-  simChef::pretty_DT(
-    digits = 2, sigfig = F, rownames = FALSE, 
-    caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
-    bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-    bold_scheme = c(F, T, F, T, F),
-    options = list(dom = 't')
-  )
+if (knitr::is_html_output()) {
+  bootstrap_model_errs_summary %>%
+    simChef::pretty_DT(
+      digits = 2, sigfig = F, rownames = FALSE, 
+      caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
+      bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+      bold_scheme = c(F, T, F, T, F),
+      options = list(dom = 't')
+    )
+} else if (knitr::is_latex_output()) {
+  bootstrap_model_errs_summary %>%
+    simChef::pretty_kable(
+      digits = 2, sigfig = F, row.names = FALSE, 
+      caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
+      bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+      bold_scheme = c(F, T, F, T, F),
+      format = "latex"
+    )
+}
+
 ```
 
 ```{r stability-check-boxplot}
@@ -538,8 +561,13 @@ For the models that pass the prediction and stability checks,
 #### Table {.unnumbered}
 
 ```{r}
-simChef::pretty_DT(model_results$importance, digits = 2, sigfig = F, 
-                   caption = "Variable Importances")
+if (knitr::is_html_output()) {
+  simChef::pretty_DT(model_results$importance, digits = 2, sigfig = F, 
+                     caption = "Variable Importances")
+} else if (knitr::is_latex_output()) {
+  simChef::pretty_kable(model_results$importance, digits = 2, sigfig = F, 
+                        caption = "Variable Importances", format = "latex")
+}
 ```
 
 #### Plots {.unnumbered}
@@ -548,13 +576,13 @@ simChef::pretty_DT(model_results$importance, digits = 2, sigfig = F,
 plotFeatureImportance(model_results$importance,
                       use_rankings = FALSE,
                       use_facets = TRUE,
-                      interactive = TRUE)
+                      interactive = FALSE)
 ```
 
 ```{r}
 plotFeatureImportancePair(model_results$importance,
                           use_rankings = TRUE,
-                          interactive = TRUE)
+                          interactive = FALSE)
 ```
 
 ### Bootstrapped Model (with stability) {.unnumbered .tabset .tabset-pills}
@@ -570,9 +598,16 @@ bootstrap_model_imps_summary <- bootstrap_model_imps %>%
                    `Min Importance` = min(importance),
                    `Max Importance` = max(importance))
   
-simChef::pretty_DT(bootstrap_model_imps_summary, 
-                   digits = 2, sigfig = F, 
-                   caption = "Summary of variable importances across bootstrapped models")
+if (knitr::is_html_output()) {
+  simChef::pretty_DT(bootstrap_model_imps_summary, 
+                     digits = 2, sigfig = F, 
+                     caption = "Summary of variable importances across bootstrapped models")
+} else if (knitr::is_latex_output()) {
+  simChef::pretty_kable(bootstrap_model_imps_summary, 
+                        digits = 2, sigfig = F, 
+                        caption = "Summary of variable importances across bootstrapped models",
+                        format = "latex")
+}
 ```
 
 #### Plots {.unnumbered}
@@ -626,12 +661,17 @@ Summarize test set prediction and/or interpretability results.
 
 ```{r test-accuracy-table, results = "asis"}
 # table of accuracy metrics
-final_model_results$errors %>%
-  simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Test Prediction Accuracies", 
-           # bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-           # bold_scheme = c(F, rep(T, ncol(.) - 1)),
-           options = list(dom = 't'))
+if (knitr::is_html_output()) {
+  final_model_results$errors %>%
+    simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
+             caption = "Test Prediction Accuracies", 
+             options = list(dom = 't'))
+} else if (knitr::is_latex_output()) {
+  final_model_results$errors %>%
+    simChef::pretty_kable(digits = 2, sigfig = F, row.names = FALSE, 
+             caption = "Test Prediction Accuracies", format = "latex")
+}
+
 ```
 
 # Post hoc analysis

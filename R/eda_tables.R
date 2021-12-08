@@ -1,4 +1,4 @@
-data_types <- function(Xtrain, ytrain) {
+data_types <- function(Xtrain, ytrain, html = knitr::is_html_output()) {
   skim_out <- skimr::skim(cbind(`.y` = ytrain, Xtrain))
   dtypes_df <- skim_out %>%
     dplyr::mutate(`.group` = ifelse(skim_variable == ".y", "y", "X"),
@@ -9,35 +9,38 @@ data_types <- function(Xtrain, ytrain) {
     dplyr::mutate(Class = capitalize(names(Freq))) %>%
     tidyr::spread(key = "Class", value = "Freq") %>%
     tibble::column_to_rownames(".group")
-  dt_out <- DT::datatable(
-    dtypes_df, rownames = T,
-    caption = shiny::tags$caption(
-      style = "color: black; font-weight: bold; font-size: 125%",
-      "Frequency of Column Types"
-    ), 
-    options = list(
-      columnDefs = list(list(className = "dt-center",
-                             targets = "_all")),
-      dom = "t"
+  if (html) {
+    tab_out <- simChef::pretty_DT(
+      dtypes_df, 
+      caption = shiny::tags$caption(
+        style = "color: black; font-weight: bold; font-size: 125%",
+        "Frequency of Column Types"
+      ),
+      options = list(dom = "t")
     )
-  )
-  return(dt_out)
+  } else {
+    tab_out <- simChef::pretty_kable(dtypes_df, caption = "Frequency of column",
+                                     format = "latex")
+  }
+  
+  return(tab_out)
 }
 
-data_summary <- function(Xtrain, ytrain, digits = 2, sigfig = FALSE) {
+data_summary <- function(Xtrain, ytrain, digits = 2, sigfig = FALSE,
+                         html = knitr::is_html_output()) {
   skim_out <- skimr::skim(cbind(`.y` = ytrain, Xtrain))
-  dt_ls <- list()
+  tab_ls <- list()
   types <- c("factor", "numeric", "character", "logical", "complex", "Date",
              "POSIXct")
   for (type in types) {
     if (sum(skim_out$skim_type == type) > 0) {
-      dt_ls[[type]] <- skim_wrapper(skim_out, type, digits, sigfig)
+      tab_ls[[type]] <- skim_wrapper(skim_out, type, digits, sigfig, html)
     }
   }
-  return(dt_ls)
+  return(tab_ls)
 }
 
-skim_wrapper <- function(skim_out, dtype, digits, sigfig) {
+skim_wrapper <- function(skim_out, dtype, digits, sigfig, html) {
   if (sigfig) {
     sigfig <- "g"
   } else {
@@ -76,8 +79,10 @@ skim_wrapper <- function(skim_out, dtype, digits, sigfig) {
                    "Q1" = "numeric.p25",
                    "Median" = "numeric.p50",
                    "Q3" = "numeric.p75",
-                   "Maximum" = "numeric.p100",
-                   "Histogram" = "numeric.hist")
+                   "Maximum" = "numeric.p100")
+    if (html) {
+      keep_cols <- c(keep_cols, "Histogram" = "numeric.hist")
+    }
   } else if (dtype == "character") {
     keep_cols <- c(keep_cols,
                    "# Empty" = "character.empty",
@@ -114,25 +119,29 @@ skim_wrapper <- function(skim_out, dtype, digits, sigfig) {
                    keep_cols[2:length(keep_cols)])
   }
   
-  if (nrow(skim_df) > 10) {
-    dt_dom <- "tip"
-  } else {
-    dt_dom <- "t"
-  }
-  dt_out <- DT::datatable(
-    skim_df %>% dplyr::select(keep_cols),
-    caption = shiny::tags$caption(
-      style = "color: black; font-weight: bold; font-size: 125%",
-      paste("Summary of", R.utils::capitalize(dtype), "Variables")
-    ), 
-    rownames = F,
-    options = list(
-      columnDefs = list(list(className = "dt-center", targets = "_all")),
-      dom = dt_dom,
-      scrollX = TRUE
+  if (html) {
+    if (nrow(skim_df) > 10) {
+      dt_dom <- "tip"
+    } else {
+      dt_dom <- "t"
+    }
+    tab_out <- simChef::pretty_DT(
+      skim_df %>% dplyr::select(keep_cols),
+      caption = shiny::tags$caption(
+        style = "color: black; font-weight: bold; font-size: 125%",
+        paste("Summary of", R.utils::capitalize(dtype), "Variables")
+      ), 
+      rownames = F,
+      options = list(dom = dt_dom, scrollX = TRUE)
     )
-  )
-  return(dt_out)
+  } else {
+    tab_out <- simChef::pretty_kable(
+      skim_df %>% dplyr::select(keep_cols), 
+      caption = paste("Summary of", R.utils::capitalize(dtype), "Variables"),
+      format = "latex", row.names = FALSE, escape = TRUE
+    )
+  }
+  return(tab_out)
 }
 
 
