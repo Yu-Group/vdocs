@@ -117,8 +117,7 @@ plot_y_distribution <- function(y, type = c("density", "histogram", "boxplot",
     plt <- plotBoxplot(data = y, x_str = "y", horizontal = T, ...) +
       ggplot2::labs(y = "y", title = "Overall y Distribution")
   } else if (type == "bar") {
-    plt <- plotBarplot(data = y, x_str = "y", 
-                       position = "fill", stat = "count", ...) +
+    plt <- plotBarplot(data = y, x_str = "y", ...) +
       ggplot2::labs(x = "y", y = "Frequency", title = "Overall y Distribution")
   }
   return(plt)
