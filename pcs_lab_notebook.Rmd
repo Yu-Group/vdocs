@@ -25,12 +25,12 @@ params:
   X_filepath:
     label: "X Data"
     # value: NULL
-    value: data/iris_X.rds
+    value: data/tcga_brca_array_data.rds
     input: file 
   y_filepath:
     label: "y data"
     # value: NULL
-    value: data/iris_y.rds
+    value: data/tcga_brca_subtypes.rds
     input: file
   train_prop:
     label: "Training data proportion"
@@ -58,7 +58,7 @@ css: [css/custom_material_rmd_theme.css, css/custom_checkbox.css]
 ---
 
 ```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
-source("R/rmd-setup.R", local = knitr::knit_global())
+source("scripts/rmd-setup.R", local = knitr::knit_global())
 
 # load in packages
 library(tidyverse)
@@ -184,7 +184,8 @@ Split the data into a training, validation, and test set.
 data_split <- basicDataSplit(X = X, y = y, 
                              train_prop = params$train_prop, 
                              valid_prop = params$valid_prop, 
-                             test_prop = params$test_prop)
+                             test_prop = params$test_prop,
+                             stratified_by = y)
 Xtrain <- data_split$X$train
 Xvalid <- data_split$X$validate
 Xtest <- data_split$X$test
@@ -230,6 +231,16 @@ Again, be as transparent as possible. This allows others to make their own educa
 ```{asis, interactive_text = TRUE}
 
 ```
+
+```{r preprocess-data}
+Xtrain <- log(Xtrain + 1) %>%
+  removeConstantCols(verbose = 1) %>%
+  removeDuplicateCols(verbose = 1) %>%
+  filterByVar(max.p = 1000)
+Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
+Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
+```
+
 
 ## Data Exploration
 
@@ -289,22 +300,30 @@ plot_y_distribution(ytrain, "bar")
 
 ```{r, add_new_line = TRUE}
 # correlation heatmap
-plotCorHeatmap(X = Xtrain, cor_type = "pearson", clust = TRUE, text_size = 8)
+keep_features <- sort(
+  sample(1:ncol(Xtrain), min(ncol(Xtrain), 1000), replace = FALSE)
+)
+plotCorHeatmap(X = Xtrain[, keep_features], cor_type = "pearson", 
+                      clust = TRUE, text_size = 0) +
+  ggplot2::labs(x = "Features", y = "Features", fill = "Cor.") +
+  simChef::pretty_ggplot_theme(x_text_angle = TRUE)
 ```
 
 #### Feature Pair Plots {.unnumbered}
 
 ```{r, add_new_line = TRUE}
 # pair plots
-col_ids <- 1:min(ncol(Xtrain), 6)
-plotPairs(data = Xtrain, columns = col_ids, 
+keep_features <- sort(
+  sample(1:ncol(Xtrain), min(ncol(Xtrain), 6), replace = FALSE)
+)
+plotPairs(data = Xtrain, columns = keep_features, 
           color = ytrain, color_label = "y")
 ```
 
 #### Marginal Associations {.unnumbered}
 
 ```{r, add_new_line = TRUE}
-caret::featurePlot(x = Xtrain,
+caret::featurePlot(x = Xtrain[, keep_features],
                    y = ytrain,
                    plot = if (is.factor(ytrain)) "box" else "scatter",
                    # strip = strip.custom(par.strip.text = list(cex = .7)),
@@ -380,11 +399,13 @@ model_list <- list(
                  nthread = 1)
 )
 
+start_time <- Sys.time()
 model_results <- fitCaret(Xtrain = Xtrain, ytrain = ytrain, 
                           Xtest = Xvalid, ytest = yvalid, 
                           model_list = model_list, tr_control = tr_control, 
                           response_type = response_type)
-
+cat(sprintf("Fitting time taken: %f minutes", 
+            difftime(Sys.time(), start_time, units = "mins")))
 ```
 
 ```{r tidymodels-fits, eval = params$modeling_pkg == "tidymodels", echo = params$modeling_pkg == "tidymodels"}
@@ -417,9 +438,12 @@ model_list <- list(RF = list(model = rf_model,
                               grid = 4))
 kfolds <- 5
 
+start_time <- Sys.time()
 model_results <- fitTidyModels(Xtrain = Xtrain, ytrain = ytrain, 
                                Xtest = Xvalid, ytest = yvalid,
                                model_list = model_list, kfolds = kfolds)
+cat(sprintf("Fitting time taken: %f minutes", 
+            difftime(Sys.time(), start_time, units = "mins")))
 ```
 
 ```{r h2o-fits, eval = params$modeling_pkg == "h2o", echo = params$modeling_pkg == "h2o"}
@@ -427,9 +451,12 @@ model_results <- fitTidyModels(Xtrain = Xtrain, ytrain = ytrain,
 model_list <- list(randomForest = list(ntrees = 500), 
                    xgboost = list())
 
+start_time <- Sys.time()
 model_results <- fith2o(Xtrain = Xtrain, ytrain = ytrain,
                         Xtest = Xvalid, ytest = yvalid,
                         model_list = model_list)
+cat(sprintf("Fitting time taken: %f minutes", 
+            difftime(Sys.time(), start_time, units = "mins")))
 ```
 
 ```{r prediction-accuracy-html, results = "asis", eval = knitr::is_html_output()}
@@ -465,7 +492,7 @@ Taking the prediction methods that pass the prediction check, perform stability 
 TODO: Add results for h20, tuning needs to be fixed for h20 + tidymodels <!-- TODO: Ana - Provide some example code here (for both fitting and visualizing results) so that the practitioner can easily input their data and models. Add something like James' slide. A few pictures with possible data perturbation schemes (separate from parameter tuning). Data splitting vs sampling of observations. Cross-validation-ish scheme and fixed training/validation setup (bootstrapping, sub-sampling, stratified-sampling). Add parameter to include/exclude certain code chunks. -->
 
 ```{r stability-check}
-n_reps <- 5 # increase for better stability measures when not testing code
+n_reps <- 2 # increase for better stability measures when not testing code
 
 # p <- progressr::progressor(steps = n_reps)
 # future::plan(multisession, workers = min(n_reps, parallel::detectCores() - 1))
@@ -688,12 +715,10 @@ Move beyond the global prediction accuracy metrics and dive deeper into individu
 
 ```
 
-TODO: Tiffany - Add examples with interesting observations of prediction accuracy metrics so the user knows what to look for.
-
 ```{r}
-plotPairs(model_results$predictions, 
-          columns = 1:ncol(model_results$predictions))
-
+plotPairs(cbind(`True Repsonses` = ytest, final_model_results$predictions), 
+          columns = 1:(ncol(final_model_results$predictions) + 1), 
+          title = "Comparison of model predictions")
 ```
 
 # Conclusions
