@@ -1,10 +1,12 @@
 data_types <- function(Xtrain, ytrain, html = knitr::is_html_output()) {
-  skim_out <- skimr::skim(cbind(`.y` = ytrain, Xtrain))
-  dtypes_df <- skim_out %>%
-    dplyr::mutate(`.group` = ifelse(skim_variable == ".y", "y", "X"),
-                  skim_type = as.factor(skim_type)) %>%
-    dplyr::group_by(`.group`) %>%
-    dplyr::summarise(Freq = c(table(skim_type))) %>%
+  data <- cbind(`.y` = ytrain, Xtrain)
+  dtypes_df <- data.frame(
+    var = colnames(data),
+    dtype = as.factor(sapply(data, class))
+  ) %>%
+    dplyr::mutate(.group = ifelse(var == ".y", "y", "X")) %>%
+    dplyr::group_by(.group) %>%
+    dplyr::summarise(Freq = c(table(dtype)), .groups = "keep") %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Class = capitalize(names(Freq))) %>%
     tidyr::spread(key = "Class", value = "Freq") %>%
@@ -27,8 +29,15 @@ data_types <- function(Xtrain, ytrain, html = knitr::is_html_output()) {
 }
 
 data_summary <- function(Xtrain, ytrain, digits = 2, sigfig = FALSE,
+                         max_vars = 1000, features = NULL, 
                          html = knitr::is_html_output()) {
-  skim_out <- skimr::skim(cbind(`.y` = ytrain, Xtrain))
+  if (is.null(features)) {
+    features <- colnames(Xtrain)
+  }
+  if (length(features) > max_vars) {
+    features <- sample(features, size = max_vars, replace = FALSE)
+  }
+  skim_out <- skimr::skim(cbind(`.y` = ytrain, Xtrain[, features]))
   tab_ls <- list()
   types <- c("factor", "numeric", "character", "logical", "complex", "Date",
              "POSIXct")

@@ -1,18 +1,31 @@
 plotFeatureImportance <- function(data, feature_col = "variable", 
                                   importance_col = "importance", 
                                   model_col = "model",
+                                  max_features = 50,
                                   use_rankings = FALSE,
                                   use_facets = TRUE,
                                   interactive = FALSE) {
-  if (use_rankings) {
+  data <- data %>%
+    dplyr::group_by(dplyr::across(tidyselect::all_of(model_col))) %>%
+    dplyr::mutate(.ranking = rank(-.data[[importance_col]]))
+  if (!is.null(max_features) & 
+      (max_features < length(unique(data[[feature_col]])))) {
+    keep_features <- data %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(c(model_col,
+                                                         feature_col)))) %>%
+      dplyr::summarise(.keep_features = any(.ranking <= max_features)) %>%
+      dplyr::filter(.keep_features)
     data <- data %>%
-      dplyr::group_by(dplyr::across(tidyselect::all_of(model_col))) %>%
-      dplyr::mutate(.ranking = rank(-.data[[importance_col]]))
+      dplyr::filter(.data[[feature_col]] %in% unique(keep_features[[feature_col]]))
+  }
+  
+  if (use_rankings) {
     importance_col <- ".ranking"
     importance_label <- "Importance Ranking"
   } else {
     importance_label <- "Importance Score"
   }
+  
   if (use_facets) {
     plt <- plotBarplot(data, x_str = feature_col, y_str = importance_col,
                        stat = "identity") + 
@@ -59,14 +72,24 @@ plotFeatureImportancePair <- function(data, feature_col = "variable",
 plotFeatureImportanceStability <- function(data, feature_col = "variable", 
                                            importance_col = "importance", 
                                            model_col = "model",
+                                           max_features = 50,
                                            use_rankings = FALSE,
                                            use_facets = TRUE,
                                            interactive = FALSE) {
-  if (use_rankings) {
+  data <- data %>%
+    dplyr::group_by(dplyr::across(c(bootstrap_id, 
+                                    tidyselect::all_of(model_col)))) %>%
+    dplyr::mutate(.ranking = rank(-.data[[importance_col]]))
+  if (!is.null(max_features)) {
+    keep_features <- data %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(c(model_col,
+                                                         feature_col)))) %>%
+      dplyr::summarise(.keep_features = mean(.ranking <= max_features) >= 0.5) %>%
+      dplyr::filter(.keep_features)
     data <- data %>%
-      dplyr::group_by(dplyr::across(c(bootstrap_id, 
-                                      tidyselect::all_of(model_col)))) %>%
-      dplyr::mutate(.ranking = rank(-.data[[importance_col]]))
+      dplyr::filter(.data[[feature_col]] %in% unique(keep_features[[feature_col]]))
+  }
+  if (use_rankings) {
     importance_col <- ".ranking"
     importance_label <- "Importance Ranking"
   } else {
