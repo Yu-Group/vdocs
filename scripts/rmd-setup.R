@@ -3,6 +3,7 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE,
   collapse = TRUE,
+  cache = TRUE,
   fig.align = "center",
   fig.pos = "H",
   fig.show = "hold",
