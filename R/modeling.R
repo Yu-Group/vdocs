@@ -1,5 +1,34 @@
-fitCaret <- function(Xtrain, ytrain, Xtest, ytest, model_list, tr_control,
-                     response_type) {
+#' Wrappers for fitting models using common modeling backends
+#' 
+#' @name fitModels
+#' @description `fitCaret`, `fitTidyModels`, and `fith2o` are wrappers for 
+#'   fitting multiple models using caret, tidymodels, and h2o backends,
+#'   respectively. In addition to fitting the models, these wrappers make
+#'   predictions on the provided test set, evaluate a variety of prediction 
+#'   metrics, and compute feature importances across all fitted models.
+#' 
+#' @param Xtrain Training data matrix or data frame.
+#' @param ytrain Training response vector.
+#' @param Xtest Test data matrix or data frame.
+#' @param ytest Test response vector.
+#' @param model_list List of models to train.
+#' @param tr_control List of training control options.
+#' 
+#' @returns A list of three:
+#' \describe{
+#' \item{errors}{Test prediction errors for the fitted models across various 
+#'   metrics.}
+#' \item{predictions}{Data frame of predicted responses for all observations in
+#'   the test set.}
+#' \item{importance}{Data frame of the feature importances for the each of the
+#'   fitted models.}
+#' }
+#' 
+NULL
+
+#' @rdname fitModels
+#' @export
+fitCaret <- function(Xtrain, ytrain, Xtest, ytest, model_list, tr_control) {
   
   model_fits <- list()
   model_preds <- list()
@@ -16,8 +45,7 @@ fitCaret <- function(Xtrain, ytrain, Xtest, ytest, model_list, tr_control,
                                                    method = model_name),
                                               mod))
     model_fits[[model_name]] <- mod_fit
-    model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xtest),
-                                         type = response_type)
+    model_preds[[model_name]] <- predict(mod_fit, as.data.frame(Xtest))
     model_errs[[model_name]] <- caret::postResample(
       pred = model_preds[[model_name]], obs = ytest
     )
@@ -36,6 +64,8 @@ fitCaret <- function(Xtrain, ytrain, Xtest, ytest, model_list, tr_control,
               importance = model_vimps))
 }
 
+#' @rdname fitModels
+#' @export
 fitTidyModels <- function(Xtrain, ytrain, Xtest, ytest, model_list, 
                           kfolds = 5) {
   
@@ -103,6 +133,8 @@ fitTidyModels <- function(Xtrain, ytrain, Xtest, ytest, model_list,
               importance = model_vimps))
 }
 
+#' @rdname fitModels
+#' @export
 fith2o <- function(Xtrain, ytrain, Xtest, ytest, model_list) {
   require(h2o)
   

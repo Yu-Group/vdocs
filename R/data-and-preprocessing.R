@@ -1,6 +1,46 @@
-basicDataSplit <- function(X, y, 
-                           train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2,
-                           stratified_by = NULL) {
+#' Splits data into training, validation, and test sets
+#' 
+#' @description Given (X, y) data, splits the data into training, validation, 
+#'   and test partitions according to the specified proportions. Can also 
+#'   perform stratified (or clustered) data splitting if provided.
+#'
+#' @param X A data matrix or data frame.
+#' @param y A response vector.
+#' @param stratified_by An optional vector of group IDs to stratify by. That is, 
+#'   the random paritioning occurs within each group so that the group 
+#'   proportions are similar across the training, validation, and test sets. 
+#'   Vector must be the same length as `y`. If \code{NULL} (default), the full
+#'   data set is randomly partitioned into training, validation, and test sets.
+#' @param train_prop Proportion of data in training set. Default is 0.6.
+#' @param valid_prop Proportion of data in validation set. Default is 0.2.
+#' @param test_prop Proportion of data in test set. Default is 0.2.
+#' 
+#' @returns A list of two:
+#' \describe{
+#' \item{X}{A list of three data matrices or data frames named `train`,
+#'   `validate`, and `test` containing the training, validation, and test X 
+#'   partitions, respectively.}
+#' \item{y}{A list of three vectors named `train`, `validate`, and `test` 
+#'   containing the training, validation, and test y partitions, respectively.}
+#' }
+#' 
+#' @examples 
+#' # splits iris data into training (60%), validation (20%), and test (20%) sets
+#' data_split <- dataSplit(X = iris %>% dplyr::select(-Species),
+#'                         y = iris$Species,
+#'                         train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2)
+#' 
+#' # splits iris data into training, validation, and test sets while keeping
+#' # `Species` distribution constant across partitions
+#' stratified_data_split <- dataSplit(X = iris %>% dplyr::select(-Species),
+#'                                    y = iris$Species,
+#'                                    stratified_by = iris$Species,
+#'                                    train_prop = 0.6, valid_prop = 0.2, 
+#'                                    test_prop = 0.2)
+#' 
+#' @export
+dataSplit <- function(X, y, stratified_by = NULL,
+                      train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2) {
   n <- nrow(X)
   if (is.null(stratified_by)) {
     split_labels <- sample(
@@ -10,12 +50,13 @@ basicDataSplit <- function(X, y,
       )
     )
   } else {
-    split_labels <- data.frame(.y = y) %>%
-      dplyr::group_by(.y) %>%
+    split_labels <- data.frame(.group = stratified_by) %>%
+      dplyr::group_by(.group) %>%
       dplyr::mutate(
         .split = sample(
           cut(
-            1:n(), n() * cumsum(c(0, train_prop, valid_prop, test_prop)), 
+            1:dplyr::n(), 
+            dplyr::n() * cumsum(c(0, train_prop, valid_prop, test_prop)), 
             labels = c("train", "validate", "test") 
           )
         )
@@ -27,66 +68,27 @@ basicDataSplit <- function(X, y,
   return(list(X = X_split, y = y_split))
 }
 
-dataOverview <- function(Xtrain, Xvalid, Xtest, ytrain, yvalid, ytest,
-                         training_only = TRUE) {
-  if (training_only) {
-    text_out <- paste(
-      sprintf("Number of features: %s", ncol(Xtrain)),
-      sprintf("Number of training samples: %s", nrow(Xtrain)),
-      sprintf("Number of NAs in training y: %s", sum(is.na(ytrain))),
-      sprintf("Number of NAs in training X: %s", sum(is.na(Xtrain))),
-      sprintf("Number of columns in training X with NAs: %s", 
-              sum(apply(Xtrain, 2, FUN = function(x) any(is.na(x))))),
-      sprintf("Number of constant columns in training X: %s",
-              sum(apply(Xtrain, 2,
-                        FUN = function(x) {
-                          all(x == x[!is.na(x)][1], na.rm = T)
-                        }), na.rm = T)),
-      sep = "\n"
-    )
-  } else {
-    text_out <- paste(
-      sprintf("Number of features: %s", ncol(Xtrain)),
-      sprintf("Number of samples in training/validation/test: %s/%s/%s", 
-              nrow(Xtrain), nrow(Xvalid), nrow(Xtest)),
-      sprintf("Number of NAs in training/validation/test y: %s/%s/%s", 
-              sum(is.na(ytrain)), sum(is.na(yvalid)), sum(is.na(ytest))),
-      sprintf("Number of NAs in training/validation/test X: %s/%s/%s", 
-              sum(is.na(Xtrain)), sum(is.na(Xvalid)), sum(is.na(Xtest))),
-      sprintf("Number of columns in training/validation/test X with NAs: %s/%s/%s", 
-              sum(apply(Xtrain, 2, FUN = function(x) any(is.na(x)))),
-              sum(apply(Xvalid, 2, FUN = function(x) any(is.na(x)))),
-              sum(apply(Xtest, 2, FUN = function(x) any(is.na(x))))),
-      sprintf("Number of constant columns in training/validation/test X: %s/%s/%s",
-              sum(apply(Xtrain, 2,
-                        FUN = function(x) {
-                          all(x == x[!is.na(x)][1], na.rm = T)
-                        }), na.rm = T),
-              sum(apply(Xvalid, 2,
-                        FUN = function(x) {
-                          all(x == x[!is.na(x)][1], na.rm = T)
-                        }), na.rm = T),
-              sum(apply(Xtest, 2,
-                        FUN = function(x) {
-                          all(x == x[!is.na(x)][1], na.rm = T)
-                        }), na.rm = T)),
-      sep = "\n"
-    )
-  }
-  
-  return(text_out)
-}
+#' Basic cleaning functions to remove columns in data.
+#' 
+#' @name removeCols
+#' @description Given data X, removes columns in X according to various
+#'   data preprocessing/cleaning procedures. `removeNACols` removes all
+#'   columns in the data with at least one NA value. `removeConstantCols`
+#'   removes all columns in the data that are a constant value (ignoring NAs).
+#'   `removeDuplicateCols` removes columns in the data that are duplicates of
+#'   another column in the data so that each column in the resulting cleaned 
+#'   data is unique.
+#' 
+#' @param X A data matrix or data frame.
+#' @param verbose Integer (0-2) indicating the level of written output.
+#' 
+#' @returns A cleaned data matrix or data frame.
+#' 
+NULL
 
+#' @rdname removeCols
+#' @export
 removeNACols <- function(X, verbose = 0) {
-  ####### Function Description ########
-  # function to remove all columns with at least one NA value
-  # 
-  # inputs:
-  # - X = data matrix or data frame
-  # - verbose = integer (0-2); level of written output
-  #   
-  # output: cleaned data matrix or frame without NAs
-  ####### 
   
   col_nas <- apply(X, 2, function(x) sum(is.na(x)))
   
@@ -102,25 +104,17 @@ removeNACols <- function(X, verbose = 0) {
     }
   }
   if (verbose >= 1) {
-    cat(paste("Removed", sum(col_nas > 0), "features\n"))
+    cat(paste("Removed", sum(col_nas > 0), "features with NAs\n"))
   }
   
-  X_cleaned <- X[, col_nas == 0]
+  X_cleaned <- X[, col_nas == 0, drop = FALSE]
   
   return(X_cleaned)
 }
 
-
+#' @rdname removeCols
+#' @export
 removeConstantCols <- function(X, verbose = 0) {
-  ####### Function Description ########
-  # function to remove all columns that are constant (i.e., have 0 variance)
-  # 
-  # inputs:
-  # - X = data matrix or data frame
-  # - verbose = integer (0-2); level of written output
-  #   
-  # output: cleaned data matrix or frame without constant columns
-  #######
   
   col_vars <- apply(X, 2, var, na.rm = T)
   
@@ -136,24 +130,17 @@ removeConstantCols <- function(X, verbose = 0) {
     hist(col_vars, main = "Histogram of Column Variances", xlab = "Variance")
   }
   if (verbose >= 1) {
-    cat(paste("Removed", sum(col_vars == 0), "features\n"))
+    cat(paste("Removed", sum(col_vars == 0), "features with constant values\n"))
   }
   
-  X_cleaned <- X[, col_vars > 0]
+  X_cleaned <- X[, col_vars > 0, drop = FALSE]
   
   return(X_cleaned)
 }
 
+#' @rdname removeCols
+#' @export
 removeDuplicateCols <- function(X, verbose = 0) {
-  ####### Function Description ########
-  # function to remove duplicate columns
-  # 
-  # inputs:
-  # - X = data matrix or data frame
-  # - verbose = integer (0-2); level of written output
-  #   
-  # output: cleaned data matrix or frame without duplicate columns
-  #######
   
   dup_cols <- duplicated(as.list(X))
   
@@ -166,7 +153,7 @@ removeDuplicateCols <- function(X, verbose = 0) {
     }
   }
   if (verbose >= 1) {
-    cat(paste("Removed", sum(dup_cols), "features\n"))
+    cat(paste("Removed", sum(dup_cols), "features that are duplicated\n"))
   }
   
   X_cleaned <- X[, !dup_cols]
@@ -174,29 +161,42 @@ removeDuplicateCols <- function(X, verbose = 0) {
   return(X_cleaned)
 }
 
-filterByVar <- function(X, min.var, max.p) {
-  ####### Function Description ########
-  # function to filter number of features in data by keeping those with the
-  # largest variance
-  # 
-  # inputs:
-  # - X = n x p data matrix or data frame
-  # - min.var = minimum threshold for variance
-  # - max.p = maximum number of features to keep
-  # 
-  # output: filtered data matrix or data frame with reduced number of features
-  ####### 
+#' Filter out columns in data to reduce dimension.
+#' 
+#' @name filterCols
+#' @description Given data X, filters out columns in X according to various
+#'   data preprocessing/cleaning procedures. `filterColsByVar` reduces the
+#'   number of features in the data by keeping those with the largest variance.
+#' 
+#' @param X A data matrix or data frame.
+#' @param min_var (Optional) minimum variance threshold. All columns with 
+#'   variance lower than `min_var` are removed. If \code{NULL} (default), no
+#'   variance threshold is applied.
+#' @param max_p (Optional) maximum number of features to keep. Only features
+#'   with the top `max_p` highest variances are kept. If \code{NULL} (default),
+#'   there is no limit on the maximum number of features to keep.
+#' 
+#' @returns A cleaned data matrix or data frame.
+#' 
+NULL
+
+#' @rdname filterCols
+#' @export
+filterColsByVar <- function(X, min_var = NULL, max_p = NULL) {
+  if (is.null(min_var) & is.null(max_p)) {
+    return(X)
+  }
   
   vars <- apply(X, 2, var, na.rm = T)
   
-  if (!missing(min.var)) {
-    fdat <- X[, vars >= min.var]
-  } else if (!missing(max.p)) {
-    var_cutoff <- sort(vars, decreasing = T)[max.p]
-    fdat <- X[, vars >= var_cutoff]
-  } else {
-    stop("Must input either min.var or max.p.")
+  if (!is.null(min_var)) {
+    X <- X[, vars >= min_var, drop = FALSE]
+    vars <- vars[vars >= min_var]
+  }
+  if (!is.null(max_p) & (ncol(X) > max_p)) {
+    var_cutoff <- sort(vars, decreasing = T)[max_p]
+    X <- X[, vars >= var_cutoff, drop = FALSE]
   }
   
-  return(fdat)
+  return(X)
 }

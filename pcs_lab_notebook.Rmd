@@ -22,14 +22,13 @@ output:
   pdf_document:
     number_sections: true
 params:
+  ## INPUT PARAMETERS HERE OR USING "Knit with Parameters..." IN ABOVE KNIT MENU
   X_filepath:
     label: "X Data"
-    # value: NULL
     value: data/tcga_brca_array_data.rds
     input: file 
   y_filepath:
     label: "y data"
-    # value: NULL
     value: data/tcga_brca_subtypes.rds
     input: file
   train_prop:
@@ -83,9 +82,8 @@ if (params$modeling_pkg != "caret") {
 }
 
 # load data in
-X <- uploadFile(params$X_filepath)
-y <- uploadFile(params$y_filepath)
-#TODO: validate data better
+X <- loadFile(params$X_filepath)
+y <- loadFile(params$y_filepath)
 validateData(X, y)
 
 # initialize counter for subchunkify
@@ -181,11 +179,10 @@ Decide on the "how" to split the data (e.g., random sampling, stratified samplin
 Split the data into a training, validation, and test set.
 
 ```{r split-data}
-data_split <- basicDataSplit(X = X, y = y, 
-                             train_prop = params$train_prop, 
-                             valid_prop = params$valid_prop, 
-                             test_prop = params$test_prop,
-                             stratified_by = y)
+data_split <- dataSplit(X = X, y = y, stratified_by = y,
+                        train_prop = params$train_prop, 
+                        valid_prop = params$valid_prop, 
+                        test_prop = params$test_prop)
 Xtrain <- data_split$X$train
 Xvalid <- data_split$X$validate
 Xtest <- data_split$X$test
@@ -205,13 +202,15 @@ Provide summary statistics and/or figures of the three data sets to illustrate h
 #### X Data Split {.unnumbered}
 
 ```{r X-data-split, add_new_line = TRUE}
-plot_X_datasplit(Xtrain, Xvalid, Xtest)
+plotDataSplit(Xtrain, Xvalid, Xtest, 
+              xlab = "X", title = "Overall X Distribution")
 ```
 
 #### Y Data Split {.unnumbered}
 
 ```{r y-data-split, add_new_line = TRUE}
-plot_y_datasplit(ytrain, yvalid, ytest)
+plotDataSplit(ytrain, yvalid, ytest, 
+              xlab = "y", title = "Overall y Distribution")
 ```
 
 ## Data Cleaning and Preprocessing
@@ -229,14 +228,15 @@ If more than one preprocessing pipeline is reasonable, examine the impacts of th
 Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.
 
 ```{asis, interactive_text = TRUE}
-
+Given this example TCGA BRCA data set, we first preprocess the data by removing constant or duplicated columns. Then since the array data is highly right skewed, we will log-transform (i.e., log(x + 1)) the data. Finally, to keep this example template relatively quick to run, we will only keep the 1000 features with the highest variance.
 ```
 
 ```{r preprocess-data}
+## DO DATA CLEANING / PRE-PROCESSING HERE 
 Xtrain <- log(Xtrain + 1) %>%
   removeConstantCols(verbose = 1) %>%
   removeDuplicateCols(verbose = 1) %>%
-  filterByVar(max.p = 1000)
+  filterColsByVar(max_p = 1000)
 Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
 Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
 ```
@@ -258,61 +258,67 @@ Add summary statistics in accompanying tables (or in figures) for quick comparis
 
 ```
 
-### Training Data Overview {.tabset .custom-tabs}
+### Data Overview {.tabset .custom-tabs}
 
-```{r echo = FALSE}
-dataOverview(Xtrain = Xtrain, ytrain = ytrain) %>%
-  cat()
+```{r data-dims, echo = FALSE}
+# summary of data dimensions
+dataDimensions(Xtrain = Xtrain, Xvalid = Xvalid, Xtest = Xtest)
+```
+
+```{r data-types, results="asis", add_new_line = TRUE}
+# summary of types of features in (X, y) data
+dataTypes(X = Xtrain, y = ytrain)
 ```
 
 #### Summary Tables {.unnumbered}
 
-```{r results="asis", add_new_line = TRUE}
-# summary of types of features in training X
-data_types(Xtrain = Xtrain, ytrain = ytrain)
-```
-
-```{r results="asis", add_new_line = TRUE}
-# summary of features in training X, sorted by type
-tab_ls <- data_summary(Xtrain = Xtrain, ytrain = ytrain, digits = 2, sigfig = F)
-for (dt_name in names(tab_ls)) {
-  simChef:::subchunkify(tab_ls[[dt_name]], i = chunk_idx, 
+```{r data-summary-table, results="asis", add_new_line = TRUE}
+# broad array of summary statistics for features in training (X, y)
+tab_ls <- dataSummary(X = Xtrain, y = ytrain)
+for (dtype in names(tab_ls)) {  # grouped by data type
+  simChef:::subchunkify(tab_ls[[dtype]], i = chunk_idx, 
                         other_args = "results='asis'")
   chunk_idx <- chunk_idx + 1
 }
 ```
 
-#### X distribution {.unnumbered}
+#### X Distribution {.unnumbered}
 
-```{r, add_new_line = TRUE}
+```{r x-dist-plot, add_new_line = TRUE}
 # plot X distribution
-plot_X_distribution(Xtrain, "density")
+plotDataDistribution(data = Xtrain, 
+                     xlab = "X", title = "Training X Distribution")
 ```
 
-#### Y distribution {.unnumbered}
+#### Y Distribution {.unnumbered}
 
-```{r, add_new_line = TRUE}
+```{r y-dist-plot, add_new_line = TRUE}
 # plot y distribution
-plot_y_distribution(ytrain, "bar")
+plotDataDistribution(data = ytrain, 
+                     xlab = "y", title = "Training y Distribution")
+```
+
+#### Data Heatmap {.unnumbered}
+
+```{r data-heatmap, add_new_line = TRUE}
+# (clustered) heatmap of (X, y) data
+plotDataHeatmap(X = Xtrain, y = ytrain, clust_rows = TRUE, clust_cols = TRUE,
+                show_ytext = FALSE, x_text_angle = TRUE)
 ```
 
 #### Feature Correlation {.unnumbered}
 
-```{r, add_new_line = TRUE}
-# correlation heatmap
-keep_features <- sort(
-  sample(1:ncol(Xtrain), min(ncol(Xtrain), 1000), replace = FALSE)
-)
-plotCorHeatmap(X = Xtrain[, keep_features], cor_type = "pearson", 
-                      clust = TRUE, text_size = 0) +
-  ggplot2::labs(x = "Features", y = "Features", fill = "Cor.") +
-  simChef::pretty_ggplot_theme(x_text_angle = TRUE)
+```{r feature-cor-heatmap, add_new_line = TRUE}
+# (clustered) correlation heatmap
+plotCorHeatmap(X = Xtrain, cor_type = "pearson", clust = TRUE,
+               x_text_angle = TRUE) +
+  ggplot2::labs(x = "Features", y = "Features", fill = "Cor.")
 ```
 
 #### Feature Pair Plots {.unnumbered}
 
-```{r, add_new_line = TRUE}
-# pair plots
+```{r feature-pair-plot, add_new_line = TRUE}
+# feature pair plot (for a subset of features)
 keep_features <- sort(
   sample(1:ncol(Xtrain), min(ncol(Xtrain), 6), replace = FALSE)
 )
@@ -322,21 +328,21 @@ plotPairs(data = Xtrain, columns = keep_features,
 
 #### Marginal Associations {.unnumbered}
 
-```{r, add_new_line = TRUE}
+```{r marginal-assoc-plot, add_new_line = TRUE}
+# marginal association plots (for a subset of features)
 caret::featurePlot(x = Xtrain[, keep_features],
                    y = ytrain,
                    plot = if (is.factor(ytrain)) "box" else "scatter",
-                   # strip = strip.custom(par.strip.text = list(cex = .7)),
                    scales = list(x = list(relation = "free"), 
                                  y = list(relation = "free")))
 ```
 
 #### PCA {.unnumbered}
 
-```{r, add_new_line = TRUE}
-# dimension reduction plots
+```{r pca-plot, add_new_line = TRUE}
+# pca plot
 plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
-        center = T, scale = FALSE)$plot
+        center = TRUE, scale = FALSE)$plot
 ```
 
 # Prediction Modeling
@@ -370,7 +376,7 @@ Carry out the prediction pipeline, outlined above.
 ```
 
 ```{r caret-fits, eval = params$modeling_pkg == "caret", echo = params$modeling_pkg == "caret"}
-## Pick models and fitting backend for caret
+## IF USING CARET MODELING BACKEND, CHOOSE METHODS AND TRAINING CONTROLS HERE
 tr_control <- caret::trainControl(
   method = "cv",
   number = 5,
@@ -380,7 +386,6 @@ tr_control <- caret::trainControl(
   verboseIter = FALSE
 )
 
-response_type <- "raw"
 model_list <- list(
   ranger = list(tuneGrid = expand.grid(mtry = seq(sqrt(ncol(Xtrain)), 
                                                   ncol(Xtrain) / 3,
@@ -402,19 +407,26 @@ model_list <- list(
 start_time <- Sys.time()
 model_results <- fitCaret(Xtrain = Xtrain, ytrain = ytrain, 
                           Xtest = Xvalid, ytest = yvalid, 
-                          model_list = model_list, tr_control = tr_control, 
-                          response_type = response_type)
+                          model_list = model_list, tr_control = tr_control)
+cat(sprintf("Fitting time taken: %f minutes", 
+            difftime(Sys.time(), start_time, units = "mins")))
+```
+
+```{r h2o-fits, eval = params$modeling_pkg == "h2o", echo = params$modeling_pkg == "h2o"}
+## IF USING H2O MODELING BACKEND, CHOOSE METHODS AND TRAINING CONTROLS HERE
+model_list <- list(randomForest = list(ntrees = 500), 
+                   xgboost = list())
+
+start_time <- Sys.time()
+model_results <- fith2o(Xtrain = Xtrain, ytrain = ytrain,
+                        Xtest = Xvalid, ytest = yvalid,
+                        model_list = model_list)
 cat(sprintf("Fitting time taken: %f minutes", 
             difftime(Sys.time(), start_time, units = "mins")))
 ```
 
 ```{r tidymodels-fits, eval = params$modeling_pkg == "tidymodels", echo = params$modeling_pkg == "tidymodels"}
-# TODO: add code for tuning parameters
-# AK: Once tuning is fixed, can adjust splits for stability
-
-## Pick models and fitting backend for tidymodels
-
-# as is, only works for classification
+## IF USING TIDYMODELS BACKEND, CHOOSE METHODS AND TRAINING CONTROLS HERE
 rf_model <- parsnip::rand_forest() %>%
   parsnip::set_args(mtry = tune::tune()) %>%
   parsnip::set_engine("ranger", importance = "impurity") %>%
@@ -446,33 +458,12 @@ cat(sprintf("Fitting time taken: %f minutes",
             difftime(Sys.time(), start_time, units = "mins")))
 ```
 
-```{r h2o-fits, eval = params$modeling_pkg == "h2o", echo = params$modeling_pkg == "h2o"}
-## Pick models and fitting backend for h2o
-model_list <- list(randomForest = list(ntrees = 500), 
-                   xgboost = list())
-
-start_time <- Sys.time()
-model_results <- fith2o(Xtrain = Xtrain, ytrain = ytrain,
-                        Xtest = Xvalid, ytest = yvalid,
-                        model_list = model_list)
-cat(sprintf("Fitting time taken: %f minutes", 
-            difftime(Sys.time(), start_time, units = "mins")))
-```
-
-```{r prediction-accuracy-html, results = "asis", eval = knitr::is_html_output()}
-# (html) table of accuracy metrics
-model_results$errors %>%
-  simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Validation Prediction Accuracies", 
-           options = list(dom = 't'))
-```
-
-```{r prediction-accuracy-latex, results = "asis", eval = knitr::is_latex_output()}
-# (latex) table of accuracy metrics
-model_results$errors %>%
-  simChef::pretty_kable(digits = 2, sigfig = F, row.names = FALSE, 
-           caption = "Validation Prediction Accuracies",
-           format = "latex")
+```{r prediction-accuracy, results = "asis"}
+# table of accuracy metrics
+prettyTable(model_results$errors,
+            digits = 2, sigfig = FALSE, rownames = FALSE,
+            caption = "Validation Prediction Accuracies", 
+            html_options = list(options = list(dom = "t")))
 ```
 
 ## Stability check
@@ -507,8 +498,7 @@ bootstrap_model_results <- future.apply::future_replicate(
       model_results_b <- fitCaret(Xtrain = Xtrain_b, ytrain = ytrain_b, 
                                   Xtest = Xvalid, ytest = yvalid, 
                                   model_list = model_list, 
-                                  tr_control = tr_control, 
-                                  response_type = response_type)
+                                  tr_control = tr_control)
     } else if (params$modeling_pkg == "tidymodels") {
       model_results_b <- fitTidyModels(Xtrain = Xtrain_b, ytrain = ytrain_b, 
                                        Xtest = Xvalid, ytest = yvalid,
@@ -537,28 +527,16 @@ bootstrap_model_errs_summary <- bootstrap_model_errs %>%
   setNames(stringr::str_replace(colnames(.), "_", " "))
 ```
 
-```{r stability-check-table-html, results = "asis", eval = knitr::is_html_output()}
-# (html) table of accuracy metrics
-bootstrap_model_errs_summary %>%
-  simChef::pretty_DT(
-    digits = 2, sigfig = F, rownames = FALSE, 
-    caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
-    bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-    bold_scheme = c(F, T, F, T, F),
-    options = list(dom = 't')
-  )
-```
-
-```{r stability-check-table-latex, results = "asis", eval = knitr::is_latex_output()}
-# (latex) table of accuracy metrics
-bootstrap_model_errs_summary %>%
-  simChef::pretty_kable(
-    digits = 2, sigfig = F, row.names = FALSE, 
-    caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
-    bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
-    bold_scheme = c(F, T, F, T, F),
-    format = "latex"
-  )
+```{r stability-check-table, results = "asis"}
+# table of accuracy metrics
+prettyTable(
+  bootstrap_model_errs_summary,
+  digits = 2, sigfig = FALSE, rownames = FALSE,
+  caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits",
+  bold_function = ". == max(., na.rm = TRUE)", bold_margin = 2,
+  bold_scheme = c(F, T, F, T, F),
+  html_options = list(options = list(dom = "t"))
+)
 ```
 
 ```{r stability-check-boxplot}
@@ -584,26 +562,21 @@ For the models that pass the prediction and stability checks, extract the import
 
 #### Table {.unnumbered}
 
-```{r add_new_line = TRUE, results = "asis", eval = knitr::is_html_output()}
-simChef::pretty_DT(model_results$importance, digits = 2, sigfig = F, 
-                   caption = "Variable Importances")
-```
-
-```{r add_new_line = TRUE, results = "asis", eval = knitr::is_latex_output()}
-simChef::pretty_kable(model_results$importance, digits = 2, sigfig = F, 
-                      caption = "Variable Importances", format = "latex")
+```{r interpretability-table, add_new_line = TRUE, results = "asis"}
+prettyTable(model_results$importance, digits = 2, sigfig = FALSE,
+            caption = "Variable Importances")
 ```
 
 #### Plots {.unnumbered}
 
-```{r, add_new_line = TRUE}
+```{r interpretability-plot, add_new_line = TRUE}
 plotFeatureImportance(model_results$importance,
                       use_rankings = FALSE,
                       use_facets = TRUE,
                       interactive = FALSE)
 ```
 
-```{r, add_new_line = TRUE}
+```{r interpretability-pair-plot, add_new_line = TRUE}
 plotFeatureImportancePair(model_results$importance,
                           use_rankings = TRUE,
                           interactive = FALSE)
@@ -613,7 +586,7 @@ plotFeatureImportancePair(model_results$importance,
 
 #### Table {.unnumbered}
 
-```{r add_new_line = TRUE, results = "asis", eval = knitr::is_html_output()}
+```{r boot-interpretability-table, add_new_line = TRUE, results = "asis"}
 bootstrap_model_imps_summary <- bootstrap_model_imps %>%
   dplyr::group_by(model, variable) %>%
   dplyr::summarise(`Mean Importance` = mean(importance),
@@ -621,28 +594,16 @@ bootstrap_model_imps_summary <- bootstrap_model_imps %>%
                    `SD Importance` = sd(importance),
                    `Min Importance` = min(importance),
                    `Max Importance` = max(importance))
-simChef::pretty_DT(bootstrap_model_imps_summary, 
-                   digits = 2, sigfig = F, 
-                   caption = "Summary of variable importances across bootstrapped models")
-```
-
-```{r add_new_line = TRUE, results = "asis", eval = knitr::is_latex_output()}
-bootstrap_model_imps_summary <- bootstrap_model_imps %>%
-  dplyr::group_by(model, variable) %>%
-  dplyr::summarise(`Mean Importance` = mean(importance),
-                   `Median Importance` = median(importance),
-                   `SD Importance` = sd(importance),
-                   `Min Importance` = min(importance),
-                   `Max Importance` = max(importance))
-simChef::pretty_kable(bootstrap_model_imps_summary, 
-                      digits = 2, sigfig = F, 
-                      caption = "Summary of variable importances across bootstrapped models",
-                      format = "latex")
+prettyTable(
+  bootstrap_model_imps_summary, 
+  digits = 2, sigfig = F, 
+  caption = "Summary of variable importances across bootstrapped models"
+)
 ```
 
 #### Plots {.unnumbered}
 
-```{r, add_new_line = TRUE}
+```{r boot-interpretability-plot, add_new_line = TRUE}
 plotFeatureImportanceStability(bootstrap_model_imps,
                                use_rankings = FALSE,
                                use_facets = FALSE,
@@ -666,8 +627,7 @@ if (params$modeling_pkg == "caret") {
   final_model_results <- fitCaret(Xtrain = Xtrain_final, ytrain = ytrain_final, 
                                   Xtest = Xtest, ytest = ytest, 
                                   model_list = model_list, 
-                                  tr_control = tr_control, 
-                                  response_type = response_type)
+                                  tr_control = tr_control)
 } else if (params$modeling_pkg == "tidymodels") {
   final_model_results <- fitTidyModels(Xtrain = Xtrain_final, 
                                        ytrain = ytrain_final, 
@@ -689,19 +649,12 @@ Summarize test set prediction and/or interpretability results.
 
 <!-- TODO: Ana - add template tables with interpretation -->
 
-```{r test-accuracy-table-html, results = "asis", eval = knitr::is_html_output()}
-# (html) table of accuracy metrics
-final_model_results$errors %>%
-  simChef::pretty_DT(digits = 2, sigfig = F, rownames = FALSE, 
-           caption = "Test Prediction Accuracies", 
-           options = list(dom = 't'))
-```
-
-```{r test-accuracy-table-latex, results = "asis", eval = knitr::is_latex_output()}
-# (latex) table of accuracy metrics
-final_model_results$errors %>%
-    simChef::pretty_kable(digits = 2, sigfig = F, row.names = FALSE, 
-             caption = "Test Prediction Accuracies", format = "latex")
+```{r test-accuracy-table, results = "asis"}
+# table of accuracy metrics
+prettyTable(final_model_results$errors, 
+            digits = 2, sigfig = FALSE, rownames = FALSE,
+            caption = "Test Prediction Accuracies", 
+            html_options = list(options = list(dom = "t")))
 ```
 
 # Post hoc analysis
@@ -715,7 +668,7 @@ Move beyond the global prediction accuracy metrics and dive deeper into individu
 
 ```
 
-```{r}
+```{r posthoc-pair-plot}
 plotPairs(cbind(`True Repsonses` = ytest, final_model_results$predictions), 
           columns = 1:(ncol(final_model_results$predictions) + 1), 
           title = "Comparison of model predictions")

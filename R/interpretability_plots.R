@@ -1,3 +1,39 @@
+#' Feature importance plots
+#' 
+#' @name plotFeatureImportance
+#' @description Various plotting functions to visualize feature importances. 
+#'   `plotFeatureImportances` creates bar plots of the feature importances 
+#'   across different models. `plotFeatureImportancePair` create pair plots,
+#'   comparing the feature importances between all pairs of models. 
+#'   `plotFeatureImportanceStability` creates boxplots of the 
+#'   distribution of feature importances across the many data perturbations for
+#'   each model.
+#' 
+#' @param data A data frame with the feature importance information. At a 
+#'   minimum, this data frame should contain columns with the names specified by 
+#'   `feature_col`, `importance_col`, and `model_col`.
+#' @param feature_col Character string. Name of the column in `data` with the
+#'   feature names.
+#' @param importance_col Character string. Name of the column in `data` with the
+#'   feature importance scores.
+#' @param model_col Character string. Name of the column in `data` with the 
+#'   model names.
+#' @param max_features Maximum number of features to display in the plot.
+#' @param use_rankings Logical indicating whether or not to use the feature
+#'   importance rankings, rather than the raw feature importance scores, for
+#'   plotting.
+#' @param use_facets Logical indicating whether or not to use faceting to
+#'   separate the feature importances by model.
+#' @param interactive Logical indicating whether or not to return an interactive
+#'   plot.
+#' 
+#' @returns If `interactive = FALSE`, returns a ggplot object. If 
+#'   `interactive = TRUE`, returns an interactive plotly object.
+#' 
+NULL
+
+#' @rdname plotFeatureImportance
+#' @export
 plotFeatureImportance <- function(data, feature_col = "variable", 
                                   importance_col = "importance", 
                                   model_col = "model",
@@ -43,6 +79,8 @@ plotFeatureImportance <- function(data, feature_col = "variable",
   return(plt)
 }
 
+#' @rdname plotFeatureImportance
+#' @export
 plotFeatureImportancePair <- function(data, feature_col = "variable", 
                                       importance_col = "importance", 
                                       model_col = "model",
@@ -69,6 +107,8 @@ plotFeatureImportancePair <- function(data, feature_col = "variable",
   return(plt)
 }
 
+#' @rdname plotFeatureImportance
+#' @export
 plotFeatureImportanceStability <- function(data, feature_col = "variable", 
                                            importance_col = "importance", 
                                            model_col = "model",
