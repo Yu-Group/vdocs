@@ -34,9 +34,9 @@ NULL
 
 #' @rdname plotFeatureImportance
 #' @export
-plotFeatureImportance <- function(data, feature_col = "variable", 
-                                  importance_col = "importance", 
-                                  model_col = "model",
+plotFeatureImportance <- function(data, feature_col = "Variable", 
+                                  importance_col = "Importance", 
+                                  model_col = "Method",
                                   max_features = 50,
                                   use_rankings = FALSE,
                                   use_facets = TRUE,
@@ -49,7 +49,8 @@ plotFeatureImportance <- function(data, feature_col = "variable",
     keep_features <- data %>%
       dplyr::group_by(dplyr::across(tidyselect::all_of(c(model_col,
                                                          feature_col)))) %>%
-      dplyr::summarise(.keep_features = any(.ranking <= max_features)) %>%
+      dplyr::summarise(.keep_features = any(.ranking <= max_features), 
+                       .groups = "keep") %>%
       dplyr::filter(.keep_features)
     data <- data %>%
       dplyr::filter(.data[[feature_col]] %in% unique(keep_features[[feature_col]]))
@@ -65,7 +66,7 @@ plotFeatureImportance <- function(data, feature_col = "variable",
   if (use_facets) {
     plt <- plotBarplot(data, x_str = feature_col, y_str = importance_col,
                        stat = "identity") + 
-      ggplot2::facet_wrap(~ .data[[model_col]], scales = "free")
+      ggplot2::facet_grid(.data[[model_col]] ~ ., scales = "free")
   } else {
     plt <- plotBarplot(data, x_str = feature_col, y_str = importance_col,
                        fill_str = model_col, stat = "identity")
@@ -81,9 +82,9 @@ plotFeatureImportance <- function(data, feature_col = "variable",
 
 #' @rdname plotFeatureImportance
 #' @export
-plotFeatureImportancePair <- function(data, feature_col = "variable", 
-                                      importance_col = "importance", 
-                                      model_col = "model",
+plotFeatureImportancePair <- function(data, feature_col = "Variable", 
+                                      importance_col = "Importance", 
+                                      model_col = "Method",
                                       use_rankings = FALSE, 
                                       interactive = FALSE, ...) {
   if (use_rankings) {
@@ -95,8 +96,12 @@ plotFeatureImportancePair <- function(data, feature_col = "variable",
     plt_title <- "Comparison of Feature Importance Rankings Across Methods"
   }
   
+  keep_cols <- c(feature_col, importance_col, model_col)
   data <- data %>%
-    tidyr::pivot_wider(names_from = model_col, values_from = importance_col)
+    dplyr::select(tidyselect::all_of(keep_cols)) %>%
+    tidyr::pivot_wider(names_from = tidyselect::all_of(model_col), 
+                       values_from = tidyselect::all_of(importance_col), 
+                       values_fill = 0)
   plt <- plotPairs(data = data,
                    columns = which(!(colnames(data) %in% feature_col)), 
                    ...) +
@@ -109,9 +114,9 @@ plotFeatureImportancePair <- function(data, feature_col = "variable",
 
 #' @rdname plotFeatureImportance
 #' @export
-plotFeatureImportanceStability <- function(data, feature_col = "variable", 
-                                           importance_col = "importance", 
-                                           model_col = "model",
+plotFeatureImportanceStability <- function(data, feature_col = "Variable", 
+                                           importance_col = "Importance", 
+                                           model_col = "Method",
                                            max_features = 50,
                                            use_rankings = FALSE,
                                            use_facets = TRUE,
@@ -124,7 +129,8 @@ plotFeatureImportanceStability <- function(data, feature_col = "variable",
     keep_features <- data %>%
       dplyr::group_by(dplyr::across(tidyselect::all_of(c(model_col,
                                                          feature_col)))) %>%
-      dplyr::summarise(.keep_features = mean(.ranking <= max_features) >= 0.5) %>%
+      dplyr::summarise(.keep_features = mean(.ranking <= max_features) >= 0.5,
+                       .groups = "keep") %>%
       dplyr::filter(.keep_features)
     data <- data %>%
       dplyr::filter(.data[[feature_col]] %in% unique(keep_features[[feature_col]]))
@@ -139,7 +145,7 @@ plotFeatureImportanceStability <- function(data, feature_col = "variable",
     plt <- ggplot2::ggplot(data) +
       ggplot2::aes(x = .data[[feature_col]], y = .data[[importance_col]]) +
       ggplot2::geom_boxplot() +
-      ggplot2::facet_wrap(~ .data[[model_col]], scales = "free")
+      ggplot2::facet_grid(.data[[model_col]] ~ ., scales = "free")
   } else {
     plt <- ggplot2::ggplot(data) +
       ggplot2::aes(x = .data[[feature_col]], y = .data[[importance_col]],
