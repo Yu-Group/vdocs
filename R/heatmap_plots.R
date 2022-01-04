@@ -197,9 +197,9 @@ plotHeatmap <- function(X, y_groups = NULL, x_groups = NULL,
   if (!color_by_quantile | is.factor(X_long$fill)) {
     if (is.null(color_scheme) | identical(color_scheme, "viridis")) {
       plt <- plt +
-        simChef::pretty_ggplot_fill(fill = fill, 
+        simChef::pretty_ggplot_fill(fill = X_long$fill, 
                                     viridis = TRUE, option = viridis_option) +
-        simChef::pretty_ggplot_color(color = fill, 
+        simChef::pretty_ggplot_color(color = X_long$fill, 
                                      viridis = TRUE, option = viridis_option)
     } else if (identical(color_scheme, "temperature")) {
       plt <- plt + 

@@ -55,7 +55,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
     dplyr::group_by(group) %>%
     dplyr::summarise(Freq = c(table(dtype)), .groups = "keep") %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Class = capitalize(names(Freq))) %>%
+    dplyr::mutate(Class = R.utils::capitalize(names(Freq))) %>%
     tidyr::spread(key = "Class", value = "Freq") %>%
     tibble::column_to_rownames("group")
   if (html) {

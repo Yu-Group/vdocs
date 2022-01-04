@@ -447,7 +447,9 @@ printFitResults(fit_results)
 ```{r prediction-results, echo = FALSE, results = "asis"}
 # display prediction metrics, confusion matrices, and roc/pr plots if applicable
 showEvalResults(eval_results, digits = 2, sigfig = FALSE,
-                html_options = list(options = list(dom = "t")))
+                html_options = list(
+                  options = list(dom = "t", pageLength = nrow(eval_results))
+                ))
 ```
 
 ## Stability check {.tabset .custom-tabs}
@@ -531,6 +533,8 @@ prettyTable(
     extensions = "RowGroup",
     options = list(
       dom = "t",
+      pageLength = nrow(bootstrap_model_errs_summary),
+      scrollY = "500px",
       rowGroup = list(dataSrc = 0),
       columnDefs = list(list(className = "dt-center", targets = "_all"),
                         list(visible = FALSE, targets = 0),
@@ -664,7 +668,10 @@ printFitResults(fit_results_final)
 ```{r final-prediction-results, echo = FALSE, results = "asis"}
 # display prediction metrics, confusion matrices, and roc/pr plots if applicable
 showEvalResults(eval_results_final, test_set = TRUE, digits = 2, sigfig = FALSE,
-                html_options = list(options = list(dom = "t")))
+                html_options = list(
+                  options = list(dom = "t", 
+                                 pageLength = nrow(eval_results_final))
+                ))
 ```
 
 # Post hoc analysis
