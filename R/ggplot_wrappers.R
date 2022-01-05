@@ -13,19 +13,25 @@
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param stat See [ggplot2::geom_bar()].
 #' @param position See [ggplot2::geom_bar()].
+#' @param theme_options (Optional) list of arguments to pass to 
+#'   simChef::pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_bar()].
 #'
 #' @return A ggplot bar plot.
 #' 
+#' @family pretty_ggplot_wrappers
+#' 
 #' @examples 
 #' df <- data.frame(x = rep(letters[1:3], 2), y = rep(LETTERS[1:2], 3))
 #' plotBarplot(data = df, x_str = "x")
 #' plotBarplot(df, x_str = "x", fill_str = "y")
+#' 
+#' @export
 plotBarplot <- function(data, x_str, y_str = NULL,
                         fill_str = NULL, fill = "#6FBBE3", 
                         stat = "count", position = "dodge",
-                        show_plot = F, ...) {
+                        theme_options = NULL, show_plot = FALSE, ...) {
   
   if (is.null(x_str) | missing(x_str)) {
     stop("Must specify x_str argument.")
@@ -40,8 +46,7 @@ plotBarplot <- function(data, x_str, y_str = NULL,
   plt <- ggplot2::ggplot(data) +
     simChef:::get_aesthetics(x_str = x_str, y_str = y_str, 
                              fill_str = fill_str) +
-    ggplot2::labs(x = x_str, y = ylab, fill = fill_str) +
-    simChef::pretty_ggplot_theme()
+    ggplot2::labs(x = x_str, y = ylab, fill = fill_str)
   if (!is.null(fill_str)) {
     if (is.character(data[[fill_str]])) {
       data[[fill_str]] <- as.factor(data[[fill_str]])
@@ -54,6 +59,12 @@ plotBarplot <- function(data, x_str, y_str = NULL,
     plt <- plt +
       ggplot2::geom_bar(position = position, stat = stat, color = "grey98",
                         fill = fill, ...)
+  }
+  if (is.null(theme_options)) {
+    plt <- plt + simChef::pretty_ggplot_theme()
+  } else {
+    plt <- plt + 
+      do.call(simChef::pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -75,44 +86,60 @@ plotBarplot <- function(data, x_str, y_str = NULL,
 #'   to use as fill aesthetic in plot.
 #' @param horizontal Logical. Whether the boxplots should be horizontal instead
 #'   of vertical.
+#' @param theme_options (Optional) list of arguments to pass to 
+#'   simChef::pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_boxplot()].
 #'
 #' @return A ggplot boxplot.
 #' 
+#' @family pretty_ggplot_wrappers
+#' 
 #' @examples 
 #' ## plot boxplot of all data in data frame
 #' plotBoxplot(as.data.frame(matrix(rnorm(1000), nrow = 100)))
 #' ## plot boxplot of single column in data frame
-#' plotBoxplot(iris, x_str = "Sepal.Width")
-#' plotBoxplot(iris, x_str = "Sepal.Width", y_str = "Species")
+#' plotBoxplot(iris, y_str = "Sepal.Width")
+#' plotBoxplot(iris, x_str = "Species", y_str = "Sepal.Width")
 #' iris2 <- data.frame(iris, 
 #'                     z = as.factor(rep(letters[1:2], 
 #'                                   length.out = nrow(iris))))
-#' plotBoxplot(iris2, x_str = "Sepal.Width", y_str = "Species", fill_str = "z")
+#' plotBoxplot(iris2, x_str = "Species", y_str = "Sepal.Width", fill_str = "z")
+#' plotBoxplot(iris2, y_str = "Sepal.Width", fill_str = "z")
+#' 
+#' @export
 plotBoxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
-                        horizontal = TRUE, show_plot = F, ...) {
-  if (is.null(x_str)) {  # plot all data
-    x_str <- "data"
+                        horizontal = FALSE, theme_options = NULL, 
+                        show_plot = FALSE, ...) {
+  if (is.null(y_str)) {  # plot all data
+    y_str <- "data"
     data <- tidyr::gather(data, key = "variable", value = "data",
-                          -tidyselect::all_of(c(fill_str, y_str)))
+                          -tidyselect::all_of(c(fill_str, x_str)))
   }
+  group_str <- x_str
   
-  group_str <- y_str
-  if (!is.null(y_str) && !is.null(fill_str)) {
-    group_str <- sprintf("interaction(%s, %s)", y_str, fill_str)
-  }
   plt <- ggplot2::ggplot(data) +
     simChef:::get_aesthetics(x_str = x_str, y_str = y_str, 
                              fill_str = fill_str, group_str = group_str) +
     ggplot2::geom_boxplot(...) +
-    ggplot2::labs(x = x_str, y = y_str, fill = fill_str) +
-    simChef::pretty_ggplot_theme()
+    ggplot2::labs(x = x_str, y = y_str, fill = fill_str)
+  if (!is.null(x_str) && !is.null(fill_str)) {
+    group_str <- substitute(interaction(x_str, fill_str),
+                            list(x_str = as.symbol(x_str), 
+                                 fill_str = as.symbol(fill_str)))
+    plt <- plt + ggplot2::aes(group = !!group_str)
+  } 
   if (!is.null(fill_str)) {
     plt <- plt + simChef::pretty_ggplot_fill(fill = data[[fill_str]])
   }
-  if (!horizontal) {
+  if (horizontal) {
     plt <- plt + ggplot2::coord_flip()
+  }
+  if (is.null(theme_options)) {
+    plt <- plt + simChef::pretty_ggplot_theme()
+  } else {
+    plt <- plt + 
+      do.call(simChef::pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -132,10 +159,14 @@ plotBoxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
 #'   to use as fill aesthetic in plot.
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param alpha Alpha value for transparency.
+#' @param theme_options (Optional) list of arguments to pass to 
+#'   simChef::pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_density()].
 #'
 #' @return A ggplot density.
+#' 
+#' @family pretty_ggplot_wrappers
 #' 
 #' @examples 
 #' ## plot distribution of all data in data frame
@@ -144,8 +175,10 @@ plotBoxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
 #' plotDensity(iris, x_str = "Sepal.Width")
 #' plotDensity(iris, x_str = "Sepal.Width", fill_str = "Species")
 #' 
+#' @export
 plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
-                        alpha = 0.4, show_plot = F, ...) {
+                        alpha = 0.4, theme_options = NULL, show_plot = FALSE, 
+                        ...) {
   if (is.null(x_str)) {  # plot all data
     x_str <- "data"
     data <- tidyr::gather(data, key = "variable", value = "data",
@@ -154,8 +187,7 @@ plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
   
   plt <- ggplot2::ggplot(data) +
     simChef:::get_aesthetics(x_str = x_str, fill_str = fill_str) + 
-    ggplot2::labs(x = x_str, y = "Density", fill = fill_str) +
-    simChef::pretty_ggplot_theme()
+    ggplot2::labs(x = x_str, y = "Density", fill = fill_str)
   if (!is.null(fill_str)) {
     if (is.character(data[[fill_str]])) {
       data[[fill_str]] <- as.factor(data[[fill_str]])
@@ -166,6 +198,12 @@ plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
   } else {
     plt <- plt +
       ggplot2::geom_density(color = "black", alpha = alpha, fill = fill, ...)
+  }
+  if (is.null(theme_options)) {
+    plt <- plt + simChef::pretty_ggplot_theme()
+  } else {
+    plt <- plt + 
+      do.call(simChef::pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -185,10 +223,14 @@ plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #'   to use as fill aesthetic in plot.
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param bins Number of histogram bins.
+#' @param theme_options (Optional) list of arguments to pass to 
+#'   simChef::pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_histogram()].
 #'
 #' @return A ggplot histogram.
+#' 
+#' @family pretty_ggplot_wrappers
 #' 
 #' @examples 
 #' ## plot distribution of all data in data frame
@@ -196,8 +238,11 @@ plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #' ## plot distribution of a single column in data frame
 #' plotHistogram(iris, x_str = "Sepal.Width")
 #' plotHistogram(iris, x_str = "Sepal.Width", fill_str = "Species")
+#' 
+#' @export
 plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
-                          bins = 12, show_plot = F, ...) {
+                          bins = 12, theme_options = NULL, show_plot = FALSE, 
+                          ...) {
   if (is.null(x_str)) {  # plot all data
     x_str <- "data"
     data <- tidyr::gather(data, key = "variable", value = "data",
@@ -206,8 +251,7 @@ plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
   
   plt <- ggplot2::ggplot(data) +
     simChef:::get_aesthetics(x_str = x_str, fill_str = fill_str) + 
-    ggplot2::labs(x = x_str, y = "Frequency", fill = fill_str) +
-    simChef::pretty_ggplot_theme()
+    ggplot2::labs(x = x_str, y = "Frequency", fill = fill_str)
   if (!is.null(fill_str)) {
     if (is.character(data[[fill_str]])) {
       data[[fill_str]] <- as.factor(data[[fill_str]])
@@ -218,6 +262,12 @@ plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
   } else {
     plt <- plt +
       ggplot2::geom_histogram(color = "grey98", bins = bins, fill = fill, ...)
+  }
+  if (is.null(theme_options)) {
+    plt <- plt + simChef::pretty_ggplot_theme()
+  } else {
+    plt <- plt + 
+      do.call(simChef::pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -237,10 +287,14 @@ plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #'   y-axis.
 #' @param color_str Character string (optional). Name of variable in \code{data}
 #'   to use as color aesthetic in plot.
+#' @param theme_options (Optional) list of arguments to pass to 
+#'   simChef::pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_line()].
 #'
 #' @return A ggplot line plot.
+#' 
+#' @family pretty_ggplot_wrappers
 #' 
 #' @examples 
 #' df <- data.frame(time = 1:5, value = 5:9)
@@ -248,7 +302,10 @@ plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #' df2 <- data.frame(time = rep(1:5, 2), value = 1:10,
 #'                   group = rep(letters[1:2], each = 5))
 #' plotLine(df2, x_str = "time", y_str = "value", color_str = "group")
-plotLine <- function(data, x_str, y_str, color_str = NULL, show_plot = F, ...) {
+#' 
+#' @export
+plotLine <- function(data, x_str, y_str, color_str = NULL, 
+                     theme_options = NULL, show_plot = FALSE, ...) {
   if (is.null(x_str) | is.null(y_str)) {
     stop("Must specify x_str and y_str argument.")
   }
@@ -257,13 +314,18 @@ plotLine <- function(data, x_str, y_str, color_str = NULL, show_plot = F, ...) {
     simChef:::get_aesthetics(x_str = x_str, y_str = y_str, 
                              color_str = color_str, group_str = color_str) + 
     ggplot2::geom_line(...) +
-    ggplot2::labs(x = x_str, y = y_str, color = color_str) +
-    simChef::pretty_ggplot_theme()
+    ggplot2::labs(x = x_str, y = y_str, color = color_str)
   if (!is.null(color_str)) {
     if (is.character(data[[color_str]])) {
       data[[color_str]] <- as.factor(data[[color_str]])
     }
     plt <- plt + simChef::pretty_ggplot_color(color = data[[color_str]])
+  }
+  if (is.null(theme_options)) {
+    plt <- plt + simChef::pretty_ggplot_theme()
+  } else {
+    plt <- plt + 
+      do.call(simChef::pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -283,18 +345,23 @@ plotLine <- function(data, x_str, y_str, color_str = NULL, show_plot = F, ...) {
 #'   y-axis.
 #' @param color_str Character string (optional). Name of variable in \code{data}
 #'   to use as color aesthetic in plot.
+#' @param theme_options (Optional) list of arguments to pass to 
+#'   simChef::pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_point()].
 #'
 #' @return A ggplot scatter plot.
 #' 
+#' @family pretty_ggplot_wrappers
+#' 
 #' @examples 
 #' plotScatter(iris, x_str = "Sepal.Width", y_str = "Sepal.Length")
 #' plotScatter(iris, x_str = "Sepal.Width", y_str = "Sepal.Length",
 #'             color_str = "Species")
-#'             
+#'            
+#' @export 
 plotScatter <- function(data, x_str, y_str, color_str = NULL,
-                        show_plot = F, ...) {
+                        theme_options = NULL, show_plot = FALSE, ...) {
   if (is.null(x_str) | is.null(y_str)) {
     stop("Must specify x_str and y_str argument.")
   }
@@ -303,13 +370,18 @@ plotScatter <- function(data, x_str, y_str, color_str = NULL,
     simChef:::get_aesthetics(x_str = x_str, y_str = y_str, 
                              color_str = color_str) + 
     ggplot2::geom_point(...) +
-    ggplot2::labs(x = x_str, y = y_str, color = color_str) +
-    simChef::pretty_ggplot_theme()
+    ggplot2::labs(x = x_str, y = y_str, color = color_str)
   if (!is.null(color_str)) {
     if (is.character(data[[color_str]])) {
       data[[color_str]] <- as.factor(data[[color_str]])
     }
     plt <- plt + simChef::pretty_ggplot_color(color = data[[color_str]])
+  }
+  if (is.null(theme_options)) {
+    plt <- plt + simChef::pretty_ggplot_theme()
+  } else {
+    plt <- plt + 
+      do.call(simChef::pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)

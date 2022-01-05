@@ -173,3 +173,9 @@ blockquote {
 	display: none !important;
 }
 
+/* set max height for code blocks */
+.scroll-300 {
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: inherit;
+}

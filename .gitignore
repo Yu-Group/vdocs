@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+data/tcga*
+figure/*
+GDCdata/*
+MANIFEST.txt
+pcs_lab_notebook_files/*
+pcs_lab_notebook_cache/*
