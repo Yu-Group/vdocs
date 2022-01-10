@@ -94,10 +94,10 @@ loadBRCAData <- function() {
   
   GDCdownload(query)
   data <- GDCprepare(query)
-  y_data <- as.data.frame(colData(data))
-  X_data <- as.data.frame(t(assay(data)))
+  y_data <- data.frame(colData(data))
+  X_data <- data.frame(t(assay(data)))
   
-  keep_samples <- rownames(y_data)[!is.na(y_data$paper_BRCA_Subtype_PAM50)]
+  keep_samples <- !is.na(y_data$paper_BRCA_Subtype_PAM50)
   y <- as.factor(y_data$paper_BRCA_Subtype_PAM50[keep_samples])
   X <- X_data[keep_samples, ]
 

@@ -56,7 +56,7 @@ css: [css/custom_material_rmd_theme.css, css/custom_checkbox.css]
 # runtime: shiny
 ---
 
-```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
 source("scripts/rmd-setup.R", local = knitr::knit_global())
 
 # load in packages
