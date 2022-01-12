@@ -3,7 +3,6 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE,
   collapse = TRUE,
-  cache = TRUE,
   fig.align = "center",
   fig.pos = "H",
   fig.show = "hold",
@@ -12,7 +11,7 @@ knitr::opts_chunk$set(
 
 if (knitr::is_html_output()) {
   options(width = 10000)
-  
+
   # knitr hook for interactive textboxes (tinyMCE) and collapsible help sections
   knitr::knit_hooks$set(
     interactive_text = function(before, options) {
@@ -24,7 +23,7 @@ if (knitr::is_html_output()) {
     help = function(before, options) {
       if (before) {
         out <- sprintf('<div class="help-info">\n>%s\n</div>',
-                       options$code)
+                       paste(options$code, collapse = "\n>"))
       }
     }
   )
@@ -50,7 +49,7 @@ if (knitr::is_html_output()) {
     # hack to fix missing new line after some subsections
     add_new_line = function(before, options) {
       if (before) {
-        out <- "\\phantom{.}"  
+        out <- "\\phantom{.}"
       }
     }
   )

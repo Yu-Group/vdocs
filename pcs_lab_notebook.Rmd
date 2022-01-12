@@ -18,7 +18,7 @@ output:
     lightbox: true
     code_download: true
     includes:
-      before_body: html/setup.html
+      before_body: header/setup.html
   pdf_document:
     number_sections: true
 params:
@@ -58,6 +58,11 @@ css: [css/custom_material_rmd_theme.css, css/custom_checkbox.css]
 
 ```{r setup, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
 source("scripts/rmd-setup.R", local = knitr::knit_global())
+
+knitr::opts_chunk$set(
+  # set to TRUE if want to cache results
+  cache = FALSE
+)
 
 # load in packages
 library(magrittr)  # can remove once package is created and `%>%` is imported
@@ -169,8 +174,9 @@ Decide on the proportion of data in each split.
 Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
 
 ```{asis, help = TRUE}
-- Here we refer to splitting data into training, validation, and test portions. In general, the goal is to fit select models (including any necessary tuning procedures) on the training data, and assess prediction accuracy on the validation data. **Test data should only be utilized after all data analysis is completed.**
-- This split can strongly effect results since data often have underlying structure/relationships (e.g., longitudinal information, related individuals, ethnicity, varying hospitals, etc.). If certain characteristics are underrepresented in training, then validation accuracy can deteriorate. Thus, a stratified approach is often recommended.
+Here we refer to splitting data into training, validation, and test portions. In general, the goal is to fit select models (including any necessary tuning procedures) on the training data, and assess prediction accuracy on the validation data. **Test data should only be utilized after all data analysis is completed.**
+
+This split can strongly effect results since data often have underlying structure/relationships (e.g., longitudinal information, related individuals, ethnicity, varying hospitals, etc.). If certain characteristics are underrepresented in training, then validation accuracy can deteriorate. Thus, a stratified approach is often recommended.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -363,9 +369,11 @@ plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
 Discuss the prediction methods under consideration, and explain why these methods were chosen.
 
 ```{asis, help = TRUE}
-- There are an overwhelming number of methods available, but at least one should be a common approach acting as a baseline. This may not be optimal for the problem setting, but serves as a helpful comparison. Any "go-to" methods in this scientific domain should be considered. Discuss why these are favored, for instance, is there a natural structure in the data that is better utilized in one approach vs another? Conversely, mention if there are approaches typically avoided in these problems. The limitations discussed previously can also help guide these decisions given some procedures will be better equipped to handle these compared to others.
-- Think back to the big picture, if interpretability is important, methods favoring sparser, simpler models may be preferred (e.g., sparse regression or tree-based procedures). If prediction is the sole goal, more complex models may be appropriate.
-- If computing time is a burden, and rules out methods with high potential, this should be highlighted for future reference as scalability and/or computing resources improve.
+There are an overwhelming number of methods available, but at least one should be a common approach acting as a baseline. This may not be optimal for the problem setting, but serves as a helpful comparison. Any "go-to" methods in this scientific domain should be considered. Discuss why these are favored, for instance, is there a natural structure in the data that is better utilized in one approach vs another? Conversely, mention if there are approaches typically avoided in these problems. The limitations discussed previously can also help guide these decisions given some procedures will be better equipped to handle these compared to others.
+
+Think back to the big picture, if interpretability is important, methods favoring sparser, simpler models may be preferred (e.g., sparse regression or tree-based procedures). If prediction is the sole goal, more complex models may be appropriate.
+
+If computing time is a burden, and rules out methods with high potential, this should be highlighted for future reference as scalability and/or computing resources improve.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -505,7 +513,6 @@ As when determining an appropriate splitting rule, the perturbation scheme shoul
 3. Evaluate prediction methods on validation data.
 4. Assess stability across the data perturbations as well as across the various methods.
 5. Filter out poor models where necessary and interpret stability results.
-
 ```{asis, help = TRUE}
 Methods with highly variable accuracy should be discarded. In addition, take note if any set of perturbations resulted in uniformly poor accuracy across methods. This could indicate an underlying issue with the perturbation approach.
 ```
