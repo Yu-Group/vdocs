@@ -1,0 +1,62 @@
+Package: veridicalDocs
+Type: Package
+Title: Beautiful Documentation for PCS-style Analyses
+Version: 0.0.0.9000
+Authors@R: c(
+    person(given = "Tiffany", family = "Tang", role = c("aut", "cre"),
+           email = "tiffany.tang@berkeley.edu"),
+    person(given = "Ana Maria", family = "Kenney", role = "aut",
+           email = "anamaria.kenney@berkeley.edu"))
+Description: Provides a beautiful and automated documentation template 
+    using Rmarkdown for performing PCS-style Analyses.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Imports: 
+    bookdown,
+    caret,
+    cowplot,
+    data.table,
+    dendextend,
+    dplyr,
+    future.apply,
+    GGally,
+    ggdendro,
+    ggplot2,
+    h2o,
+    htmltools,
+    irlba,
+    kableExtra,
+    knitr,
+    leaflet,
+    magrittr,
+    methods,
+    parsnip,
+    patchwork,
+    plotly,
+    purrr,
+    R.utils,
+    RColorBrewer,
+    rlang,
+    rmdformats,
+    rsample,
+    shiny,
+    simChef,
+    skimr,
+    stringr,
+    tibble,
+    tidyr,
+    tidyselect,
+    tune,
+    vip,
+    viridis,
+    workflows,
+    yardstick
+Suggests: 
+    testthat (>= 3.0.0),
+    SummarizedExperiment,
+    TCGAbiolinks,
+    utils,
+    rmarkdown
+Config/testthat/edition: 3

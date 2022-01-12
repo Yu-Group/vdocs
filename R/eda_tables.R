@@ -46,6 +46,10 @@ dataDimensions <- function(Xtrain, Xvalid, Xtest, print = TRUE) {
 #' 
 #' @export
 dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
+  group <- NULL  # to fix no visible binding for global variable error
+  dtype <- NULL
+  Freq <- NULL
+  
   data <- cbind(.y = y, X)
   dtypes_df <- data.frame(
     var = colnames(data),
@@ -101,6 +105,11 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
 dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
                         features = NULL, max_features = 1000, 
                         html = knitr::is_html_output(), ...) {
+  skim_type <- NULL  # to fix no visible binding for global variable error
+  complete_rate <- NULL
+  factor.ordered <- NULL
+  logical.count <- NULL
+  
   if (is.null(features)) {
     features <- colnames(X)
     if (length(features) > max_features) {

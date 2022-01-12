@@ -1,8 +1,7 @@
 #' @rdname fitModel
 #' @export
-fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(), 
+fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
                           cv_options = list(), train_options = list()) {
-  require(parsnip)
   if (identical(train_options, list())) {
     train_options <- NULL
   }
@@ -13,7 +12,7 @@ fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
       model_options$mode <- "classification"
     }
   }
-  
+
   if (!is.null(cv_options$nfolds)) {
     nfolds <- cv_options$nfolds
   } else {
@@ -21,12 +20,13 @@ fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
   }
   foldids <- cv_options$foldids
   metric <- cv_options$metric
-  
+
   train_df <- dplyr::bind_cols(as.data.frame(Xtrain), .y = ytrain)
-  
+
   wf <- workflows::workflow() %>%
     workflows::add_formula(.y ~ .)
-  
+  model_fun <- get(model_name, asNamespace("parsnip"))
+
   if (".tune_params" %in% names(model_options)) {
     if (is.null(foldids)) {
       train_cvfolds <- rsample::vfold_cv(train_df, v = nfolds)
@@ -51,14 +51,14 @@ fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
     if (is.list(model_options$engine)) {
       engine_args <- model_options$engine
       model_options$engine <- NULL
-      model <- do.call(model_name, args = c(model_options, model_args))
-      model <- do.call("set_engine", 
+      model <- do.call(model_fun, args = c(model_options, model_args))
+      model <- do.call(parsnip::set_engine,
                        args = c(list(object = model), engine_args))
     } else {
-      model <- do.call(model_name, args = c(model_options, model_args))
+      model <- do.call(model_fun, args = c(model_options, model_args))
     }
     wf <- wf %>% workflows::add_model(model)
-    fit <- do.call(tune::tune_grid, 
+    fit <- do.call(tune::tune_grid,
                    args = c(list(object = wf,
                                  resamples = train_cvfolds,
                                  grid = param_grid),
@@ -70,8 +70,8 @@ fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
     if (is.list(model_options$engine)) {
       engine_args <- model_options$engine
       model_options$engine <- NULL
-      model <- do.call(model_name, args = model_options)
-      model <- do.call("set_engine", 
+      model <- do.call(model_fun, args = model_options)
+      model <- do.call(parsnip::set_engine,
                        args = c(list(object = model), engine_args))
     } else {
       model <- do.call(model_name, args = model_options)
@@ -89,13 +89,13 @@ predictTidymodels <- function(fit, Xtest, ...) {
   if (inherits(fit, "tune_results")) {
     fit <- attr(fit, "best_fit")
   }
-  
-  pred <- predict(fit, as.data.frame(Xtest), ...)
+
+  pred <- stats::predict(fit, as.data.frame(Xtest), ...)
   if (workflows::extract_fit_parsnip(fit)$spec$mode == "classification") {
-    prob_pred <- predict(fit, as.data.frame(Xtest), type = "prob", ...)
-    colnames(prob_pred) <- stringr::str_remove(colnames(prob_pred), 
+    prob_pred <- stats::predict(fit, as.data.frame(Xtest), type = "prob", ...)
+    colnames(prob_pred) <- stringr::str_remove(colnames(prob_pred),
                                                "^\\.pred\\_")
-    pred <- tibble::tibble(predictions = pred$.pred_class, 
+    pred <- tibble::tibble(predictions = pred$.pred_class,
                            prob_predictions = prob_pred)
   } else {
     pred <- tibble::tibble(predictions = pred$.pred_class)
@@ -106,30 +106,38 @@ predictTidymodels <- function(fit, Xtest, ...) {
 #' @rdname interpretModel
 #' @export
 interpretTidymodels <- function(fit, ...) {
-  
+
   if (inherits(fit, "tune_results")) {
     fit <- attr(fit, "best_fit")
   }
-  
+
   fit <- fit %>%
     workflows::extract_fit_parsnip()
   imp <- vip::vi(fit, ...)
-  
+
   return(imp)
 }
 
 #' @rdname printFit
 #' @export
 printTidymodelsFit <- function(fit) {
+  id <- NULL  # to fix no visible binding for global variable error
+  .metrics <- NULL
+  .estimator <- NULL
+  .config <- NULL
+  Mean <- NULL
+  SD <- NULL
+  .metric <- NULL
+
   cat(sprintf("Fitting time taken: %s min\n\n", attr(fit, "time_taken")))
-  
+
   if (!is.null(attr(fit, "best_fit"))) {
-    cat("=====================================================\n", 
-        "================ Tuned Model Summary ================\n", 
+    cat("=====================================================\n",
+        "================ Tuned Model Summary ================\n",
         "=====================================================\n\n", sep = "")
     print(attr(fit, "best_fit"))
-    cat("\n\n======================================================\n", 
-        "==== Summary of CV Fit for Tuning Hyperparameters ====\n", 
+    cat("\n\n======================================================\n",
+        "==== Summary of CV Fit for Tuning Hyperparameters ====\n",
         "======================================================\n\n", sep = "")
     print(fit)
     cat("\n# Metrics Summary\n")
@@ -138,15 +146,15 @@ printTidymodelsFit <- function(fit) {
       tidyr::unnest(.metrics) %>%
       dplyr::select(-.estimator, -.config) %>%
       tidyr::pivot_wider(names_from = "id", values_from = ".estimate")
-    fit_df$Mean <- rowMeans(fit_df %>% dplyr::select(starts_with("Fold")))
-    fit_df$SD <- apply(fit_df %>% dplyr::select(starts_with("Fold")), 1, sd)
+    fit_df$Mean <- rowMeans(fit_df %>% dplyr::select(tidyselect::starts_with("Fold")))
+    fit_df$SD <- apply(fit_df %>% dplyr::select(tidyselect::starts_with("Fold")), 1, stats::sd)
     fit_df <- fit_df %>%
       dplyr::relocate(Mean, SD, .after = .metric) %>%
       dplyr::arrange(.metric)
     print(fit_df, n = nrow(fit_df))
   } else {
-    cat("=====================================================\n", 
-        "=================== Model Summary ===================\n", 
+    cat("=====================================================\n",
+        "=================== Model Summary ===================\n",
         "=====================================================\n\n", sep = "")
     print(fit)
   }
