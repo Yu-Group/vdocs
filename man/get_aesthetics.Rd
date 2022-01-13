@@ -23,13 +23,13 @@ on the y-axis.}
 \item{color_str}{Character string specifying the name of the data column to
 use for the color aesthetic.}
 
-\item{fill_str}{Character string specifying the name of the data column to 
+\item{fill_str}{Character string specifying the name of the data column to
 use for the fill aesthetic.}
 
-\item{group_str}{Character string specifying the name of the data column to 
+\item{group_str}{Character string specifying the name of the data column to
 use for the group aesthetic.}
 
-\item{linetype_str}{Character string specifying the name of the data column 
+\item{linetype_str}{Character string specifying the name of the data column
 to use for the linetype aesthetic.}
 }
 \value{

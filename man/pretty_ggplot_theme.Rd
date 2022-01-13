@@ -30,7 +30,7 @@ pretty_ggplot_theme(
 \item{strip_background_color}{Color for strip background (for
 \code{ggplot2::facet_grid()} and \code{ggplot2::facet_wrap()}).}
 
-\item{grid_color}{Color of panel grid major axes or \code{NULL} if want no 
+\item{grid_color}{Color of panel grid major axes or \code{NULL} if want no
 major grid lines.}
 
 \item{axis_line_width}{Width of x and y axes lines.}
@@ -39,24 +39,24 @@ major grid lines.}
 
 \item{x_text_angle}{Logical; whether or not to angle x text at 45 degrees.}
 
-\item{size_theme}{One of "small", "normal", "large", "xlarge"; default sizes 
-for plot text and titles. If \code{NULL}, defaults to values specified by 
+\item{size_theme}{One of "small", "normal", "large", "xlarge"; default sizes
+for plot text and titles. If \code{NULL}, defaults to values specified by
 \code{axis_title_size}, \code{axis_text_size}, \code{legend_title_size},
 \code{legend_text_size}, \code{strip_text_size}, \code{title_size}.}
 
-\item{axis_title_size}{Font size of axis title. Ignored if \code{size_theme} 
+\item{axis_title_size}{Font size of axis title. Ignored if \code{size_theme}
 not \code{NULL}.}
 
-\item{axis_text_size}{Font size of axis text. Ignored if \code{size_theme} 
+\item{axis_text_size}{Font size of axis text. Ignored if \code{size_theme}
 not \code{NULL}.}
 
-\item{legend_title_size}{Font size of legend title. Ignored if 
+\item{legend_title_size}{Font size of legend title. Ignored if
 \code{size_theme} not \code{NULL}.}
 
-\item{legend_text_size}{Font size of legend text/key. Ignored if 
+\item{legend_text_size}{Font size of legend text/key. Ignored if
 \code{size_theme} not \code{NULL}.}
 
-\item{strip_text_size}{Font size of strip text. Ignored if \code{size_theme} 
+\item{strip_text_size}{Font size of strip text. Ignored if \code{size_theme}
 not \code{NULL}.}
 
 \item{title_size}{Font size of plot title. Ignored if \code{size_theme}

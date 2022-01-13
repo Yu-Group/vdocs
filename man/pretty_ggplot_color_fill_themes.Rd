@@ -11,7 +11,7 @@ pretty_ggplot_color(color, viridis = F, option = "plasma", drop = T, ...)
 pretty_ggplot_fill(fill, viridis = F, option = "plasma", drop = T, ...)
 }
 \arguments{
-\item{color}{Vector used for color aesthetic. Should match 
+\item{color}{Vector used for color aesthetic. Should match
 \code{ggplot2::aes(color = ...)} argument.}
 
 \item{viridis}{Logical. Whether or not to use \code{viridis} scheme if using
@@ -25,7 +25,7 @@ discrete color scheme.}
 [ggplot2::scale_fill_manual()], [viridis::scale_colour_viridis()], or
 [viridis::scale_fill_viridis()].}
 
-\item{fill}{Vector used for fill aesthetic. Should match 
+\item{fill}{Vector used for fill aesthetic. Should match
 \code{ggplot2::aes(fill = ...)} argument.}
 }
 \value{
@@ -46,5 +46,5 @@ ggplot(iris) +
   geom_density() +
   pretty_ggplot_theme() +
   pretty_ggplot_fill(fill = iris$Species)
-  
+
 }

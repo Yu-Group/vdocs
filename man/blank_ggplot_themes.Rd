@@ -27,17 +27,17 @@ ggplot(iris) +
   aes(x = Sepal.Length, fill = Species) +
   geom_density() +
   blank_x_theme()
-  
+
 ## blank y-axis theme
 ggplot(iris) +
   aes(x = Sepal.Length, fill = Species) +
   geom_density() +
   blank_y_theme()
-  
+
 ## blank x- and y-axes theme
 ggplot(iris) +
   aes(x = Sepal.Length, fill = Species) +
   geom_density() +
   blank_xy_theme()
-  
+
 }
