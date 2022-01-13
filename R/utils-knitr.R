@@ -1,7 +1,7 @@
-#' Knitr options setup for vdoc Rmd template
+#' Knitr options setup for vdocs Rmd template
 #'
 #' @description Helper function to set up knitr options and hooks for the
-#'   vdoc Rmarkdown template.
+#'   vdocs Rmarkdown template.
 #'
 #' @param echo Logical indicating whether to display the source code in the
 #'   output document.
@@ -24,7 +24,7 @@
 #'   See \url{https://yihui.org/knitr/options/} for possible options.
 #'
 #' @export
-vdoc_knitr_setup <- function(echo = TRUE,
+vdocs_knitr_setup <- function(echo = TRUE,
                              warning = FALSE,
                              message = FALSE,
                              cache = FALSE,

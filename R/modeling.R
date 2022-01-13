@@ -361,6 +361,9 @@ interpretModels <- function(fit_list, options = list(), use = NULL) {
 #'
 #' @param fit_list List of fitted models for which to make predictions.
 #'   Typically the output of `fitModels()`.
+#' @param test_set Logical indicating whether or not this evaluation is for the
+#'   test set. If `FALSE`, output is assumed to be associated with validation
+#'   set.
 #' @param use One of "caret", "h2o", "tidymodels", indicating the modeling
 #'   package to use. If \code{NULL} (default), the modeling package is inferred
 #'   from the fit.
@@ -370,7 +373,7 @@ interpretModels <- function(fit_list, options = list(), use = NULL) {
 #' @returns Print fit summary to the console.
 #'
 #' @export
-printFitResults <- function(fit_list, use = NULL,
+printFitResults <- function(fit_list, test_set = FALSE, use = NULL,
                             html = knitr::is_html_output()) {
 
   for (fit_idx in 1:length(fit_list)) {
@@ -388,9 +391,10 @@ printFitResults <- function(fit_list, use = NULL,
     } else if (use_pkg == "tidymodels") {
       print_func <- printTidymodelsFit
     }
-    subchunkify(print_func(fit), i = .chunk_globalenv$chunk_idx,
+    subchunkify(print_func(fit),
+                i = paste0(names(fit_list)[fit_idx], fit_idx, "_",
+                           ifelse(test_set, "test", "valid")),
                 other_args = "results = 'markup'")
-    .chunk_globalenv$chunk_idx <- .chunk_globalenv$chunk_idx + 1
   }
   return(invisible(fit_list))
 }
@@ -441,9 +445,10 @@ showEvalResults <- function(eval_results, test_set = FALSE,
       caption = sprintf("%s Prediction Accuracies", results_type),
       html_options = html_options, latex_options = latex_options
     )
-  subchunkify(res_kab, i = .chunk_globalenv$chunk_idx,
+  subchunkify(res_kab,
+              i = paste0("prediction_results_",
+                         ifelse(test_set, "test", "valid")),
               other_args = "results='asis'")
-  .chunk_globalenv$chunk_idx <- .chunk_globalenv$chunk_idx + 1
 
   if ("conf" %in% names(eval_results)) {
     cat("\n\n### Confusion Tables {.unnumbered}\n\n")
@@ -472,25 +477,26 @@ showEvalResults <- function(eval_results, test_set = FALSE,
         # kableExtra::collapse_rows(columns = 1, valign = "middle",
         #                           headers_to_remove = 1)
         kableExtra::column_spec(1, bold = TRUE)
-      subchunkify(conf_kab, i = .chunk_globalenv$chunk_idx,
+      subchunkify(conf_kab,
+                  i = paste0("conf_tab_", eval_results$conf$Method[[model_idx]],
+                             model_idx, "_", ifelse(test_set, "test", "valid")),
                   other_args = "results='asis'")
-      .chunk_globalenv$chunk_idx <- .chunk_globalenv$chunk_idx + 1
     }
     if (!is.null(eval_results$roc_plot)) {
       cat("\n\n### ROC Plot {.unnumbered}\n\n")
       plt <- eval_results$roc_plot +
         ggplot2::labs(title = sprintf("%s ROC Plot", results_type))
-      subchunkify(plt, i = .chunk_globalenv$chunk_idx,
+      subchunkify(plt,
+                  i = paste0("roc_plot_", ifelse(test_set, "test", "valid")),
                   fig_height = fig_height, fig_width = fig_width)
-      .chunk_globalenv$chunk_idx <- .chunk_globalenv$chunk_idx + 1
     }
     if (!is.null(eval_results$pr_plot)) {
       cat("\n\n### PR Plot {.unnumbered}\n\n")
       plt <- eval_results$pr_plot +
         ggplot2::labs(title = sprintf("%s PR Plot", results_type))
-      subchunkify(plt, i = .chunk_globalenv$chunk_idx,
+      subchunkify(plt,
+                  i = paste0("pr_plot_", ifelse(test_set, "test", "valid")),
                   fig_height = fig_height, fig_width = fig_width)
-      .chunk_globalenv$chunk_idx <- .chunk_globalenv$chunk_idx + 1
     }
   }
   return(invisible(eval_results))

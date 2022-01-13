@@ -8,52 +8,64 @@ header-includes:
     - \usepackage{gensymb}
     - \usepackage{tcolorbox}
 output:
-  veridicalDocs::vdoc:
+  vdocs::veridical:
+    lab_notebook: true
+    number_sections: true
   pdf_document:
     number_sections: true
 params:
   ## INPUT PARAMETERS HERE OR USING "Knit with Parameters..." IN ABOVE KNIT MENU
   X_filepath:
     label: "X Data"
-    value: NULL
+    # specify file path for X data
+    value: NULL  
     input: file 
   y_filepath:
     label: "y data"
-    value: NULL
+    # specify file path for y data
+    value: NULL  
     input: file
   train_prop:
     label: "Training data proportion"
-    value: 0.6
+    # specify proportion of data to put in training set
+    value: 0.6  
     input: numeric
   valid_prop:
     label: "Validation data proportion"
-    value: 0.2
+    # specify proportion of data to put in validation set
+    value: 0.2  
     input: numeric
   test_prop:
     label: "Test data proportion"
-    value: 0.2
+    # specify proportion of data to put in test set
+    value: 0.2  
     input: numeric
   modeling_pkg:
     label: "Modeling Package"
-    value: "tidymodels"
+    # specify which modeling package to use
+    value: "tidymodels"  
     input: select
     choices: ["caret", "h2o", "tidymodels"]
   n_data_perturbations:
     label: "Number of data perturbations (e.g., bootstrap samples)"
-    # increase for better measure of stability, but at the cost of higher computational load
+    # specify number of data perturbations; note: increase for better measure 
+    # of stability, but at the cost of higher computational load
     value: 2  
     input: numeric
   seed:
     label: "Random Seed"
+    # specify random seed
     value: 12345
     input: numeric
 ---
 
-```{r setup, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
-library(veridicalDocs)
+<!-- INSTRUCTIONS: This Rmarkdown facilitates beautiful documentation for PCS-style analyses. After inputting in the required data and parameters above, please go through and provide responses to all questions in the notebook below. Responses should be typed in all chunks with the header `interactive_text = TRUE`. -->
 
-# set up knitr options for vdoc template
-vdoc_knitr_setup()
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
+library(vdocs)
+
+# set up knitr options for vdocs
+vdocs_knitr_setup()
 
 # set seed
 set.seed(params$seed)
@@ -65,10 +77,6 @@ validateDataSplit(params$train_prop, params$valid_prop, params$test_prop)
 X <- loadFile(params$X_filepath)
 y <- loadFile(params$y_filepath)
 validateData(X, y)
-
-# initialize counter for subchunkify
-.chunk_globalenv <- new.env(parent = emptyenv())
-.chunk_globalenv$chunk_idx <- 1
 ```
 
 # Domain problem formulation
@@ -233,17 +241,12 @@ There are often multiple, standard preprocessing options that should be tested t
 Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.
 
 ```{asis, interactive_text = TRUE}
-Given this example TCGA BRCA data set, we first preprocess the data by removing constant or duplicated columns. Then since the array data is highly right skewed, we will log-transform (i.e., log(x + 1)) the data. Finally, to keep this example template relatively quick to run, we will only keep the 1000 features with the highest variance.
+
 ```
 
 ```{r preprocess-data}
 ## DO DATA CLEANING / PRE-PROCESSING HERE 
-Xtrain <- log(Xtrain + 1) %>%
-  removeConstantCols(verbose = 1) %>%
-  removeDuplicateCols(verbose = 1) %>%
-  filterColsByVar(max_p = 1000)
-Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
-Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
+
 ```
 
 
@@ -281,9 +284,7 @@ dataTypes(X = Xtrain, y = ytrain)
 # broad array of summary statistics for features in training (X, y)
 tab_ls <- dataSummary(X = Xtrain, y = ytrain)
 for (dtype in names(tab_ls)) {  # grouped by data type
-  subchunkify(tab_ls[[dtype]], i = .chunk_globalenv$chunk_idx, 
-                        other_args = "results='asis'")
-  .chunk_globalenv$chunk_idx <- .chunk_globalenv$chunk_idx + 1
+  subchunkify(tab_ls[[dtype]], i = dtype, other_args = "results='asis'")
 }
 ```
 
@@ -446,7 +447,7 @@ model_list <- list(
 )
 ```
 
-```{r fit-models, class.output="scroll-300"}
+```{r fit-models}
 # fit/train models
 fit_results <- fitModels(Xtrain = Xtrain, ytrain = ytrain,
                          model_list = model_list, cv_options = cv_options,
@@ -672,7 +673,7 @@ Evaluate pipeline on test data.
 Careful! Remember that **test data should only be touched once**. These results should not be used to make post-analysis modeling decisions. This is "double-dipping" and not an accurate measurement of out-of-sample accuracy.
 ```
 
-```{r final-fits, class.output="scroll-300"}
+```{r final-fits}
 Xtrain_final <- dplyr::bind_rows(Xtrain, Xvalid)
 ytrain_final <- c(ytrain, yvalid)
 

@@ -4,11 +4,20 @@
 \alias{printFitResults}
 \title{Print fit results summary}
 \usage{
-printFitResults(fit_list, use = NULL, html = knitr::is_html_output())
+printFitResults(
+  fit_list,
+  test_set = FALSE,
+  use = NULL,
+  html = knitr::is_html_output()
+)
 }
 \arguments{
 \item{fit_list}{List of fitted models for which to make predictions.
 Typically the output of `fitModels()`.}
+
+\item{test_set}{Logical indicating whether or not this evaluation is for the
+test set. If `FALSE`, output is assumed to be associated with validation
+set.}
 
 \item{use}{One of "caret", "h2o", "tidymodels", indicating the modeling
 package to use. If \code{NULL} (default), the modeling package is inferred

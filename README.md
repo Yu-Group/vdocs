@@ -1,17 +1,17 @@
 
-# veridicalDocs
+# vdocs
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of veridicalDocs is to provide a beautiful and automated documentation template for PCS-style analyses.
+The goal of vdocs is to provide a beautiful and automated documentation template for PCS-style analyses.
 
 ## Installation
 
-`veridicalDocs` is under active development. To install the package directly from GitHub, please use:
+`vdocs` is under active development. To install the package directly from GitHub, please use:
 
 ``` r
-devtools::install_github("Yu-Group/veridicalDocs")
+devtools::install_github("Yu-Group/vdocs")
 ```
 
 ## Example
@@ -19,7 +19,7 @@ devtools::install_github("Yu-Group/veridicalDocs")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(veridicalDocs)
+library(vdocs)
 ## basic example code
 ```
 

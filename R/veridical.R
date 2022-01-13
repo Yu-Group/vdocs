@@ -1,7 +1,7 @@
-#' vdoc design - bootstrap HTML output format
+#' veridical design - bootstrap HTML output format
 #'
 #' @description Format for converting from R Markdown to an HTML document
-#'   using the vdoc design theme. The vdoc theme is largely based upon the
+#'   using the veridical design theme. The veridical theme is largely based upon the
 #'   material design theme from the `rmdformats` R package. See
 #'   \url{https://github.com/juba/rmdformats} for the source code.
 #'
@@ -11,33 +11,45 @@
 #'
 #' @inheritParams rmdformats::material
 #' @inheritParams rmarkdown::html_document
+#' @param lab_notebook Logical indicating whether the veridical theme is being
+#'   used for a PCS lab notebook. If \code{TRUE}, the veridical theme will
+#'   also load additional scripts to enable interactivity of the notebook.
 #' @param ... Additional function arguments passed to `rmdformats::material()`.
 #'
 #' @return R Markdown output format to pass to \code{\link[rmarkdown]{render}}
 #'
 #' @export
-vdoc <- function(fig_width = 10,
-                 fig_height = 8,
-                 number_sections = TRUE,
-                 code_folding = "hide",
-                 code_download = TRUE,
-                 use_bookdown = TRUE,
-                 includes = NULL,
-                 fig_caption = TRUE,
-                 highlight = "kate",
-                 lightbox = TRUE,
-                 thumbnails = TRUE,
-                 gallery = FALSE,
-                 cards = TRUE,
-                 pandoc_args = NULL,
-                 md_extensions = NULL,
-                 mathjax = "rmdformats",
-                 ...) {
+veridical <- function(lab_notebook = FALSE,
+                      fig_width = 10,
+                      fig_height = 8,
+                      number_sections = FALSE,
+                      code_folding = "hide",
+                      code_download = TRUE,
+                      use_bookdown = TRUE,
+                      includes = NULL,
+                      fig_caption = TRUE,
+                      highlight = "kate",
+                      lightbox = TRUE,
+                      thumbnails = TRUE,
+                      gallery = FALSE,
+                      cards = TRUE,
+                      pandoc_args = NULL,
+                      md_extensions = NULL,
+                      mathjax = "rmdformats",
+                      ...) {
   if (is.null(includes)) {
-    includes <- rmarkdown::includes(
-      before_body = system.file("templates/vdoc/header/setup.html",
-                                package = "veridicalDocs")
+    header_files <- c(
+      system.file("templates/veridical/header/veridicalHeader.html",
+                  package = "vdocs"),
+      system.file("templates/veridical/header/vdocsHeader.html",
+                  package = "vdocs"),
+      system.file("templates/veridical/header/tinymce.html",
+                  package = "vdocs")
     )
+    if (!lab_notebook) {
+      header_files <- header_files[1]
+    }
+    includes <- rmarkdown::includes(before_body = header_files)
   }
   html_template(
     template_name = "material",
@@ -45,15 +57,15 @@ vdoc <- function(fig_width = 10,
     template_dependencies = list(
       html_dependency_bootstrap_material(),
       html_dependency_material(),
-      html_dependency_vdoc()
+      html_dependency_veridical(lab_notebook = lab_notebook)
     ),
     pandoc_args = pandoc_args,
     fig_width = fig_width,
     fig_height = fig_height,
     fig_caption = fig_caption,
-    number_sections = TRUE,
-    code_folding = "hide",
-    code_download = TRUE,
+    number_sections = number_sections,
+    code_folding = code_folding,
+    code_download = code_download,
     includes = includes,
     highlight = highlight,
     lightbox = lightbox,
@@ -102,19 +114,29 @@ html_dependency_material <- function() {
                             stylesheet = "material.css")
 }
 
-#' vdoc dependencies
+#' veridical dependencies
 #'
 #' @description Dependencies on top of base material design theme.
 #'
+#' @param lab_notebook Logical indicating whether the veridical theme is being
+#'   used for a PCS lab notebook. If \code{TRUE}, the veridical theme will
+#'   also load additional scripts to enable interactivity of the notebook.
+#'
 #' @keywords internal
-html_dependency_vdoc <- function() {
-  htmltools::htmlDependency(name = "vdoc",
+html_dependency_veridical <- function(lab_notebook = FALSE) {
+  if (lab_notebook) {
+    scripts <- c("js/checkbox.js", "js/collapsibleInfo.js")
+    stylesheets <- c("css/veridical.css", "css/checkbox.css")
+  } else {
+    scripts <- NULL
+    stylesheets <- "css/veridical.css"
+  }
+  htmltools::htmlDependency(name = "veridical",
                             version = "0.1",
-                            src = system.file("templates/vdoc",
-                                              package = "veridicalDocs"),
-                            script = c("js/checkbox.js",
-                                       "js/collapsibleInfo.js"),
-                            stylesheet = c("css/vdoc.css", "css/checkbox.css"))
+                            src = system.file("templates/veridical",
+                                              package = "vdocs"),
+                            script = scripts,
+                            stylesheet = stylesheets)
 }
 
 

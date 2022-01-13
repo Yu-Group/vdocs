@@ -168,14 +168,41 @@ blockquote {
 	cursor: pointer;
 }
 
-/* remove bottom statusbar from tinymce */
-.tox-statusbar {
-	display: none !important;
+/* add padding box */
+.padded-panel {
+    padding: 15px;
+    position: relative;
 }
 
-/* set max height for code blocks */
-.scroll-300 {
-  max-height: 300px;
-  overflow-y: auto;
-  background-color: inherit;
+/* additional tab styles (gray circles and squares) */
+.tabset-square>.nav-pills>li>a {
+    font-size: 14px;
+    font-weight: 500;
+    padding-bottom: 8px;
+    padding-left: 11px;
+    padding-right: 11px;
+    background-color: #95a5a6;
+    color: white;
+    border: 0.5px solid white;
+    border-left: 0px;
+    border-right: 0px;
 }
+.tabset-circle>.nav-pills>li>a,
+.tabset-circle>.panel>.nav-pills>li>a {
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: normal;
+    padding-bottom: 8px;
+    padding-left: 11px;
+    padding-right: 11px;
+    background-color: #95a5a6;
+    color: white;
+}
+.tabset-square>.nav-pills>li.active>a,
+.tabset-circle>.nav-pills>li.active>a,
+.tabset-circle>.panel>.nav-pills>li.active>a {
+    background-color: #637172;
+}
+
+
+
