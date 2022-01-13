@@ -106,18 +106,3 @@ loadBRCAData <- function() {
   return(list(X = X, y = y))
 }
 
-#' Copy of `subchunkify()` function from simChef
-#' @param ... Arguments to pass to simChef:::subchunkify()
-#' @export
-subchunkify <- function(...) {
-  func <- get("subchunkify", asNamespace("simChef"))
-  return(func(...))
-}
-
-#' Copy of `get_aesthetics()` function from simChef
-#' @param ... Arguments to pass to simChef:::get_aesthetics()
-#' @keywords internal
-get_aesthetics <- function(...) {
-  func <- get("get_aesthetics", asNamespace("simChef"))
-  return(func(...))
-}

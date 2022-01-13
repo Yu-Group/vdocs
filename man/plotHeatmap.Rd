@@ -143,11 +143,11 @@ data vector of colors to use for the fill color scale.}
 `color_scheme = "viridis"`.}
 
 \item{theme_function}{Function which adds theme() to ggplot object. If
-\code{NULL}, adds \code{simChef::pretty_ggplot_theme()} to ggplot.}
+\code{NULL}, adds \code{pretty_ggplot_theme()} to ggplot.}
 
 \item{show_plot}{Logical. Should this plot be printed? Default \code{FALSE}.}
 
-\item{...}{Other arguments to pass to \code{simChef::pretty_ggplot_theme()}
+\item{...}{Other arguments to pass to \code{pretty_ggplot_theme()}
 or \code{theme_function()}.}
 
 \item{clust_x}{Logical; whether or not to cluster columns.}

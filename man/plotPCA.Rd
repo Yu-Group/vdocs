@@ -77,7 +77,7 @@ explained in axes labels.}
 
 \item{show_plot}{Logical. Should this plot be printed? Default \code{FALSE}.}
 
-\item{...}{Other arguments to pass to \code{simChef::pretty_ggplot_theme()}
+\item{...}{Other arguments to pass to \code{pretty_ggplot_theme()}
 or \code{theme_function()}}
 }
 \value{

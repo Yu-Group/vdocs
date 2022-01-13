@@ -37,11 +37,11 @@ dataDimensions <- function(Xtrain, Xvalid, Xtest, print = TRUE) {
 #' @param y Response vector.
 #' @param html Logical indicating whether or not the output is an html table
 #'   or a latex table.
-#' @param ... Additional arguments to pass to simChef::pretty_DT() if
-#'   \code{html = TRUE} or simChef::pretty_kable() if \code{html = FALSE}.
+#' @param ... Additional arguments to pass to pretty_DT() if
+#'   \code{html = TRUE} or pretty_kable() if \code{html = FALSE}.
 #' 
-#' @returns Returns an html table (i.e., the output of simChef::pretty_DT()) or
-#'   a latex table (i.e., the output of simChef::pretty_kable()), 
+#' @returns Returns an html table (i.e., the output of pretty_DT()) or
+#'   a latex table (i.e., the output of pretty_kable()), 
 #'   containing the frequency of each data type in the given (X, y) data.
 #' 
 #' @export
@@ -63,7 +63,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
     tidyr::spread(key = "Class", value = "Freq") %>%
     tibble::column_to_rownames("group")
   if (html) {
-    tab_out <- simChef::pretty_DT(
+    tab_out <- pretty_DT(
       dtypes_df, 
       caption = shiny::tags$caption(
         style = "color: black; font-weight: bold; font-size: 125%",
@@ -73,7 +73,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
       ...
     )
   } else {
-    tab_out <- simChef::pretty_kable(dtypes_df, caption = "Frequency of column",
+    tab_out <- pretty_kable(dtypes_df, caption = "Frequency of column",
                                      format = "latex", ...)
   }
   return(tab_out)
@@ -89,7 +89,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   types are ignored.
 #' 
 #' @inheritParams dataTypes
-#' @inheritParams simChef::pretty_DT
+#' @inheritParams pretty_DT
 #' @param features (Optional) vector of features to include in summary. Default
 #'   (\code{NULL}) is to include all features.
 #' @param max_features (Optional) maximum number of features to include in 
@@ -97,8 +97,8 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   number of features in X exceeds `max_features`, the features kept in the 
 #'   summary are chosen randomly.
 #' 
-#' @returns Returns an html table (i.e., the output of simChef::pretty_DT()) or
-#'   a latex table (i.e., the output of simChef::pretty_kable()), 
+#' @returns Returns an html table (i.e., the output of pretty_DT()) or
+#'   a latex table (i.e., the output of pretty_kable()), 
 #'   containing a broad overview of summary statistics for each data column.
 #' 
 #' @export
@@ -203,7 +203,7 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
       
       caption <- paste("Summary of", R.utils::capitalize(dtype), "Variables")
       if (html) {
-        tab_ls[[dtype]] <- simChef::pretty_DT(
+        tab_ls[[dtype]] <- pretty_DT(
           skim_df %>% dplyr::select(tidyselect::all_of(keep_cols)),
           caption = shiny::tags$caption(
             style = "color: black; font-weight: bold; font-size: 125%", caption
@@ -214,7 +214,7 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
           ...
         )
       } else {
-        tab_ls[[dtype]] <- simChef::pretty_kable(
+        tab_ls[[dtype]] <- pretty_kable(
           skim_df %>% dplyr::select(tidyselect::all_of(keep_cols)), 
           caption = caption, format = "latex", row.names = FALSE, escape = TRUE, 
           ...

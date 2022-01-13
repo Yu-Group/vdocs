@@ -65,9 +65,9 @@
 #' @param viridis_option Argument indicating viridis palette name. Only used if
 #'   `color_scheme = "viridis"`.
 #' @param theme_function Function which adds theme() to ggplot object. If
-#'   \code{NULL}, adds \code{simChef::pretty_ggplot_theme()} to ggplot.
+#'   \code{NULL}, adds \code{pretty_ggplot_theme()} to ggplot.
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
-#' @param ... Other arguments to pass to \code{simChef::pretty_ggplot_theme()}
+#' @param ... Other arguments to pass to \code{pretty_ggplot_theme()}
 #'   or \code{theme_function()}.
 #'
 #' @return A ggplot object.
@@ -190,7 +190,7 @@ plotHeatmap <- function(X, y_groups = NULL, x_groups = NULL,
 
   # add theme
   if (is.null(theme_function)) {
-    plt <- plt + simChef::pretty_ggplot_theme(...)
+    plt <- plt + pretty_ggplot_theme(...)
   } else {
     plt <- theme_function(plt, ...)
   }
@@ -203,9 +203,9 @@ plotHeatmap <- function(X, y_groups = NULL, x_groups = NULL,
   if (!color_by_quantile | is.factor(X_long$fill)) {
     if (is.null(color_scheme) | identical(color_scheme, "viridis")) {
       plt <- plt +
-        simChef::pretty_ggplot_fill(fill = X_long$fill,
+        pretty_ggplot_fill(fill = X_long$fill,
                                     viridis = TRUE, option = viridis_option) +
-        simChef::pretty_ggplot_color(color = X_long$fill,
+        pretty_ggplot_color(color = X_long$fill,
                                      viridis = TRUE, option = viridis_option)
     } else if (identical(color_scheme, "temperature")) {
       plt <- plt +

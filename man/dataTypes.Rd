@@ -14,12 +14,12 @@ dataTypes(X, y, html = knitr::is_html_output(), ...)
 \item{html}{Logical indicating whether or not the output is an html table
 or a latex table.}
 
-\item{...}{Additional arguments to pass to simChef::pretty_DT() if
-\code{html = TRUE} or simChef::pretty_kable() if \code{html = FALSE}.}
+\item{...}{Additional arguments to pass to pretty_DT() if
+\code{html = TRUE} or pretty_kable() if \code{html = FALSE}.}
 }
 \value{
-Returns an html table (i.e., the output of simChef::pretty_DT()) or
-  a latex table (i.e., the output of simChef::pretty_kable()), 
+Returns an html table (i.e., the output of pretty_DT()) or
+  a latex table (i.e., the output of pretty_kable()), 
   containing the frequency of each data type in the given (X, y) data.
 }
 \description{

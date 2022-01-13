@@ -1,4 +1,4 @@
 library(testthat)
-library(veridicalDocs)
+library(vdocs)
 
-test_check("veridicalDocs")
+test_check("vdocs")

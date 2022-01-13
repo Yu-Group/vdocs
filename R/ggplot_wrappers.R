@@ -14,7 +14,7 @@
 #' @param stat See [ggplot2::geom_bar()].
 #' @param position See [ggplot2::geom_bar()].
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_bar()].
 #'
@@ -54,17 +54,17 @@ plotBarplot <- function(data, x_str, y_str = NULL,
     plt <- plt +
       ggplot2::geom_bar(position = position, stat = stat, color = "grey98",
                         ...) +
-      simChef::pretty_ggplot_fill(fill = data[[fill_str]])
+      pretty_ggplot_fill(fill = data[[fill_str]])
   } else {
     plt <- plt +
       ggplot2::geom_bar(position = position, stat = stat, color = "grey98",
                         fill = fill, ...)
   }
   if (is.null(theme_options)) {
-    plt <- plt + simChef::pretty_ggplot_theme()
+    plt <- plt + pretty_ggplot_theme()
   } else {
     plt <- plt +
-      do.call(simChef::pretty_ggplot_theme, args = theme_options)
+      do.call(pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -87,7 +87,7 @@ plotBarplot <- function(data, x_str, y_str = NULL,
 #' @param horizontal Logical. Whether the boxplots should be horizontal instead
 #'   of vertical.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_boxplot()].
 #'
@@ -130,16 +130,16 @@ plotBoxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
     plt <- plt + ggplot2::aes(group = !!group_str)
   }
   if (!is.null(fill_str)) {
-    plt <- plt + simChef::pretty_ggplot_fill(fill = data[[fill_str]])
+    plt <- plt + pretty_ggplot_fill(fill = data[[fill_str]])
   }
   if (horizontal) {
     plt <- plt + ggplot2::coord_flip()
   }
   if (is.null(theme_options)) {
-    plt <- plt + simChef::pretty_ggplot_theme()
+    plt <- plt + pretty_ggplot_theme()
   } else {
     plt <- plt +
-      do.call(simChef::pretty_ggplot_theme, args = theme_options)
+      do.call(pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -160,7 +160,7 @@ plotBoxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param alpha Alpha value for transparency.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_density()].
 #'
@@ -194,16 +194,16 @@ plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
     }
     plt <- plt +
       ggplot2::geom_density(color = "black", alpha = alpha, ...) +
-      simChef::pretty_ggplot_fill(fill = data[[fill_str]])
+      pretty_ggplot_fill(fill = data[[fill_str]])
   } else {
     plt <- plt +
       ggplot2::geom_density(color = "black", alpha = alpha, fill = fill, ...)
   }
   if (is.null(theme_options)) {
-    plt <- plt + simChef::pretty_ggplot_theme()
+    plt <- plt + pretty_ggplot_theme()
   } else {
     plt <- plt +
-      do.call(simChef::pretty_ggplot_theme, args = theme_options)
+      do.call(pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -224,7 +224,7 @@ plotDensity <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param bins Number of histogram bins.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_histogram()].
 #'
@@ -258,16 +258,16 @@ plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
     }
     plt <- plt +
       ggplot2::geom_histogram(color = "grey98", bins = bins, ...) +
-      simChef::pretty_ggplot_fill(fill = data[[fill_str]])
+      pretty_ggplot_fill(fill = data[[fill_str]])
   } else {
     plt <- plt +
       ggplot2::geom_histogram(color = "grey98", bins = bins, fill = fill, ...)
   }
   if (is.null(theme_options)) {
-    plt <- plt + simChef::pretty_ggplot_theme()
+    plt <- plt + pretty_ggplot_theme()
   } else {
     plt <- plt +
-      do.call(simChef::pretty_ggplot_theme, args = theme_options)
+      do.call(pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -288,7 +288,7 @@ plotHistogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #' @param color_str Character string (optional). Name of variable in \code{data}
 #'   to use as color aesthetic in plot.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_line()].
 #'
@@ -319,13 +319,13 @@ plotLine <- function(data, x_str, y_str, color_str = NULL,
     if (is.character(data[[color_str]])) {
       data[[color_str]] <- as.factor(data[[color_str]])
     }
-    plt <- plt + simChef::pretty_ggplot_color(color = data[[color_str]])
+    plt <- plt + pretty_ggplot_color(color = data[[color_str]])
   }
   if (is.null(theme_options)) {
-    plt <- plt + simChef::pretty_ggplot_theme()
+    plt <- plt + pretty_ggplot_theme()
   } else {
     plt <- plt +
-      do.call(simChef::pretty_ggplot_theme, args = theme_options)
+      do.call(pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -346,7 +346,7 @@ plotLine <- function(data, x_str, y_str, color_str = NULL,
 #' @param color_str Character string (optional). Name of variable in \code{data}
 #'   to use as color aesthetic in plot.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_point()].
 #'
@@ -375,13 +375,13 @@ plotScatter <- function(data, x_str, y_str, color_str = NULL,
     if (is.character(data[[color_str]])) {
       data[[color_str]] <- as.factor(data[[color_str]])
     }
-    plt <- plt + simChef::pretty_ggplot_color(color = data[[color_str]])
+    plt <- plt + pretty_ggplot_color(color = data[[color_str]])
   }
   if (is.null(theme_options)) {
-    plt <- plt + simChef::pretty_ggplot_theme()
+    plt <- plt + pretty_ggplot_theme()
   } else {
     plt <- plt +
-      do.call(simChef::pretty_ggplot_theme, args = theme_options)
+      do.call(pretty_ggplot_theme, args = theme_options)
   }
   if (show_plot) {
     print(plt)

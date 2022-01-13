@@ -27,7 +27,7 @@
 #'   in the data. For example, heights = c(2, 1) would make the first row twice
 #'   as tall as the second row.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   simChef::pretty_ggplot_theme().
+#'   pretty_ggplot_theme().
 #' @param ... Additional arguments to pass to ggplot2::geom_*().
 #'
 #' @returns A ggplot object.
@@ -317,7 +317,7 @@ plotDataHeatmap <- function(X, y, subsample_rows = 1, subsample_cols = 1,
       ggplot2::aes(x = y, y = x) +
       ggplot2::geom_point() +
       ggplot2::scale_y_continuous(expand = c(0, 0)) +
-      simChef::pretty_ggplot_theme() +
+      pretty_ggplot_theme() +
       ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                      axis.title.y = ggplot2::element_blank(),
                      axis.ticks.y = ggplot2::element_blank())
@@ -359,10 +359,10 @@ plotDataHeatmap <- function(X, y, subsample_rows = 1, subsample_cols = 1,
 #' @param title Character string. Title of plot.
 #' @param drop Logical. Whether or not to drop factors with no observations.
 #' @param theme_function function which adds theme() to ggpairs() object. If
-#'   \code{NULL}, add \code{simChef::pretty_ggplot_theme()} to
+#'   \code{NULL}, add \code{pretty_ggplot_theme()} to
 #'   [GGally::ggpairs()] object.
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
-#' @param ... Other arguments to pass to \code{simChef::pretty_ggplot_theme()}
+#' @param ... Other arguments to pass to \code{pretty_ggplot_theme()}
 #'   or \code{theme_function()}
 #'
 #' @return A [GGally::ggpairs] object.
@@ -430,7 +430,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
       columnLabels = column_labels
     )
     if (is.null(theme_function)) {
-      plt <- plt + simChef::pretty_ggplot_theme(...)
+      plt <- plt + pretty_ggplot_theme(...)
     } else {
       plt <- theme_function(plt, ...)
     }
@@ -451,13 +451,13 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
         ggplot2::labs(color = color_label)
       if (is.null(color_scheme)) {
         legend_plt <- legend_plt +
-          simChef::pretty_ggplot_color(color = color, drop = drop)
+          pretty_ggplot_color(color = color, drop = drop)
       } else {
         legend_plt <- legend_plt +
           ggplot2::scale_color_manual(values = color_scheme, drop = drop)
       }
       if (is.null(theme_function)) {
-        legend_plt <- legend_plt + simChef::pretty_ggplot_theme(...)
+        legend_plt <- legend_plt + pretty_ggplot_theme(...)
       } else {
         legend_plt <- theme_function(legend_plt, ...)
       }
@@ -490,8 +490,8 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
       for (j in 1:plt$ncol) {
         if (is.null(color_scheme)) {
           plt[i, j] <- plt[i, j] +
-            simChef::pretty_ggplot_color(color = color, drop = drop) +
-            simChef::pretty_ggplot_fill(fill = color, drop = drop)
+            pretty_ggplot_color(color = color, drop = drop) +
+            pretty_ggplot_fill(fill = color, drop = drop)
         } else {
           plt[i, j] <- plt[i, j] +
             ggplot2::scale_color_manual(values = color_scheme, drop = drop) +
@@ -502,7 +502,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
 
     plt <- plt + ggplot2::labs(color = color_label, fill = color_label)
     if (is.null(theme_function)) {
-      plt <- plt + simChef::pretty_ggplot_theme(...)
+      plt <- plt + pretty_ggplot_theme(...)
     } else {
       plt <- theme_function(plt, ...)
     }
@@ -586,8 +586,8 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
         ) + ggplot2::labs(color = color_label, fill = color_label)
         if (is.null(color_scheme)) {
           plt[1, 1] <- plt[1, 1] +
-            simChef::pretty_ggplot_color(color = plt_df$plt_color, drop = drop) +
-            simChef::pretty_ggplot_fill(fill = plt_df$plt_color, drop = drop)
+            pretty_ggplot_color(color = plt_df$plt_color, drop = drop) +
+            pretty_ggplot_fill(fill = plt_df$plt_color, drop = drop)
         } else {
           plt[1, 1] <- plt[1, 1] +
             ggplot2::scale_color_manual(values = color_scheme, drop = drop) +
@@ -612,22 +612,22 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
         ggplot2::theme(legend.position = "bottom")
       if (is.null(color_scheme)) {
         legend_plt1 <- legend_plt1 +
-          simChef::pretty_ggplot_color(color = color, drop = drop)
+          pretty_ggplot_color(color = color, drop = drop)
       } else {
         legend_plt1 <- legend_plt1 +
           ggplot2::scale_color_manual(values = color_scheme, drop = drop)
       }
       if (is.null(color_scheme_upper)) {
         legend_plt2 <- legend_plt2 +
-          simChef::pretty_ggplot_color(color = color_upper, option = "D",
+          pretty_ggplot_color(color = color_upper, option = "D",
                                        viridis = TRUE, drop = drop)
       } else {
         legend_plt2 <- legend_plt2 +
           ggplot2::scale_color_manual(values = color_scheme_upper, drop = drop)
       }
       if (is.null(theme_function)) {
-        legend_plt1 <- legend_plt1 + simChef::pretty_ggplot_theme(...)
-        legend_plt2 <- legend_plt2 + simChef::pretty_ggplot_theme(...)
+        legend_plt1 <- legend_plt1 + pretty_ggplot_theme(...)
+        legend_plt2 <- legend_plt2 + pretty_ggplot_theme(...)
       } else {
         legend_plt1 <- theme_function(legend_plt1, ...)
         legend_plt2 <- theme_function(legend_plt2, ...)
@@ -689,7 +689,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
                       as.character(color))) {
                 if (is.null(color_scheme)) {
                   plt[i, j] <- plt[i, j] +
-                    simChef::pretty_ggplot_fill(fill = color, drop = drop)
+                    pretty_ggplot_fill(fill = color, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
                     ggplot2::scale_fill_manual(values = color_scheme,
@@ -698,7 +698,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
               } else {
                 if (is.null(color_scheme_upper)) {
                   plt[i, j] <- plt[i, j] +
-                    simChef::pretty_ggplot_fill(fill = color_upper, option = "D",
+                    pretty_ggplot_fill(fill = color_upper, option = "D",
                                      viridis = T, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
@@ -721,7 +721,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
               if (ptr) {
                 if (is.null(color_scheme)) {
                   plt[i, j] <- plt[i, j] +
-                    simChef::pretty_ggplot_color(color = color, drop = drop)
+                    pretty_ggplot_color(color = color, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
                     ggplot2::scale_color_manual(values = color_scheme,
@@ -730,7 +730,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
               } else {
                 if (is.null(color_scheme_upper)) {
                   plt[i, j] <- plt[i, j] +
-                    simChef::pretty_ggplot_color(color = color_upper, option = "D",
+                    pretty_ggplot_color(color = color_upper, option = "D",
                                       viridis = T, drop = drop)
                 } else {
                   plt[i, j] <- plt[i, j] +
@@ -747,7 +747,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
     if (length(columns) != 1) {
       if (is.null(theme_function)) {
         plt <- cowplot::plot_grid(
-          GGally::ggmatrix_gtable(plt + simChef::pretty_ggplot_theme(...)),
+          GGally::ggmatrix_gtable(plt + pretty_ggplot_theme(...)),
           legend1, legend2,
           nrow = 3, rel_heights = c(10, 1, 1)
         )
@@ -760,7 +760,7 @@ plotPairs <- function(data, columns, color = NULL, color_upper = NULL,
       }
     } else {
       if (is.null(theme_function)) {
-        plt <- plt + simChef::pretty_ggplot_theme(...)
+        plt <- plt + pretty_ggplot_theme(...)
       } else {
         plt <- theme_function(plt, ...)
       }
@@ -891,9 +891,9 @@ plotPCA <- function(X, pca_obj, npcs, pcs,
           y = paste0("PC2", var_explained_str[2]),
           color = color_label, title = title
         ) +
-        simChef::pretty_ggplot_theme(...)
+        pretty_ggplot_theme(...)
       if (is.null(color_scheme)) {
-        plt <- plt + simChef::pretty_ggplot_color(color = plt_df$color)
+        plt <- plt + pretty_ggplot_color(color = plt_df$color)
       } else {
         plt <- plt + ggplot2::scale_color_manual(values = color_scheme)
       }
@@ -906,7 +906,7 @@ plotPCA <- function(X, pca_obj, npcs, pcs,
           y = paste0("PC2", var_explained_str[2]),
           title = title
         ) +
-        simChef::pretty_ggplot_theme(...)
+        pretty_ggplot_theme(...)
     }
   } else {
     plt <- plotPairs(data = plt_df, columns = pcs, title = title,

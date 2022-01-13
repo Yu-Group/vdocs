@@ -269,15 +269,15 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
       )
       roc_plot <- ggplot2::autoplot(roc_df) +
         ggplot2::labs(x = "FPR", y = "TPR", color = "Method") +
-        simChef::pretty_ggplot_color(color = as.factor(roc_df$Method)) +
-        simChef::pretty_ggplot_theme()
+        pretty_ggplot_color(color = as.factor(roc_df$Method)) +
+        pretty_ggplot_theme()
       pr_df <- yardstick::pr_curve(
         data = pred_df, truth = y, tidyselect::all_of(prob_cols)
       )
       pr_plot <- ggplot2::autoplot(pr_df) +
         ggplot2::labs(x = "Recall", y = "Precision", color = "Method") +
-        simChef::pretty_ggplot_color(color = as.factor(pr_df$Method)) +
-        simChef::pretty_ggplot_theme()
+        pretty_ggplot_color(color = as.factor(pr_df$Method)) +
+        pretty_ggplot_theme()
     } else {
       roc_plot <- NULL
       pr_plot <- NULL
@@ -463,7 +463,7 @@ showEvalResults <- function(eval_results, test_set = FALSE,
         # dplyr::mutate(
         #   .row_head = kableExtra::cell_spec(.row_head, angle = -90)
         # ) %>%
-        simChef::pretty_kable(
+        pretty_kable(
           caption = sprintf("%s Confusion Matrix on %s Set",
                             eval_results$conf$Method[[model_idx]],
                             results_type),

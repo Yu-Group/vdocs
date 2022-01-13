@@ -29,7 +29,7 @@ to use as fill aesthetic in plot.}
 \item{alpha}{Alpha value for transparency.}
 
 \item{theme_options}{(Optional) list of arguments to pass to
-simChef::pretty_ggplot_theme().}
+pretty_ggplot_theme().}
 
 \item{show_plot}{Logical. Should this plot be printed? Default \code{FALSE}.}
 
