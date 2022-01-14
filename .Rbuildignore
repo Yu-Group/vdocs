@@ -5,3 +5,6 @@
 ^vignettes/GDCdata$
 ^vignettes/data$
 ^vignettes/MANIFEST\.txt$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
