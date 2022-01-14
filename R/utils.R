@@ -13,10 +13,6 @@ loadFile <- function(file_path) {
   if (is.null(file_path)) {
     stop("Cannot upload file. Must provide file path.")
   } else if (!file.exists(file_path)) {
-    if (file_path == "data/tcga_brca_array_data.rds") {
-      data <- loadBRCAData()
-      return(data$X)
-    }
     stop("Cannot find file. ",
          "Please check that the file path is specified correctly.")
   }
@@ -64,45 +60,5 @@ validateData <- function(X, y) {
   if (nrow(X) != length(y)) {
     stop("The number of rows in X do not match the length of the response y.")
   }
-}
-
-#' Loads toy TCGA BRCA data
-#'
-#' @description Downloads and loads in TCGA BRCA data as a toy example for the
-#'   PCS lab notebook
-#'
-#' @returns A list of two:
-#' \describe{
-#' \item{X}{A data frame of gene expression features, measured via RNA-Seq.}
-#' \item{y}{Response vector; PAM50 BRCA subtypes.}
-#' }
-#'
-#' @export
-loadBRCAData <- function() {
-  query <- TCGAbiolinks::GDCquery(
-    project = "TCGA-BRCA",
-    data.category = "Gene expression",
-    data.type = "Gene expression quantification",
-    platform = "Illumina HiSeq",
-    file.type  = "normalized_results",
-    experimental.strategy = "RNA-Seq",
-    legacy = TRUE
-  )
-
-  TCGAbiolinks::GDCdownload(query)
-  data <- TCGAbiolinks::GDCprepare(query)
-  y_data <- data.frame(SummarizedExperiment::colData(data))
-  X_data <- data.frame(t(SummarizedExperiment::assay(data)))
-
-  keep_samples <- !is.na(y_data$paper_BRCA_Subtype_PAM50)
-  y <- as.factor(y_data$paper_BRCA_Subtype_PAM50[keep_samples])
-  X <- X_data[keep_samples, ]
-
-  if (!dir.exists("data")) {
-    dir.create("data", recursive = TRUE)
-  }
-  saveRDS(y, "data/tcga_brca_subtypes.rds")
-  saveRDS(X, "data/tcga_brca_array_data.rds")
-  return(list(X = X, y = y))
 }
 

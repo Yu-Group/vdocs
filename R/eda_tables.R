@@ -59,7 +59,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
     dplyr::group_by(group) %>%
     dplyr::summarise(Freq = c(table(dtype)), .groups = "keep") %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Class = R.utils::capitalize(names(Freq))) %>%
+    dplyr::mutate(Class = stringr::str_to_title(names(Freq))) %>%
     tidyr::spread(key = "Class", value = "Freq") %>%
     tibble::column_to_rownames("group")
   if (html) {
@@ -139,7 +139,7 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
       if (dtype == "factor") {
         skim_df <- skim_df %>%
           dplyr::mutate(factor.ordered = tolower(factor.ordered) %>%
-                          R.utils::capitalize())
+                          stringr::str_to_title())
         keep_cols <- c(keep_cols,
                        "Ordered Factor" = "factor.ordered",
                        "# Unique Factors" = "factor.n_unique",
@@ -201,7 +201,7 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
                        keep_cols[2:length(keep_cols)])
       }
       
-      caption <- paste("Summary of", R.utils::capitalize(dtype), "Variables")
+      caption <- paste("Summary of", stringr::str_to_title(dtype), "Variables")
       if (html) {
         tab_ls[[dtype]] <- pretty_DT(
           skim_df %>% dplyr::select(tidyselect::all_of(keep_cols)),

@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^\.github$
+^vignettes/GDCdata$
+^vignettes/data$
+^vignettes/MANIFEST\.txt$
