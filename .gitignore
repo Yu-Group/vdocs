@@ -11,3 +11,9 @@ pcs_lab_notebook_files/*
 pcs_lab_notebook_cache/*
 
 cache/
+inst/doc
+
+vignettes/data/
+vignettes/GDCdata/
+
+vignettes/TCGA_BRCA_subtypes_analysis_files/

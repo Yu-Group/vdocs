@@ -1,0 +1,111 @@
+---
+title: "Getting started with vdocs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vdocs Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(vdocs)
+```
+
+# Overview
+
+# Example Usage with TCGA BRCA Data
+
+## Download TCGA BRCA Data
+
+```{r eval = FALSE}
+#' Loads toy TCGA BRCA data
+#'
+#' @description Downloads and loads in TCGA BRCA data as a toy example for the
+#'   PCS lab notebook
+#'
+#' @returns A list of two:
+#' \describe{
+#' \item{X}{A data frame of gene expression features, measured via RNA-Seq.}
+#' \item{y}{Response vector; PAM50 BRCA subtypes.}
+#' }
+
+# Set query for TCGA BRCA gene expression data, measured via RNA-Seq
+query <- TCGAbiolinks::GDCquery(
+  project = "TCGA-BRCA",
+  data.category = "Gene expression",
+  data.type = "Gene expression quantification",
+  platform = "Illumina HiSeq",
+  file.type  = "normalized_results",
+  experimental.strategy = "RNA-Seq",
+  legacy = TRUE
+)
+
+# Download and prepare data requested in query
+TCGAbiolinks::GDCdownload(query)
+data <- TCGAbiolinks::GDCprepare(query)
+
+# Convert clinical data and assay data into data.frames
+y_data <- data.frame(SummarizedExperiment::colData(data))
+X_data <- data.frame(t(SummarizedExperiment::assay(data)))
+
+# Remove samples that do not have a corresponding PAM50 subtype
+keep_samples <- !is.na(y_data$paper_BRCA_Subtype_PAM50)
+y <- as.factor(y_data$paper_BRCA_Subtype_PAM50[keep_samples])
+X <- X_data[keep_samples, ]
+
+# Save assay data (X) and PAM50 subtype data (y) to disk
+if (!dir.exists("data")) {
+  dir.create("data", recursive = TRUE)
+}
+saveRDS(y, "data/tcga_brca_subtypes.rds")
+saveRDS(X, "data/tcga_brca_array_data.rds")
+
+```
+
+Can start new Rmarkdown template via File > New File > R Markdown... > From Template > PCS Lab Notebook. Alternatively, can use code, but this is not as convenient...
+
+```{r eval = FALSE}
+# create Rmarkdown template via R code
+rmarkdown::draft(file = "TCGA_BRCA_subtypes_analysis",
+                 template = "veridical", package = "vdocs",
+                 edit = FALSE)
+```
+
+TODO: Add the following chunks (without the `eval = FALSE`) to the Rmd for data cleaning
+
+```{asis, interactive_text = TRUE, eval = FALSE}
+Given this example TCGA BRCA data set, we first preprocess the data by removing constant or duplicated columns. Then since the array data is highly right skewed, we will log-transform (i.e., log(x + 1)) the data. Finally, to keep this example template relatively quick to run, we will only keep the 1000 features with the highest variance.
+```
+
+```{r preprocess-data, eval = FALSE}
+## DO DATA CLEANING / PRE-PROCESSING HERE 
+Xtrain <- log(Xtrain + 1) %>%
+  removeConstantCols(verbose = 1) %>%
+  removeDuplicateCols(verbose = 1) %>%
+  filterColsByVar(max_p = 1000)
+Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
+Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
+```
+
+```{r eval = FALSE}
+# run the analysis via render (not recommended)
+rmarkdown::render("TCGA_BRCA_subtypes_analysis.Rmd", 
+                  params = list(X_filepath = "data/tcga_brca_array_data.rds",
+                                y_filepath = "data/tcga_brca_subtypes.rds",
+                                train_prop = 0.6,
+                                valid_prop = 0.2,
+                                test_prop = 0.2,
+                                modeling_pkg = "tidymodels",
+                                n_data_perturbations = 2,
+                                seed = 12345))
+```
+
+
+

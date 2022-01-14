@@ -1,0 +1,21 @@
+<!-- custom navigation tabs -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    // js function to replace nav-tabs class by custom-nav-tabs
+    $(".custom-tabs>ul").removeClass("nav-tabs")
+    $(".custom-tabs>ul").addClass("custom-nav-tabs")
+  });
+</script>
+
+<!-- modify header -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    // modify header
+    $(".header-panel .col-xs-3").removeClass("col-xs-3").addClass("col-xs-12")
+
+    // modify "Code" button
+    $(".btn-toolbar>.btn-group>a>span:first").html('&#9881;')
+    $(".btn-toolbar>.btn-group>ul").addClass('pull-right')
+    $(".btn-toolbar .caret").remove();
+  });
+</script>

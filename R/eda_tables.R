@@ -37,15 +37,19 @@ dataDimensions <- function(Xtrain, Xvalid, Xtest, print = TRUE) {
 #' @param y Response vector.
 #' @param html Logical indicating whether or not the output is an html table
 #'   or a latex table.
-#' @param ... Additional arguments to pass to simChef::pretty_DT() if
-#'   \code{html = TRUE} or simChef::pretty_kable() if \code{html = FALSE}.
+#' @param ... Additional arguments to pass to pretty_DT() if
+#'   \code{html = TRUE} or pretty_kable() if \code{html = FALSE}.
 #' 
-#' @returns Returns an html table (i.e., the output of simChef::pretty_DT()) or
-#'   a latex table (i.e., the output of simChef::pretty_kable()), 
+#' @returns Returns an html table (i.e., the output of pretty_DT()) or
+#'   a latex table (i.e., the output of pretty_kable()), 
 #'   containing the frequency of each data type in the given (X, y) data.
 #' 
 #' @export
 dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
+  group <- NULL  # to fix no visible binding for global variable error
+  dtype <- NULL
+  Freq <- NULL
+  
   data <- cbind(.y = y, X)
   dtypes_df <- data.frame(
     var = colnames(data),
@@ -55,11 +59,11 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
     dplyr::group_by(group) %>%
     dplyr::summarise(Freq = c(table(dtype)), .groups = "keep") %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Class = R.utils::capitalize(names(Freq))) %>%
+    dplyr::mutate(Class = stringr::str_to_title(names(Freq))) %>%
     tidyr::spread(key = "Class", value = "Freq") %>%
     tibble::column_to_rownames("group")
   if (html) {
-    tab_out <- simChef::pretty_DT(
+    tab_out <- pretty_DT(
       dtypes_df, 
       caption = shiny::tags$caption(
         style = "color: black; font-weight: bold; font-size: 125%",
@@ -69,7 +73,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
       ...
     )
   } else {
-    tab_out <- simChef::pretty_kable(dtypes_df, caption = "Frequency of column",
+    tab_out <- pretty_kable(dtypes_df, caption = "Frequency of column",
                                      format = "latex", ...)
   }
   return(tab_out)
@@ -85,7 +89,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   types are ignored.
 #' 
 #' @inheritParams dataTypes
-#' @inheritParams simChef::pretty_DT
+#' @inheritParams pretty_DT
 #' @param features (Optional) vector of features to include in summary. Default
 #'   (\code{NULL}) is to include all features.
 #' @param max_features (Optional) maximum number of features to include in 
@@ -93,14 +97,19 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   number of features in X exceeds `max_features`, the features kept in the 
 #'   summary are chosen randomly.
 #' 
-#' @returns Returns an html table (i.e., the output of simChef::pretty_DT()) or
-#'   a latex table (i.e., the output of simChef::pretty_kable()), 
+#' @returns Returns an html table (i.e., the output of pretty_DT()) or
+#'   a latex table (i.e., the output of pretty_kable()), 
 #'   containing a broad overview of summary statistics for each data column.
 #' 
 #' @export
 dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
                         features = NULL, max_features = 1000, 
                         html = knitr::is_html_output(), ...) {
+  skim_type <- NULL  # to fix no visible binding for global variable error
+  complete_rate <- NULL
+  factor.ordered <- NULL
+  logical.count <- NULL
+  
   if (is.null(features)) {
     features <- colnames(X)
     if (length(features) > max_features) {
@@ -130,7 +139,7 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
       if (dtype == "factor") {
         skim_df <- skim_df %>%
           dplyr::mutate(factor.ordered = tolower(factor.ordered) %>%
-                          R.utils::capitalize())
+                          stringr::str_to_title())
         keep_cols <- c(keep_cols,
                        "Ordered Factor" = "factor.ordered",
                        "# Unique Factors" = "factor.n_unique",
@@ -192,9 +201,9 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
                        keep_cols[2:length(keep_cols)])
       }
       
-      caption <- paste("Summary of", R.utils::capitalize(dtype), "Variables")
+      caption <- paste("Summary of", stringr::str_to_title(dtype), "Variables")
       if (html) {
-        tab_ls[[dtype]] <- simChef::pretty_DT(
+        tab_ls[[dtype]] <- pretty_DT(
           skim_df %>% dplyr::select(tidyselect::all_of(keep_cols)),
           caption = shiny::tags$caption(
             style = "color: black; font-weight: bold; font-size: 125%", caption
@@ -205,7 +214,7 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
           ...
         )
       } else {
-        tab_ls[[dtype]] <- simChef::pretty_kable(
+        tab_ls[[dtype]] <- pretty_kable(
           skim_df %>% dplyr::select(tidyselect::all_of(keep_cols)), 
           caption = caption, format = "latex", row.names = FALSE, escape = TRUE, 
           ...
