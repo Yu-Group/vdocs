@@ -79,6 +79,10 @@ y <- loadFile(params$y_filepath)
 validateData(X, y)
 ```
 
+```{r load-saved-responses, eval = knitr::is_html_output(), echo = FALSE, results = "asis", cache = FALSE}
+load_saved_responses()
+```
+
 # Domain problem formulation
 
 What is the real-world question? This could be hypothesis-driven or discovery-based.

@@ -19,7 +19,7 @@
     // 'bold italic backcolor | alignleft aligncenter ' +
     // 'alignright alignjustify | bullist numlist | image table | help',
     plugins: "advlist autolink autoresize lists link image charmap visualblocks code table paste hr save", 
-    toolbar: "save | undo redo | formatgroup paragraphgroup insertgroup",
+    toolbar: "undo redo | formatgroup paragraphgroup insertgroup",
 
     toolbar_groups: {
       formatgroup: {
@@ -37,10 +37,6 @@
         tooltip: 'Insert',
         items: 'image table link charmap hr'
       }
-    },
-
-    save_onsavecallback: function () {
-      localStorage.setItem(tinymce.activeEditor.id, tinymce.activeEditor.getContent())
     },
 
     /*
@@ -89,9 +85,11 @@
     },
 
     setup: function (editor) {
-      // retrieve stored text from localStorage
+      // retrieve stored text
       editor.on('init', function () {
-        editor.setContent(localStorage.getItem(editor.id));
+        if ($("#" + editor.id + "-data")[0].innerHTML.trim().length > 0) {
+          editor.setContent($("#" + editor.id + "-data")[0].innerHTML);
+        } 
       });
     },
 

@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+
 <!-- modify header -->
 <script type="text/javascript">
   $(document).ready(function() {
@@ -15,18 +17,11 @@
       $(".help-info").hide()
     })
 
-    // add clear cache button 
-    var settings_item = $(".btn-toolbar>.btn-group>ul:first>.divider:last") 
-    settings_item.after(
-      '<li><a id="clear-cache" href="#">Clear Cache</a></li>',
-      '<li role="separator" class="divider"></li>'
+    // add save responses button
+    var settings_item = $(".btn-toolbar>.btn-group")
+    settings_item[0].style.float = "unset"
+    settings_item.before(
+      '<div class="btn-group" style="float: unset"><i class="fas fa-save fa-lg" accesskey="s" title="Save responses" onclick="saveResponses()" style="cursor: pointer; margin-right: 7px;"></i></div>'
     )
-    $('#clear-cache').click(function(){
-      localStorage.removeItem("checkboxValues")
-      var $textboxes = $(".tinymce-text");
-      $textboxes.each(function(){
-        localStorage.removeItem(this.id)
-      })
-    });
   });
 </script>

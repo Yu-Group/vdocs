@@ -68,6 +68,7 @@ vdocs_knitr_setup <- function(echo = TRUE,
     knitr::opts_hooks$set(
       interactive_text = function(options) {
         options$echo <- FALSE
+        options$cache <- FALSE
         return(options)
       },
       help = function(options) {
@@ -103,5 +104,34 @@ vdocs_knitr_setup <- function(echo = TRUE,
         return(options)
       }
     )
+  }
+}
+
+#' Load in saved responses in vdocs Rmd template
+#'
+#' @description Helper function to load in previously saved responses into vdocs
+#'   Rmarkdown html report.
+#'
+#' @export
+load_saved_responses <- function() {
+  if (file.exists("responses.zip")) {
+    utils::unzip("responses.zip", exdir = "responses")
+    checkboxes <- readLines(file.path("responses", "checkboxes.txt"),
+                            warn = FALSE)
+    cat(sprintf('<div id="checkbox-data" style="display: none;">%s</div>',
+                checkboxes))
+    for (fname in list.files("responses", pattern = "^mce\\_.*\\.html$")) {
+      mce_id <- substr(fname, start = 1, stop = nchar(fname) - 5)
+      textbox <- paste(readLines(file.path("responses", fname), warn = FALSE),
+                       collapse = "\n")
+      cat(sprintf('<div id="%s-data" style="display: none;">%s</div>',
+                  mce_id, textbox))
+    }
+    unlink("responses/", recursive = TRUE)
+  } else {
+    cat('<div id="checkbox-data" style="display: none;"></div>')
+    for (mce_id in paste0("mce_", 0:23)) {
+      cat(sprintf('<div id="%s-data" style="display: none;"></div>', mce_id))
+    }
   }
 }
