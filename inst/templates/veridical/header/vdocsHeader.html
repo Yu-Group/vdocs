@@ -22,7 +22,11 @@
       '<li role="separator" class="divider"></li>'
     )
     $('#clear-cache').click(function(){
-      localStorage.clear()
+      localStorage.removeItem("checkboxValues")
+      var $textboxes = $(".tinymce-text");
+      $textboxes.each(function(){
+        localStorage.removeItem(this.id)
+      })
     });
   });
 </script>
