@@ -1,0 +1,43 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<script src="https://raw.githubusercontent.com/Stuk/jszip/master/dist/jszip.min.js"></script>
+
+<script type="text/javascript">
+	function saveResponses() {
+		// initialize zip file output
+		var zip = new JSZip();
+
+		// get checkbox values (dictionary)
+		var checkboxValues = {};
+		var $checkboxes = $(":checkbox");
+		$checkboxes.each(function(){
+			checkboxValues[this.id] = this.checked;
+		})
+		// $("#checkbox-data")[0].innerHTML = JSON.stringify(checkboxValues)
+		zip.file("checkboxes.txt", JSON.stringify(checkboxValues))
+
+		// get textbox values (html)
+		var textValues = {};
+		var $textboxes = $(".tinymce-text");
+		$textboxes.each(function(){
+			textValues[this.id] = tinymce.get(this.id).getContent();
+			// $("#" + this.id + "-data")[0].innerHTML = textValues[this.id]
+			zip.file(this.id + ".html", textValues[this.id])
+		})
+
+		// save as zip file
+		zip.generateAsync({type:"blob"}).then(function(content) {
+			saveAs(content, "responses.zip")
+		})
+	}
+
+	function getCheckboxResponses() {
+		if ($("#checkbox-data")[0].innerHTML.trim().length > 0) {
+			return JSON.parse($("#checkbox-data").text().
+				replace(/[\u2018\u2019]/g, "'").
+				replace(/[\u201C\u201D]/g, '"'));
+		} else {
+			return;
+		}
+	}
+</script>

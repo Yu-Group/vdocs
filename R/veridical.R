@@ -44,6 +44,8 @@ veridical <- function(lab_notebook = FALSE,
       system.file("templates/veridical/header/vdocsHeader.html",
                   package = "vdocs"),
       system.file("templates/veridical/header/tinymce.html",
+                  package = "vdocs"),
+      system.file("templates/veridical/header/saveResponses.html",
                   package = "vdocs")
     )
     if (!lab_notebook) {
