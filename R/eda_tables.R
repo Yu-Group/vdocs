@@ -102,7 +102,7 @@ dataTypes <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   containing a broad overview of summary statistics for each data column.
 #' 
 #' @export
-dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
+dataSummary <- function(X, y = NULL, digits = 2, sigfig = FALSE,
                         features = NULL, max_features = 1000, 
                         html = knitr::is_html_output(), ...) {
   skim_type <- NULL  # to fix no visible binding for global variable error
@@ -117,7 +117,11 @@ dataSummary <- function(X, y, digits = 2, sigfig = FALSE,
     }
   }
   
-  skim_out <- skimr::skim(cbind(`.y` = y, X[, features]))
+  if (!is.null(y)) {
+    skim_out <- skimr::skim(cbind(`.y` = y, X[, features]))
+  } else {
+    skim_out <- skimr::skim(X[, features])
+  }
   tab_ls <- list()
   dtypes <- c("factor", "numeric", "character", "logical", "complex", "Date",
               "POSIXct")
