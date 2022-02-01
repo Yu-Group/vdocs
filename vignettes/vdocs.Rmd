@@ -2,7 +2,7 @@
 title: "Getting started with vdocs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{vdocs Vignette}
+  %\VignetteIndexEntry{Getting started with vdocs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -30,7 +30,15 @@ With a "PCS lab notebook", practitioners can provide a complete narrative of the
 
 # Create a New PCS Lab Notebook
 
-To get started, the easiest way to create a new PCS Lab Notebook is to open a new Rmarkdown file from template: go to `File > New File > R Markdown... > From Template > PCS Lab Notebook` and voila! The lab notebook template has been auto-populated with code to perform a standard PCS-style analysis, but of course, any or all of the R code can be changed. The PCS lab notebook still adds much-needed value by providing a checklist of questions that every data scientist should consider and document throughout the analysis pipeline. While responding to these questions takes time, we highly encourage every data scientist or practitioner to put in this extra effort as a step towards our greater goal of ensuring scientific reproducibility!
+To get started, the easiest way to create a new PCS Lab Notebook is to open a new Rmarkdown file from template in RStudio: go to `File > New File > R Markdown... > From Template > PCS Lab Notebook > OK` and voila! A directory, whose name was specified in the `Name` dialog box, has been created and contains the .Rmd PCS lab notebook template.
+
+<center>
+
+![*Steps to create a new PCS Lab Notebook in RStudio.*](figures/create_new_nb.png){width=100%}
+
+</center>
+
+This lab notebook template has been auto-populated with code to perform a standard PCS-style analysis, but of course, any or all of the R code can be changed. The PCS lab notebook still adds much-needed value by providing a checklist of questions that every data scientist should consider and document throughout the analysis pipeline. While responding to these questions takes time, we highly encourage every data scientist or practitioner to put in this extra effort as a step towards our greater goal of ensuring scientific reproducibility!
 
 # Example Usage: TCGA BRCA Data
 
@@ -38,7 +46,7 @@ Let us now walk through an example usage of the PCS lab notebook using breast ca
 
 ## Step 1: Download Data
 
-To begin, we must first obtain the data of interest. Here, we will make use of the `TCGAbiolinks` package, which can be installed through `Bioconductor`. In the following code snippet, we download gene expression data, measured via RNA-Seq, for TCGA breast cancer patients along with their PAM50 breast cancer subtype classification. 
+To begin, we must first obtain the data of interest. Here, we will make use of the `TCGAbiolinks` package, which can be installed through `Bioconductor`. In the following code snippet to be run in the R console, we download gene expression data, measured via RNA-Seq, for TCGA breast cancer patients along with their PAM50 breast cancer subtype classification. 
 
 ```{r eval = FALSE}
 # Set query for TCGA BRCA gene expression data, measured via RNA-Seq
@@ -66,11 +74,11 @@ y <- as.factor(y_data$paper_BRCA_Subtype_PAM50[keep_samples])
 X <- X_data[keep_samples, ]
 
 # Save assay data (X) and PAM50 subtype data (y) to disk
-if (!dir.exists("data")) {
-  dir.create("data", recursive = TRUE)
+if (!dir.exists(file.path("TCGA BRCA Example", "data"))) {
+  dir.create(file.path("TCGA BRCA Example", "data"), recursive = TRUE)
 }
-saveRDS(y, "data/tcga_brca_subtypes.rds")
-saveRDS(X, "data/tcga_brca_array_data.rds")
+saveRDS(y, "TCGA BRCA Example/data/tcga_brca_subtypes.rds")
+saveRDS(X, "TCGA BRCA Example/data/tcga_brca_array_data.rds")
 
 ```
 
@@ -94,8 +102,14 @@ After obtaining the data and saving it to disk, we can next input the required p
 
 These parameters can be set in one of two ways:
 
-1. In the parameter section of the PCS lab notebook (i.e., the `params:` section within the yaml header of the Rmarkdown), input the desired values in the `value:` slot for each parameter.
-2. Alternatively, when it is time to knit the document, click on the knit dropdown menu, and click `Knit with parameters`. A pop-up box will show up with slots to fill out for each parameter.
+A.  In the parameter section of the PCS lab notebook (i.e., the `params:` section within the yaml header of the Rmarkdown), input the desired values in the `value:` slot for each parameter.
+B.  Alternatively, when it is time to knit the document, click on the knit dropdown menu, and click `Knit with parameters`. A pop-up box will show up with slots to fill out for each parameter.
+
+<center>
+
+![*How to input parameters before or at the time of knitting.*](figures/input_parameters.png){width=100%}
+
+</center>
 
 ## Step 3: Modify Code
 
@@ -123,14 +137,27 @@ As for the modeling section, the PCS lab notebook, by default, provides code to 
 
 The final and by far the most important step is to provide a transparent narrative for the entire analysis. One of the key assets of the PCS lab notebook is that this narrative is made simple through a guided checklist of questions that every practitioner should consider and document throughout the analysis pipeline. These questions can be answered in one of two ways:
 
-1. They can be answered by directly typing responses into the Rmarkdown code chunks that are labeled ````{asis, interactive_text = TRUE}` before knitting. (Check out the [Visual R Markdown](https://rstudio.github.io/visual-markdown-editing/) editor that was rolled out in RStudio v1.4! This visual markdown editing mode is great for those who are less familiar with Rmarkdown.)
-2. Alternatively, practitioners can type in their responses to the guided questions after knitting to html. After knitting, the questions that require responses will be followed by interactive textboxes. **To save these responses, click on the "save" button, located in the top left corner of the knitted html document, and save the responses zip file in the same directory as the Rmarkdown file. Then, re-knit the Rmarkdown file to see the saved responses.**
+A.  They can be answered by directly typing responses into the Rmarkdown code chunks that are labeled ````{asis, interactive_text = TRUE}` before knitting. (Check out the [Visual R Markdown](https://rstudio.github.io/visual-markdown-editing/) editor that was rolled out in RStudio v1.4! This visual markdown editing mode is great for those who are less familiar with Rmarkdown.)
+
+<center>
+
+![*How to input text narrative into Rmarkdown document directly.*](figures/insert_text_responses.png){width=100%}
+
+</center>
+
+B.  Alternatively, practitioners can type in their responses to the guided questions after knitting to html. After knitting, the questions that require responses will be followed by interactive textboxes. **To save these responses, click on the "save" button, located in the top right corner of the knitted html document, and save the responses zip file in the same directory as the Rmarkdown file. Then, re-knit the Rmarkdown file to see the saved responses.**
+
+<center>
+
+![*How to input text narrative into html document after knitting the Rmarkdown.*](figures/insert_text_responses_html.png){width=100%}
+
+</center>
 
 Note: though we list this step as last for organization and clarity, we encourage practitioners to provide this narrative concurrently with any code modifications (in step 3). 
 
 ## The End Product
 
-After answering the guided questions and knitting the Rmarkdown, we get a beautiful html report like the TCGA BRCA report [here](), generated from the Rmarkdown file [here](). If a pdf is preferred over html, one can click `Knit to pdf_document` in the knit dropdown menu.
+After answering the guided questions and knitting the Rmarkdown, we get a beautiful html report like the TCGA BRCA report [here](TCGA-BRCA-Example.html), generated from the Rmarkdown file [here](https://github.com/Yu-Group/vdocs/blob/main/vignettes/TCGA BRCA Example/TCGA BRCA Example.Rmd). If a pdf is preferred over html, one can click `Knit to pdf_document` in the knit dropdown menu.
 
 # Stay Tuned!
 

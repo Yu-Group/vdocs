@@ -1,0 +1,759 @@
+---
+title: "PCS Documentation"
+author: ""
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+header-includes:
+    - \usepackage{float}
+    - \usepackage{amsmath}
+    - \usepackage{gensymb}
+    - \usepackage{tcolorbox}
+output:
+  vdocs::veridical:
+    lab_notebook: true
+    number_sections: true
+  pdf_document:
+    number_sections: true
+params:
+  ## INPUT PARAMETERS HERE OR USING "Knit with Parameters..." IN ABOVE KNIT MENU
+  X_filepath:
+    label: "X Data"
+    # specify file path for X data
+    value: data/tcga_brca_array_data.rds  
+    input: file 
+  y_filepath:
+    label: "y data"
+    # specify file path for y data
+    value: data/tcga_brca_subtypes.rds
+    input: file
+  train_prop:
+    label: "Training data proportion"
+    # specify proportion of data to put in training set
+    value: 0.6  
+    input: numeric
+  valid_prop:
+    label: "Validation data proportion"
+    # specify proportion of data to put in validation set
+    value: 0.2  
+    input: numeric
+  test_prop:
+    label: "Test data proportion"
+    # specify proportion of data to put in test set
+    value: 0.2  
+    input: numeric
+  modeling_pkg:
+    label: "Modeling Package"
+    # specify which modeling package to use
+    value: "tidymodels"  
+    input: select
+    choices: ["caret", "h2o", "tidymodels"]
+  n_data_perturbations:
+    label: "Number of data perturbations (e.g., bootstrap samples)"
+    # specify number of data perturbations; note: increase for better measure 
+    # of stability, but at the cost of higher computational load
+    value: 2  
+    input: numeric
+  seed:
+    label: "Random Seed"
+    # specify random seed
+    value: 12345
+    input: numeric
+---
+
+<!-- INSTRUCTIONS: This Rmarkdown facilitates beautiful documentation for PCS-style analyses. After inputting in the required data and parameters above, please go through and provide responses to all questions in the notebook below. Responses should be typed in all chunks with the header `interactive_text = TRUE`. -->
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
+library(vdocs)
+
+# set up knitr options for vdocs
+vdocs_knitr_setup()
+
+# set seed
+set.seed(params$seed)
+
+# validate inputs
+validateDataSplit(params$train_prop, params$valid_prop, params$test_prop)
+
+# load data in
+X <- loadFile(params$X_filepath)
+y <- loadFile(params$y_filepath)
+validateData(X, y)
+```
+
+```{r load-saved-responses, eval = knitr::is_html_output(), echo = FALSE, results = "asis", cache = FALSE}
+load_saved_responses()
+```
+
+# Domain problem formulation
+
+What is the real-world question? This could be hypothesis-driven or discovery-based.
+
+```{asis, help = TRUE}
+This should be very high level, providing the big picture behind the study. Often this takes the form of a pre-existing hypothesis (e.g., individuals with a specific genetic mutation are more likely to have a given characteristic) or more open ended discovery (e.g., identify mutations that are related to a given characteristic).
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Why is this question interesting and important? What are the implications of better understanding this data?
+
+```{asis, help = TRUE}
+Try to incentive this study for those coming from a variety of backgrounds and levels of scientific understanding. Perhaps mention how previous, related, work made an impact in the field.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Briefly describe any background information necessary to understand this problem.
+
+```{asis, help = TRUE}
+This should provide readers some intuition for the scientific problem. This section should be a short, high-level, summary. For additional details, one can refer readers to introductory material, tutorials, and/or review papers.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Briefly describe how this question can be answered in the context of a model or analysis.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Outline the rest of the report/analysis.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+# Data
+
+What is the data under investigation? Provide a brief overview/description of the data.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Describe how your data connects to the domain problem.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+## Data Collection
+
+How was the data collected or generated (including details on the experimental design)? Be as transparent as possible so that conclusions made from this data are not misinterpreted down the road.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Describe any limitations when using the data to answer the domain problem of interest.
+
+```{asis, help = TRUE}
+While the previous section lays out the entire collection process, here it is important to highlight any limitations as these may not be obvious to those from other fields. This includes any personal judgement calls made in the collection process.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Where is the data stored, and how can it be accessed by others (if applicable)?
+
+```{asis, interactive_text = TRUE}
+
+```
+
+## Data Splitting
+
+Decide on the proportion of data in each split.
+
+Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
+
+```{asis, help = TRUE}
+Here we refer to splitting data into training, validation, and test portions. In general, the goal is to fit select models (including any necessary tuning procedures) on the training data, and assess prediction accuracy on the validation data. **Test data should only be utilized after all data analysis is completed.**
+
+This split can strongly effect results since data often have underlying structure/relationships (e.g., longitudinal information, related individuals, ethnicity, varying hospitals, etc.). If certain characteristics are underrepresented in training, then validation accuracy can deteriorate. Thus, a stratified approach is often recommended.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Split the data into a training, validation, and test set.
+
+```{r split-data}
+data_split <- dataSplit(X = X, y = y, stratified_by = y,
+                        train_prop = params$train_prop, 
+                        valid_prop = params$valid_prop, 
+                        test_prop = params$test_prop)
+Xtrain <- data_split$X$train
+Xvalid <- data_split$X$validate
+Xtest <- data_split$X$test
+ytrain <- data_split$y$train
+yvalid <- data_split$y$validate
+ytest <- data_split$y$test
+```
+
+Provide summary statistics and/or figures of the three data sets to illustrate how similar (or different) they are.
+
+```{asis, help = TRUE}
+This step is important as it can highlight any concerns with your chosen splitting rule. For instance, under the classification setting, the distribution of categories should be similar across the three data sets.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+### Data Splitting Overview {.tabset .custom-tabs}
+
+#### X Data Split {.unnumbered}
+
+```{r X-data-split, add_new_line = TRUE}
+plotDataSplit(Xtrain, Xvalid, Xtest, 
+              xlab = "X", title = "Overall X Distribution")
+```
+
+#### Y Data Split {.unnumbered}
+
+```{r y-data-split, add_new_line = TRUE}
+plotDataSplit(ytrain, yvalid, ytest, 
+              xlab = "y", title = "Overall y Distribution")
+```
+
+## Data Cleaning and Preprocessing
+
+What steps were taken to clean the data? More importantly, why was the data cleaned in this way?
+
+```{asis, help = TRUE}
+Data cleaning can be very problem and domain dependent. Be sure to specify which approaches are common in the field (and why). Where appropriate, highlight any steps that were judgement calls necessary to continue the analysis. 
+```
+
+Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).
+
+Record your preprocessing steps in a way such that if someone else were to reproduce your analysis, they could easily replicate and understand your steps.
+
+It can be helpful to include relevant plots that explain/justify the choices that were made when cleaning the data.
+
+If more than one preprocessing pipeline is reasonable, examine the impacts of these alternative preprocessing pipelines on the final data results.
+
+```{asis, help = TRUE}
+There are often multiple, standard preprocessing options that should be tested to assess stability of results. Any judgement calls mentioned above should also be compared with alternative choices where possible.
+```
+
+Again, be as transparent as possible. This allows others to make their own educated decisions on how best to preprocess the data.
+
+```{asis, interactive_text = TRUE}
+Given this example TCGA BRCA data set, we first preprocess the data by removing constant or duplicated columns. Then since the array data is highly right skewed, we will log-transform (i.e., log(x + 1)) the data. Finally, to keep this example template relatively quick to run, we will only keep the 1000 features with the highest variance.
+```
+
+```{r preprocess-data}
+## DO DATA CLEANING / PRE-PROCESSING HERE 
+Xtrain <- log(Xtrain + 1) %>%
+  removeConstantCols(verbose = 1) %>%
+  removeDuplicateCols(verbose = 1) %>%
+  filterColsByVar(max_p = 1000)
+Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
+Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
+```
+
+## Data Exploration
+
+The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.
+
+Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.
+
+Provide additional plots representing remaining oddities after pre-processing if applicable.
+
+Add summary statistics in accompanying tables (or in figures) for quick comparisons.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+### Data Overview {.tabset .custom-tabs}
+
+```{r data-dims, echo = FALSE}
+# summary of data dimensions
+dataDimensions(Xtrain = Xtrain, Xvalid = Xvalid, Xtest = Xtest)
+```
+
+```{r data-types, results="asis", add_new_line = TRUE}
+# summary of types of features in (X, y) data
+dataTypes(X = Xtrain, y = ytrain)
+```
+
+#### Summary Tables {.unnumbered}
+
+```{r data-summary-table, results="asis", add_new_line = TRUE}
+# broad array of summary statistics for features in training (X, y)
+tab_ls <- dataSummary(X = Xtrain, y = ytrain)
+for (dtype in names(tab_ls)) {  # grouped by data type
+  subchunkify(tab_ls[[dtype]], i = dtype, other_args = "results='asis'")
+}
+```
+
+#### X Distribution {.unnumbered}
+
+```{r x-dist-plot, add_new_line = TRUE}
+# plot X distribution
+plotDataDistribution(data = Xtrain, 
+                     xlab = "X", title = "Training X Distribution")
+```
+
+#### Y Distribution {.unnumbered}
+
+```{r y-dist-plot, add_new_line = TRUE}
+# plot y distribution
+plotDataDistribution(data = ytrain, 
+                     xlab = "y", title = "Training y Distribution")
+```
+
+#### Data Heatmap {.unnumbered}
+
+```{r data-heatmap, add_new_line = TRUE}
+# (clustered) heatmap of (X, y) data
+plotDataHeatmap(X = Xtrain, y = ytrain, clust_rows = TRUE, clust_cols = TRUE,
+                show_ytext = FALSE, x_text_angle = TRUE)
+```
+
+#### Feature Correlation {.unnumbered}
+
+```{r feature-cor-heatmap, add_new_line = TRUE}
+# (clustered) correlation heatmap
+plotCorHeatmap(X = Xtrain, cor_type = "pearson", clust = TRUE,
+               x_text_angle = TRUE) +
+  ggplot2::labs(x = "Features", y = "Features", fill = "Cor.")
+```
+
+#### Feature Pair Plots {.unnumbered}
+
+```{r feature-pair-plot, add_new_line = TRUE}
+# feature pair plot (for a subset of features)
+keep_features <- sort(
+  sample(1:ncol(Xtrain), min(ncol(Xtrain), 6), replace = FALSE)
+)
+plotPairs(data = Xtrain, columns = keep_features, 
+          color = ytrain, color_label = "y")
+```
+
+#### Marginal Associations {.unnumbered}
+
+```{r marginal-assoc-plot, add_new_line = TRUE}
+# marginal association plots (for a subset of features)
+caret::featurePlot(x = Xtrain[, keep_features],
+                   y = ytrain,
+                   plot = if (is.factor(ytrain)) "box" else "scatter",
+                   scales = list(x = list(relation = "free"), 
+                                 y = list(relation = "free")))
+```
+
+#### PCA {.unnumbered}
+
+```{r pca-plot, add_new_line = TRUE}
+# pca plot
+plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
+        center = TRUE, scale = FALSE)$plot
+```
+
+# Prediction Modeling
+
+Discuss the prediction methods under consideration, and explain why these methods were chosen.
+
+```{asis, help = TRUE}
+There are an overwhelming number of methods available, but at least one should be a common approach acting as a baseline. This may not be optimal for the problem setting, but serves as a helpful comparison. Any "go-to" methods in this scientific domain should be considered. Discuss why these are favored, for instance, is there a natural structure in the data that is better utilized in one approach vs another? Conversely, mention if there are approaches typically avoided in these problems. The limitations discussed previously can also help guide these decisions given some procedures will be better equipped to handle these compared to others.
+
+Think back to the big picture, if interpretability is important, methods favoring sparser, simpler models may be preferred (e.g., sparse regression or tree-based procedures). If prediction is the sole goal, more complex models may be appropriate.
+
+If computing time is a burden, and rules out methods with high potential, this should be highlighted for future reference as scalability and/or computing resources improve.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.
+
+```{asis, help = TRUE}
+These accuracy metrics should clearly support the main goal of the study. There are often multiple ways to quantify accuracy, and different measurements may have been used in previous studies, thus comparing across several provides an additional stability metric.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+## Prediction check {.tabset .custom-tabs}
+
+Carry out the prediction pipeline, outlined above.
+
+1.  Fit prediction methods on training data.
+
+```{asis, help = TRUE}
+Recall, this includes any parameter tuning which may require further data splitting (e.g., k-fold cross-validation) **within the training data**.
+```
+
+2.  Evaluate prediction methods on validation data.
+3.  Compare results, and filter out poor models.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+```{r caret-fit-params, eval = params$modeling_pkg == "caret", echo = params$modeling_pkg == "caret", cache = FALSE}
+## IF USING CARET MODELING BACKEND, CHOOSE METHODS AND TRAINING CONTROLS HERE
+cv_options <- list(nfolds = 5, 
+                   foldids = NULL,
+                   metric = "Accuracy")
+
+model_list <- list(
+  ranger = list(.tune_params = list(mtry = round(seq(sqrt(ncol(Xtrain)), 
+                                                     ncol(Xtrain) / 3,
+                                                     length.out = 3)),
+                                    splitrule = "gini",
+                                    min.node.size = 1),
+                importance = "impurity",
+                num.threads = 1),
+  xgbTree = list(nthread = 1)
+)
+```
+
+```{r h2o-fit-params, eval = params$modeling_pkg == "h2o", echo = params$modeling_pkg == "h2o", cache = FALSE}
+## IF USING H2O MODELING BACKEND, CHOOSE METHODS AND TRAINING CONTROLS HERE
+cv_options <- list(nfolds = 5,
+                   foldids = NULL,
+                   metric = "accuracy")
+
+model_list <- list(
+  randomForest = list(.tune_params = list(mtries = round(seq(sqrt(ncol(Xtrain)),
+                                                             ncol(Xtrain) / 3,
+                                                             length.out = 3))),
+                      ntrees = 500),
+  xgboost = list()
+)
+
+# initialize h2o cluster
+h2o::h2o.init(nthreads = -1)
+```
+
+```{r tidymodels-fit-params, eval = params$modeling_pkg == "tidymodels", echo = params$modeling_pkg == "tidymodels", cache = FALSE}
+## IF USING TIDYMODELS BACKEND, CHOOSE METHODS AND TRAINING CONTROLS HERE
+cv_options <- list(nfolds = 5,
+                   foldids = NULL,
+                   metric = "accuracy")
+
+model_list <- list(
+  rand_forest = list(.tune_params = list(mtry = round(seq(sqrt(ncol(Xtrain)),
+                                                          ncol(Xtrain) / 3,
+                                                          length.out = 3))),
+                     engine = list(engine = "ranger",
+                                   importance = "impurity")),
+  boost_tree = list(engine = "xgboost")
+)
+```
+
+```{r fit-models}
+# fit/train models
+fit_results <- fitModels(Xtrain = Xtrain, ytrain = ytrain,
+                         model_list = model_list, cv_options = cv_options,
+                         use = params$modeling_pkg)
+
+# make prediction on validation set
+pred_results <- predictModels(fit_list = fit_results, Xtest = Xvalid)
+
+# evaluate predictions on validation set
+eval_results <- evaluateModels(pred_df = pred_results, ytest = yvalid)
+
+# collect feature importance metrics from model fits
+imp_results <- interpretModels(fit_list = fit_results)
+```
+
+### Fit Summary {.unnumbered .tabset .tabset-pills}
+
+```{r fit-summary, echo = FALSE, results = "asis"}
+# print out fit output summary
+printFitResults(fit_results)
+```
+
+### Prediction Results {.unnumbered}
+
+```{r prediction-results, echo = FALSE, results = "asis"}
+# display prediction metrics, confusion matrices, and roc/pr plots if applicable
+showEvalResults(eval_results, digits = 2, sigfig = FALSE,
+                html_options = list(
+                  options = list(dom = "t", pageLength = nrow(eval_results))
+                ))
+```
+
+## Stability check {.tabset .custom-tabs}
+
+Taking the prediction methods that pass the prediction check, perform stability analysis.
+
+```{asis, help = TRUE}
+This stability analysis assesses changes in validation accuracy based on small perturbations in the training data. The "perturbed data sets" mentioned below refer to the **training data only**, validation and test sets remain the same.
+```
+
+1.  Specify and justify the appropriate data perturbation(s).
+
+```{asis, help = TRUE}
+As when determining an appropriate splitting rule, the perturbation scheme should incorporate any known data structure. For instance, if using a bootstrap approach (i.e., the data are re-sampled with replacement), stratified sampling may be more appropriate to avoid unbalanced groups.
+```
+
+2.  Re-fit the prediction methods on these perturbed data sets.
+3.  Evaluate prediction methods on validation data.
+4.  Assess stability across the data perturbations as well as across the various methods.
+5.  Filter out poor models where necessary and interpret stability results.
+
+```{asis, help = TRUE}
+Methods with highly variable accuracy should be discarded. In addition, take note if any set of perturbations resulted in uniformly poor accuracy across methods. This could indicate an underlying issue with the perturbation approach.
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+```{r stability-check}
+n_reps <- params$n_data_perturbations
+
+# p <- progressr::progressor(steps = n_reps)
+# future::plan(multisession, workers = min(n_reps, parallel::detectCores() - 1))
+bootstrap_model_results <- future.apply::future_replicate(
+  n = n_reps,
+  expr = {
+    bootstrap <- sample(1:nrow(Xtrain), nrow(Xtrain), replace = TRUE)
+    Xtrain_b <- Xtrain[bootstrap, ]
+    ytrain_b <- ytrain[bootstrap]
+    
+    # fit/train models on bootstrap data
+    fit_results_b <- fitModels(Xtrain = Xtrain_b, ytrain = ytrain_b,
+                               model_list = model_list, cv_options = cv_options,
+                               use = params$modeling_pkg)
+
+    # make prediction on validation set
+    pred_results_b <- predictModels(fit_list = fit_results_b, Xtest = Xvalid)
+
+    # evaluate predictions on validation set
+    eval_results_b <- evaluateModels(pred_df = pred_results_b, ytest = yvalid)
+    
+    # collect feature importance metrics from model fits
+    imp_results_b <- interpretModels(fit_list = fit_results_b)
+    
+    return(list(# fit = fit_results_b,  # uncomment if need bootstrap fits; can be memory intensive
+                predictions = pred_results_b,
+                eval_metrics = eval_results_b,
+                importances = imp_results_b))
+  },
+  simplify = FALSE
+)
+
+bootstrap_model_errs <- purrr::map_dfr(bootstrap_model_results,
+                                       ~.x$eval_metrics$metrics,
+                                       .id = "bootstrap_id")
+bootstrap_model_preds <- purrr::map(bootstrap_model_results, "predictions")
+bootstrap_model_imps <- purrr::map_dfr(bootstrap_model_results, "importances",
+                                       .id = "bootstrap_id")
+
+# summarize bootstrap model error metrics
+bootstrap_model_errs_summary <- bootstrap_model_errs %>%
+  tidyr::pivot_longer(cols = c(-bootstrap_id, -Metric), 
+                      names_to = "Method", values_to = "Value") %>%
+  dplyr::group_by(Method, Metric) %>%
+  dplyr::summarise(Mean = mean(Value), SD = sd(Value), .groups = "drop") %>%
+  tidyr::pivot_longer(cols = c(Mean, SD), 
+                      values_to = "Value", names_to = "Statistic") %>%
+  tidyr::pivot_wider(names_from = "Method", values_from = "Value") %>%
+  dplyr::arrange(Metric, Statistic)
+```
+
+### Table {.unnumbered}
+
+```{r stability-check-table, results = "asis"}
+# table of accuracy metrics
+prettyTable(
+  bootstrap_model_errs_summary, 
+  digits = 2, sigfig = FALSE, rownames = FALSE,
+  caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
+  html_options = list(
+    extensions = "RowGroup",
+    options = list(
+      dom = "t",
+      pageLength = nrow(bootstrap_model_errs_summary),
+      scrollY = "500px",
+      rowGroup = list(dataSrc = 0),
+      columnDefs = list(list(className = "dt-center", targets = "_all"),
+                        list(visible = FALSE, targets = 0),
+                        list(title = "Metric", targets = 1))
+    )
+  )
+)
+```
+
+### Plot {.unnumbered}
+
+```{r stability-check-boxplot}
+# boxplots
+bootstrap_model_errs %>%
+  tidyr::pivot_longer(cols = c(-bootstrap_id, -Metric), 
+                      names_to = "Method", values_to = "Value") %>%
+  plotBoxplot(x_str = "Method", y_str = "Value") +
+  ggplot2::facet_wrap(~ Metric) +
+  ggplot2::labs(title = "Validation Prediction Accuracies Over Bootstrapped Training Fits")
+```
+
+## Interpretability {.tabset .custom-tabs}
+
+For the models that pass the prediction and stability checks, extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+### Full Model (without stability) {.unnumbered .tabset .tabset-pills}
+
+#### Table {.unnumbered}
+
+```{r interpretability-table, add_new_line = TRUE, results = "asis"}
+prettyTable(imp_results, digits = 2, sigfig = FALSE,
+            caption = "Variable Importances")
+```
+
+#### Plots {.unnumbered}
+
+```{r interpretability-plot, add_new_line = TRUE}
+plotFeatureImportance(imp_results,
+                      use_rankings = FALSE,
+                      use_facets = TRUE,
+                      interactive = FALSE)
+```
+
+```{r interpretability-pair-plot, add_new_line = TRUE}
+plotFeatureImportancePair(imp_results,
+                          use_rankings = TRUE,
+                          interactive = FALSE)
+```
+
+### Bootstrapped Model (with stability) {.unnumbered .tabset .tabset-pills}
+
+#### Table {.unnumbered}
+
+```{r boot-interpretability-table, add_new_line = TRUE, results = "asis"}
+bootstrap_model_imps_summary <- bootstrap_model_imps %>%
+  dplyr::group_by(Method, Variable) %>%
+  dplyr::summarise(`Mean Importance` = mean(Importance),
+                   `Median Importance` = median(Importance),
+                   `SD Importance` = sd(Importance),
+                   `Min Importance` = min(Importance),
+                   `Max Importance` = max(Importance), 
+                   .groups = "keep")
+prettyTable(
+  bootstrap_model_imps_summary, 
+  digits = 2, sigfig = F, 
+  caption = "Summary of variable importances across bootstrapped models"
+)
+```
+
+#### Plots {.unnumbered}
+
+```{r boot-interpretability-plot, add_new_line = TRUE}
+plotFeatureImportanceStability(bootstrap_model_imps,
+                               use_rankings = FALSE,
+                               use_facets = TRUE,
+                               interactive = FALSE)
+```
+
+# Main Results
+
+##  {.unnumbered .tabset .custom-tabs}
+
+Interpret and summarize the prediction and stability results.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+Evaluate pipeline on test data.
+
+```{asis, help = TRUE}
+Careful! Remember that **test data should only be touched once**. These results should not be used to make post-analysis modeling decisions. This is "double-dipping" and not an accurate measurement of out-of-sample accuracy.
+```
+
+```{r final-fits}
+Xtrain_final <- dplyr::bind_rows(Xtrain, Xvalid)
+ytrain_final <- c(ytrain, yvalid)
+
+# fit/train models
+fit_results_final <- fitModels(Xtrain = Xtrain_final, ytrain = ytrain_final,
+                               model_list = model_list, cv_options = cv_options,
+                               use = params$modeling_pkg)
+
+# make prediction on test set
+pred_results_final <- predictModels(fit_list = fit_results_final, Xtest = Xtest)
+
+# evaluate predictions on test set
+eval_results_final <- evaluateModels(pred_df = pred_results_final, ytest = ytest)
+
+# collect feature importance metrics from model fits
+imp_results_final <- interpretModels(fit_list = fit_results_final)
+```
+
+Summarize test set prediction and/or interpretability results.
+
+```{asis, interactive_text = TRUE}
+
+```
+
+### Fit Summary {.unnumbered .tabset .tabset-pills}
+
+```{r final-fit-summary, echo = FALSE, results = "asis"}
+# print out fit output summary
+printFitResults(fit_results_final)
+```
+
+### Prediction Results {.unnumbered}
+
+```{r final-prediction-results, echo = FALSE, results = "asis"}
+# display prediction metrics, confusion matrices, and roc/pr plots if applicable
+showEvalResults(eval_results_final, test_set = TRUE, digits = 2, sigfig = FALSE,
+                html_options = list(
+                  options = list(dom = "t", 
+                                 pageLength = nrow(eval_results_final))
+                ))
+```
+
+# Post hoc analysis
+
+Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.
+
+-   Examine any points that had poor predictions.
+
+```{asis, help = TRUE}
+As mentioned in the stability analysis, check for any commonalities among perturbations, or specific observations, that resulted in poor accuracy metrics across procedures.
+```
+
+-   Examine differences between prediction methods.
+
+```{asis, help = TRUE}
+Are there certain methods that may not be overall the most accurate, but outperform others on the more "challenging" validation/test observations? Conversely, are some procedures very effective across the majority of observations, but some outlying behavior effects overall results?
+```
+
+```{asis, interactive_text = TRUE}
+
+```
+
+```{r posthoc-pair-plot}
+pred_results_final %>%
+  dplyr::mutate(.id = rep(1:nrow(Xtest), length.out = dplyr::n())) %>%
+  tidyr::pivot_wider(id_cols = .id, 
+                     names_from = "Method", values_from = "predictions") %>%
+  dplyr::mutate(`True Responses` = ytest) %>%
+  plotPairs(columns = 2:(length(unique(pred_results_final$Method)) + 2),
+            title = "Comparison of model test predictions")
+```
+
+# Conclusions
+
+Reiterate main findings, note any caveats, and clearly translate findings/analysis back to the domain problem context.
+
+```{asis, interactive_text = TRUE}
+
+```
