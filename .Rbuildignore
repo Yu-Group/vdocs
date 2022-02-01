@@ -3,7 +3,6 @@
 ^LICENSE\.md$
 ^\.github$
 ^vignettes/TCGA\ BRCA\ Example$
-^vignettes/figures$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
