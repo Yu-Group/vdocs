@@ -2,9 +2,8 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^\.github$
-^vignettes/GDCdata$
-^vignettes/data$
-^vignettes/MANIFEST\.txt$
+^vignettes/TCGA\ BRCA\ Example$
+^vignettes/figures$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
