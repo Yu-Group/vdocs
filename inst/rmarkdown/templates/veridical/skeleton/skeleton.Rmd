@@ -256,8 +256,6 @@ Again, be as transparent as possible. This allows others to make their own educa
 
 ## Data Exploration
 
-<span style="color:red">TODO: Add drag and drop feature in shiny version for other images</span
-
 The main goal of this section is to give the reader a feel for what the data "looks like" at a basic level.
 
 Provide plots that summarize the data and perhaps even plots that convey some smaller findings which ultimately motivate the main findings.
