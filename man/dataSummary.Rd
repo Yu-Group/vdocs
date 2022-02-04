@@ -6,7 +6,7 @@
 \usage{
 dataSummary(
   X,
-  y,
+  y = NULL,
   digits = 2,
   sigfig = FALSE,
   features = NULL,
