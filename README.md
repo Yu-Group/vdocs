@@ -6,9 +6,9 @@
 
 `vdocs` creates beautiful, rigorous, and transparent data analysis reports via "PCS lab notebooks" like the one below!
 
-<p align="center">
-  <img src="https://github.com/Yu-Group/vdocs/blob/main/man/figures/vdocs.gif" alt="animated"/>
-</p>
+<center>
+![](man/figures/vdocs.gif)
+</center>
 
 ## Overview
 

@@ -2,7 +2,7 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^\.github$
-^vignettes/TCGA\ BRCA\ Example$
+^TCGA\ BRCA\ Example$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
