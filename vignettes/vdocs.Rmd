@@ -159,7 +159,7 @@ Note: though we list this step as last for organization and clarity, we encourag
 
 ## The End Product
 
-After answering the guided questions and knitting the Rmarkdown, we get a beautiful html report like the TCGA BRCA report [here](TCGA-BRCA-Example.html), generated from the Rmarkdown file [here](https://github.com/Yu-Group/vdocs/blob/main/vignettes/TCGA BRCA Example/TCGA BRCA Example.Rmd). If a pdf is preferred over html, one can click `Knit to pdf_document` in the knit dropdown menu.
+After answering the guided questions and knitting the Rmarkdown, we get a beautiful html report like the TCGA BRCA report [here](../../TCGA\ BRCA\ Example/TCGA-BRCA-Example.html), generated from the Rmarkdown file [here](https://github.com/Yu-Group/vdocs/blob/main/TCGA%20BRCA%20Example/TCGA%20BRCA%20Example.Rmd). If a pdf is preferred over html, one can click `Knit to pdf_document` in the knit dropdown menu.
 
 # Stay Tuned!
 
