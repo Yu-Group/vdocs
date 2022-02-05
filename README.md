@@ -6,7 +6,7 @@
 
 `vdocs` creates beautiful, rigorous, and transparent data analysis reports via "PCS lab notebooks" like the one below!
 
-![](man/figures/vdocs.gif)
+![](man/figures/vdocs.gif){width=100%}
 
 ## Overview
 

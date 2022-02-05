@@ -22,9 +22,11 @@ library(vdocs)
 
 `vdocs` creates beautiful, rigorous, and transparent data analysis reports via "PCS lab notebooks" like the one below!
 
-<p align="center">
-  <img src="https://github.com/Yu-Group/vdocs/blob/main/man/figures/vdocs.gif" alt="animated"/>
-</p>
+<center>
+
+![](figures/vdocs.gif){width=100%}
+
+</center>
 
 With a "PCS lab notebook", practitioners can provide a complete narrative of their data analysis and easily document any human judgment calls made along the way to promote trustworthy and veridical data science. For more on veridical data science, see [Kumbier and Yu (2020)](https://www.pnas.org/content/117/8/3920). In addition to the convenient documentation template, `vdocs` provides starter code to run a PCS-style analysis with basic prediction and stability checks. 
 
