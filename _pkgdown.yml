@@ -1,2 +1,90 @@
+reference:
+  - title: "General Themes"
+    desc: >
+      A library of beautiful themes for Rmarkdown files, ggplots, and tables.
+  - subtitle: "Rmarkdown"
+    contents:
+      - veridical
+  - subtitle: "ggplot"
+    contents:
+      - pretty_ggplot_theme
+      - pretty_ggplot_color
+      - pretty_ggplot_fill
+      - blank_ggplot_themes
+  - subtitle: "Tables"
+    contents:
+      - prettyTable
+      - pretty_DT
+      - pretty_kable
+  - title: "General Visualization Functions"
+    desc: >
+      A library of general functions for making beautiful visualizations.
+  - subtitle: "ggplot Wrappers"
+    desc: >
+      Function wrappers around common ggplot geoms.
+    contents:
+      - plotBarplot
+      - plotBoxplot
+      - plotDensity
+      - plotHistogram
+      - plotLine
+      - plotScatter
+  - subtitle: "Exploratory Data Analysis (EDA) Plots"
+    desc: >
+      Functions to create common EDA plots.
+    contents:
+      - plotDataDistribution
+      - plotDataHeatmap
+      - plotDataSplit
+      - plotHclust
+      - plotHeatmap
+      - plotPairs
+      - plotPCA
+      - dataSummary
+      - dataTypes
+      - dataDimensions
+  - subtitle: "Exploratory Data Analysis (EDA) Tables"
+    desc: >
+      Functions to create common EDA tables.
+    contents:
+      - dataDimensions
+      - dataSummary
+      - dataTypes
+  - subtitle: "Utilities"
+    contents: 
+      - get_aesthetics
+  - title: "Data Cleaning and Preprocessing Functions"
+    desc: >
+      A library of functions to preprocess or clean data.
+    contents:
+      - dataSplit
+      - filterColsByVar
+      - removeCols
+  - title: "Modeling Functions" 
+    desc: >
+      Functions to fit, predict, evaluate, and interpret models using caret, h2o, or tidymodels backends.
+    contents:
+      - fitModel
+      - fitModels
+      - printFit
+      - predictModel
+      - predictModels
+      - evaluateModels
+      - interpretModel
+      - interpretModels
+      - plotFeatureImportance
+  - title: "vdocs and Rmarkdown Utilities"
+    desc: >
+      Utility functions for creating the vdocs Rmarkdown template.
+    contents:
+      - subchunkify
+      - load_saved_responses
+      - loadFile
+      - printFitResults
+      - showEvalResults
+      - validateData
+      - validateDataSplit
+      - vdocs_knitr_setup
+
 template:
   assets: TCGA-BRCA-Example
