@@ -23,7 +23,7 @@ params:
   y_filepath:
     label: "y data"
     # specify file path for y data
-    value: data/tcga_brca_subtypes.rds
+    value: data/tcga_brca_subtypes.rds  
     input: file
   train_prop:
     label: "Training data proportion"
@@ -88,7 +88,7 @@ load_saved_responses()
 What is the real-world question? This could be hypothesis-driven or discovery-based.
 
 ```{asis, help = TRUE}
-This should be very high level, providing the big picture behind the study. Often this takes the form of a pre-existing hypothesis (e.g., individuals with a specific genetic mutation are more likely to have a given characteristic) or more open ended discovery (e.g., identify mutations that are related to a given characteristic).
+This should be very high level, providing the big picture behind the study. Often this takes the form of a pre-existing hypothesis (e.g., individuals with a specific genetic mutation are more likely to have a given characteristic) or more open-ended discovery (e.g., identify mutations that are related to a given characteristic).
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -98,7 +98,7 @@ This should be very high level, providing the big picture behind the study. Ofte
 Why is this question interesting and important? What are the implications of better understanding this data?
 
 ```{asis, help = TRUE}
-Try to incentive this study for those coming from a variety of backgrounds and levels of scientific understanding. Perhaps mention how previous, related, work made an impact in the field.
+Try to incentive this study for those coming from a variety of backgrounds and levels of scientific understanding. Perhaps mention how previous related work made an impact in the field.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -108,7 +108,7 @@ Try to incentive this study for those coming from a variety of backgrounds and l
 Briefly describe any background information necessary to understand this problem.
 
 ```{asis, help = TRUE}
-This should provide readers some intuition for the scientific problem. This section should be a short, high-level, summary. For additional details, one can refer readers to introductory material, tutorials, and/or review papers.
+This should provide readers some intuition for the scientific problem. This section should be a short high-level summary. For additional details, one can refer readers to introductory material, tutorials, and/or review papers.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -152,7 +152,7 @@ How was the data collected or generated (including details on the experimental d
 Describe any limitations when using the data to answer the domain problem of interest.
 
 ```{asis, help = TRUE}
-While the previous section lays out the entire collection process, here it is important to highlight any limitations as these may not be obvious to those from other fields. This includes any personal judgement calls made in the collection process.
+While the previous section lays out the entire collection process, here it is important to highlight any limitations as these may not be obvious to those from other fields. This includes any personal judgement calls made in the data collection process.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -172,9 +172,9 @@ Decide on the proportion of data in each split.
 Decide on the "how" to split the data (e.g., random sampling, stratified sampling, etc.), and explain why this is a reasonable way to split the data.
 
 ```{asis, help = TRUE}
-Here we refer to splitting data into training, validation, and test portions. In general, the goal is to fit select models (including any necessary tuning procedures) on the training data, and assess prediction accuracy on the validation data. **Test data should only be utilized after all data analysis is completed.**
+Here, we refer to splitting data into training, validation, and test portions. Generally, one fits select models (including any necessary tuning procedures) on the training data and assesses prediction accuracy on the validation data to compare models against one another. **The test data should only be utilized once after all data analysis is completed.**
 
-This split can strongly effect results since data often have underlying structure/relationships (e.g., longitudinal information, related individuals, ethnicity, varying hospitals, etc.). If certain characteristics are underrepresented in training, then validation accuracy can deteriorate. Thus, a stratified approach is often recommended.
+Note that *how* the data splitting is performed can greatly affect the results. This is because data often have underlying inherent structures and relationships (e.g., longitudinal information, related individuals, ethnicity, varying hospitals, etc.) that should be preserved when splitting. As a concrete example, if the data under study comes from patients across four hospitals, it is often advisable to perform the data splitting by hospital so that the training set is composed of all patients from hospitals A and B, the validation set is composed of all patients from hospital C, and the test set is composed of all patients from hospital D. By splitting the data in this way, the validation (or test) accuracy is a more accurate evaluation of how the fitted model will perform on a completely new batch of data in the future. Ultimately, the goal of the data splitting scheme is to mimic the process of obtaining new **future data**.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -227,7 +227,7 @@ plotDataSplit(ytrain, yvalid, ytest,
 What steps were taken to clean the data? More importantly, why was the data cleaned in this way?
 
 ```{asis, help = TRUE}
-Data cleaning can be very problem and domain dependent. Be sure to specify which approaches are common in the field (and why). Where appropriate, highlight any steps that were judgement calls necessary to continue the analysis. 
+Data cleaning can be very problem and domain dependent. Be sure to specify which approaches are common in the field and why. Where appropriate, highlight any steps that were judgement calls necessary to continue the analysis. 
 ```
 
 Discuss all inconsistencies, problems, oddities in the data (e.g., missing data, errors in data, outliers, etc.).
@@ -257,6 +257,7 @@ Xtrain <- log(Xtrain + 1) %>%
 Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
 Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
 ```
+
 
 ## Data Exploration
 
@@ -362,11 +363,11 @@ plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
 Discuss the prediction methods under consideration, and explain why these methods were chosen.
 
 ```{asis, help = TRUE}
-There are an overwhelming number of methods available, but at least one should be a common approach acting as a baseline. This may not be optimal for the problem setting, but serves as a helpful comparison. Any "go-to" methods in this scientific domain should be considered. Discuss why these are favored, for instance, is there a natural structure in the data that is better utilized in one approach vs another? Conversely, mention if there are approaches typically avoided in these problems. The limitations discussed previously can also help guide these decisions given some procedures will be better equipped to handle these compared to others.
+There are an overwhelming number of methods available, but at least one should be a common approach acting as a baseline. This may not be optimal for the problem setting, but serves as a helpful comparison. Any "go-to" methods in this scientific domain should also be considered. Discuss why these are favored. For instance, is there a natural structure in the data that is better utilized in one approach vs another? Conversely, mention if there are approaches that are typically avoided in these problems. The limitations discussed previously can also help to guide these modeling decisions.
 
-Think back to the big picture, if interpretability is important, methods favoring sparser, simpler models may be preferred (e.g., sparse regression or tree-based procedures). If prediction is the sole goal, more complex models may be appropriate.
+Furthermore, think back to the big picture. If interpretability is important, methods favoring sparser, simpler models may be preferred (e.g., sparse regression or tree-based procedures). If prediction is the sole goal, more complex models may be appropriate.
 
-If computing time is a burden, and rules out methods with high potential, this should be highlighted for future reference as scalability and/or computing resources improve.
+If computing time is a burden and rules out methods with high potential, this should be highlighted for future reference as scalability and/or computing resources improve.
 ```
 
 ```{asis, interactive_text = TRUE}
@@ -376,25 +377,21 @@ If computing time is a burden, and rules out methods with high potential, this s
 Discuss the accuracy metrics under consideration, and explain why these metrics were chosen.
 
 ```{asis, help = TRUE}
-These accuracy metrics should clearly support the main goal of the study. There are often multiple ways to quantify accuracy, and different measurements may have been used in previous studies, thus comparing across several provides an additional stability metric.
+These accuracy metrics should clearly support the main goal of the study. There are often multiple ways to quantify accuracy (e.g., RMSE, $R^2$, correlation, AUROC, AUPRC, classification accuracy). Often, comparing across several metrics provides an additional stability check and a more holistic picture of the model performance.
 ```
 
 ```{asis, interactive_text = TRUE}
 
 ```
 
+
 ## Prediction check {.tabset .custom-tabs}
 
 Carry out the prediction pipeline, outlined above.
 
-1.  Fit prediction methods on training data.
-
-```{asis, help = TRUE}
-Recall, this includes any parameter tuning which may require further data splitting (e.g., k-fold cross-validation) **within the training data**.
-```
-
-2.  Evaluate prediction methods on validation data.
-3.  Compare results, and filter out poor models.
+1. Fit prediction methods on training data. (Note: this includes any parameter tuning which may require further data splitting (e.g., k-fold cross-validation) **within the training data**.)
+2. Evaluate prediction methods on validation data.
+3. Compare results, and filter out poor models.
 
 ```{asis, interactive_text = TRUE}
 
@@ -468,6 +465,7 @@ eval_results <- evaluateModels(pred_df = pred_results, ytest = yvalid)
 imp_results <- interpretModels(fit_list = fit_results)
 ```
 
+
 ### Fit Summary {.unnumbered .tabset .tabset-pills}
 
 ```{r fit-summary, echo = FALSE, results = "asis"}
@@ -487,30 +485,29 @@ showEvalResults(eval_results, digits = 2, sigfig = FALSE,
 
 ## Stability check {.tabset .custom-tabs}
 
-Taking the prediction methods that pass the prediction check, perform stability analysis.
+Taking the prediction methods that pass the prediction check, perform a stability analysis.
 
 ```{asis, help = TRUE}
-This stability analysis assesses changes in validation accuracy based on small perturbations in the training data. The "perturbed data sets" mentioned below refer to the **training data only**, validation and test sets remain the same.
+One way to assess a model's stability is to assess changes in model's validation accuracy based on appropriate data perturbations of the training data. However, this stability analysis is heavily dependent on the problem at hand and should be tailored to assess the stability of metrics that are relevant to the domain problem.
 ```
 
-1.  Specify and justify the appropriate data perturbation(s).
-
+1. Specify and justify the appropriate data perturbation(s).
 ```{asis, help = TRUE}
-As when determining an appropriate splitting rule, the perturbation scheme should incorporate any known data structure. For instance, if using a bootstrap approach (i.e., the data are re-sampled with replacement), stratified sampling may be more appropriate to avoid unbalanced groups.
+As when determining an appropriate splitting rule, the perturbation scheme should incorporate any known data structure. For instance, if using a bootstrap approach with structured data, stratified sampling may be more appropriate to better mimic the process of obtaining a new batch of data in the future.
 ```
 
-2.  Re-fit the prediction methods on these perturbed data sets.
-3.  Evaluate prediction methods on validation data.
-4.  Assess stability across the data perturbations as well as across the various methods.
-5.  Filter out poor models where necessary and interpret stability results.
-
+2. Re-fit the prediction methods on these perturbed data sets.
+3. Evaluate prediction methods on validation data.
+4. Assess stability across the data perturbations as well as across the various methods.
+5. Filter out poor models where necessary and interpret stability results.
 ```{asis, help = TRUE}
-Methods with highly variable accuracy should be discarded. In addition, take note if any set of perturbations resulted in uniformly poor accuracy across methods. This could indicate an underlying issue with the perturbation approach.
+Methods with highly variable accuracy should be discarded. In addition, take note if any set of perturbations resulted in uniformly poor accuracy across methods. This could indicate an underlying issue with the perturbation scheme.
 ```
 
 ```{asis, interactive_text = TRUE}
 
 ```
+
 
 ```{r stability-check}
 n_reps <- params$n_data_perturbations
@@ -663,7 +660,7 @@ plotFeatureImportanceStability(bootstrap_model_imps,
 
 # Main Results
 
-##  {.unnumbered .tabset .custom-tabs}
+## {.unnumbered .tabset .custom-tabs}
 
 Interpret and summarize the prediction and stability results.
 
@@ -702,6 +699,7 @@ Summarize test set prediction and/or interpretability results.
 
 ```
 
+
 ### Fit Summary {.unnumbered .tabset .tabset-pills}
 
 ```{r final-fit-summary, echo = FALSE, results = "asis"}
@@ -724,13 +722,13 @@ showEvalResults(eval_results_final, test_set = TRUE, digits = 2, sigfig = FALSE,
 
 Move beyond the global prediction accuracy metrics and dive deeper into individual-level predictions for the validation and/or test set, i.e., provide a more "local" analysis.
 
--   Examine any points that had poor predictions.
+Examine any points that had poor predictions.
 
 ```{asis, help = TRUE}
 As mentioned in the stability analysis, check for any commonalities among perturbations, or specific observations, that resulted in poor accuracy metrics across procedures.
 ```
 
--   Examine differences between prediction methods.
+Examine differences between prediction methods.
 
 ```{asis, help = TRUE}
 Are there certain methods that may not be overall the most accurate, but outperform others on the more "challenging" validation/test observations? Conversely, are some procedures very effective across the majority of observations, but some outlying behavior effects overall results?
@@ -757,3 +755,4 @@ Reiterate main findings, note any caveats, and clearly translate findings/analys
 ```{asis, interactive_text = TRUE}
 
 ```
+
