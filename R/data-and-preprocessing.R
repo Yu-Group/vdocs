@@ -26,21 +26,21 @@
 #'
 #' @examples
 #' # splits iris data into training (60%), validation (20%), and test (20%) sets
-#' data_split <- dataSplit(X = iris %>% dplyr::select(-Species),
-#'                         y = iris$Species,
-#'                         train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2)
+#' data_split <- split_data(X = iris %>% dplyr::select(-Species),
+#'                          y = iris$Species,
+#'                          train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2)
 #'
 #' # splits iris data into training, validation, and test sets while keeping
 #' # `Species` distribution constant across partitions
-#' stratified_data_split <- dataSplit(X = iris %>% dplyr::select(-Species),
-#'                                    y = iris$Species,
-#'                                    stratified_by = iris$Species,
-#'                                    train_prop = 0.6, valid_prop = 0.2,
-#'                                    test_prop = 0.2)
+#' stratified_data_split <- split_data(X = iris %>% dplyr::select(-Species),
+#'                                     y = iris$Species,
+#'                                     stratified_by = iris$Species,
+#'                                     train_prop = 0.6, valid_prop = 0.2,
+#'                                     test_prop = 0.2)
 #'
 #' @export
-dataSplit <- function(X, y, stratified_by = NULL,
-                      train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2) {
+split_data <- function(X, y, stratified_by = NULL,
+                       train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2) {
   .group <- NULL  # to fix no visible binding for global variable error
   .split <- NULL
 
@@ -73,12 +73,12 @@ dataSplit <- function(X, y, stratified_by = NULL,
 
 #' Basic cleaning functions to remove columns in data.
 #'
-#' @name removeCols
+#' @name remove_cols
 #' @description Given data X, removes columns in X according to various
-#'   data preprocessing/cleaning procedures. `removeNACols` removes all
-#'   columns in the data with at least one NA value. `removeConstantCols`
+#'   data preprocessing/cleaning procedures. `remove_na_cols` removes all
+#'   columns in the data with at least one NA value. `remove_constant_cols`
 #'   removes all columns in the data that are a constant value (ignoring NAs).
-#'   `removeDuplicateCols` removes columns in the data that are duplicates of
+#'   `remove_duplicate_cols` removes columns in the data that are duplicates of
 #'   another column in the data so that each column in the resulting cleaned
 #'   data is unique.
 #'
@@ -89,9 +89,9 @@ dataSplit <- function(X, y, stratified_by = NULL,
 #'
 NULL
 
-#' @rdname removeCols
+#' @rdname remove_cols
 #' @export
-removeNACols <- function(X, verbose = 0) {
+remove_na_cols <- function(X, verbose = 0) {
 
   col_nas <- apply(X, 2, function(x) sum(is.na(x)))
 
@@ -115,9 +115,9 @@ removeNACols <- function(X, verbose = 0) {
   return(X_cleaned)
 }
 
-#' @rdname removeCols
+#' @rdname remove_cols
 #' @export
-removeConstantCols <- function(X, verbose = 0) {
+remove_constant_cols <- function(X, verbose = 0) {
   col_vars <- apply(X, 2, stats::var, na.rm = T)
 
   if (verbose >= 2) {
@@ -141,9 +141,9 @@ removeConstantCols <- function(X, verbose = 0) {
   return(X_cleaned)
 }
 
-#' @rdname removeCols
+#' @rdname remove_cols
 #' @export
-removeDuplicateCols <- function(X, verbose = 0) {
+remove_duplicate_cols <- function(X, verbose = 0) {
 
   dup_cols <- duplicated(as.list(X))
 
@@ -166,9 +166,9 @@ removeDuplicateCols <- function(X, verbose = 0) {
 
 #' Filter out columns in data to reduce dimension.
 #'
-#' @name filterCols
+#' @name filter_cols
 #' @description Given data X, filters out columns in X according to various
-#'   data preprocessing/cleaning procedures. `filterColsByVar` reduces the
+#'   data preprocessing/cleaning procedures. `filter_cols_by_var` reduces the
 #'   number of features in the data by keeping those with the largest variance.
 #'
 #' @param X A data matrix or data frame.
@@ -183,9 +183,9 @@ removeDuplicateCols <- function(X, verbose = 0) {
 #'
 NULL
 
-#' @rdname filterCols
+#' @rdname filter_cols
 #' @export
-filterColsByVar <- function(X, min_var = NULL, max_p = NULL) {
+filter_cols_by_var <- function(X, min_var = NULL, max_p = NULL) {
   if (is.null(min_var) & is.null(max_p)) {
     return(X)
   }

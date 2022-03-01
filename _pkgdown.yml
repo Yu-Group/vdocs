@@ -13,7 +13,7 @@ reference:
       - blank_ggplot_themes
   - subtitle: "Tables"
     contents:
-      - prettyTable
+      - pretty_table
       - pretty_DT
       - pretty_kable
   - title: "General Visualization Functions"
@@ -23,33 +23,30 @@ reference:
     desc: >
       Function wrappers around common ggplot geoms.
     contents:
-      - plotBarplot
-      - plotBoxplot
-      - plotDensity
-      - plotHistogram
-      - plotLine
-      - plotScatter
+      - plot_bar
+      - plot_boxplot
+      - plot_density
+      - plot_histogram
+      - plot_line
+      - plot_point
   - subtitle: "Exploratory Data Analysis (EDA) Plots"
     desc: >
       Functions to create common EDA plots.
     contents:
-      - plotDataDistribution
-      - plotDataHeatmap
-      - plotDataSplit
-      - plotHclust
-      - plotHeatmap
-      - plotPairs
-      - plotPCA
-      - dataSummary
-      - dataTypes
-      - dataDimensions
+      - plot_data_distribution
+      - plot_data_heatmap
+      - plot_data_split
+      - plot_hclust
+      - plot_heatmap
+      - plot_pairs
+      - plot_pca
   - subtitle: "Exploratory Data Analysis (EDA) Tables"
     desc: >
       Functions to create common EDA tables.
     contents:
-      - dataDimensions
-      - dataSummary
-      - dataTypes
+      - get_data_summary
+      - get_data_types
+      - get_data_dimensions
   - subtitle: "Utilities"
     contents: 
       - get_aesthetics
@@ -57,33 +54,33 @@ reference:
     desc: >
       A library of functions to preprocess or clean data.
     contents:
-      - dataSplit
-      - filterColsByVar
-      - removeCols
+      - split_data
+      - filter_cols
+      - remove_cols
   - title: "Modeling Functions" 
     desc: >
       Functions to fit, predict, evaluate, and interpret models using caret, h2o, or tidymodels backends.
     contents:
-      - fitModel
-      - fitModels
-      - printFit
-      - predictModel
-      - predictModels
-      - evaluateModels
-      - interpretModel
-      - interpretModels
-      - plotFeatureImportance
+      - fit_model
+      - fit_models
+      - print_fit
+      - predict_model
+      - predict_models
+      - evaluate_models
+      - interpret_model
+      - interpret_models
+      - plot_feature_importance
   - title: "vdocs and Rmarkdown Utilities"
     desc: >
       Utility functions for creating the vdocs Rmarkdown template.
     contents:
       - subchunkify
       - load_saved_responses
-      - loadFile
-      - printFitResults
-      - showEvalResults
-      - validateData
-      - validateDataSplit
+      - load_file
+      - print_fit_results
+      - print_eval_results
+      - validate_data
+      - validate_data_split
       - vdocs_knitr_setup
 
 template:

@@ -448,7 +448,7 @@ pretty_DT <- function(X, digits = 3, sigfig = T,
 #'   data frame that was used to create the table is returned.
 #'
 #' @export
-prettyTable <- function(X, html = knitr::is_html_output(),
+pretty_table <- function(X, html = knitr::is_html_output(),
                         digits = 3, sigfig = TRUE,
                         rownames = TRUE, caption = "", na_disp = "NA",
                         bold_function = NULL, bold_margin = NULL,
