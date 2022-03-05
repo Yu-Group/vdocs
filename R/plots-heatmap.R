@@ -108,6 +108,22 @@ plot_heatmap <- function(X, y_groups = NULL, x_groups = NULL,
   ytext_colors <- ytext_colors
   xtext_colors <- xtext_colors
 
+  if (!is.null(xtext_colors)) {
+    if (is.character(xtext_colors)) {
+      xtext_colors <- as.factor(xtext_colors)
+    }
+  }
+  if (!is.null(ytext_colors)) {
+    if (is.character(ytext_colors)) {
+      ytext_colors <- as.factor(ytext_colors)
+    }
+  }
+  if (!is.null(xtext_colors) && !is.null(ytext_colors)) {
+    if (!(identical(xtext_colors, ytext_colors))) {
+      stop("Can only supply one of xtext_colors or ytext_colors but not both.")
+    }
+  }
+
   if (any(duplicated(ytext_labels)) | any(duplicated(xtext_labels))) {
     stop("xtext_labels and ytext_labels cannot contain duplicates.")
   }
@@ -163,7 +179,7 @@ plot_heatmap <- function(X, y_groups = NULL, x_groups = NULL,
     plt <- ggplot2::ggplot(X_long) +
       ggplot2::geom_tile(ggplot2::aes(x = x, y = y, fill = fill, color = fill),
                          size = size) +
-      ggplot2::guides(color = FALSE)
+      ggplot2::guides(color = "none")
   } else {
     plt <- ggplot2::ggplot(X_long) +
       ggplot2::geom_tile(ggplot2::aes(x = x, y = y, fill = fill))

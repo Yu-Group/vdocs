@@ -33,14 +33,22 @@
 #' @returns A ggplot object.
 #'
 #' @export
-plot_data_split <- function(train, valid, test, by_feature = NULL,
-                          plot_type = "auto", xlab = "Value", title = NULL,
-                          plot_heights = 1, theme_options = NULL, ...) {
+plot_data_split <- function(train = NULL, valid = NULL, test = NULL,
+                            by_feature = NULL, plot_type = "auto",
+                            xlab = "Value", title = NULL,
+                            plot_heights = 1, theme_options = NULL, ...) {
   .split <- NULL  # to fix no visible binding for global variable error
+
+  if (is.null(train) & is.null(valid) & is.null(test)) {
+    stop("Must specify at least one of train, valid, or test data sets.")
+  }
 
   if (identical(plot_type, "auto")) {
     plot_type <- list(continuous = "density",
                       categorical = "bar")
+  } else if (!is.list(plot_type)) {
+    stop("plot_type must be either 'auto' or a list. ",
+         "See ? plot_data_split for details.")
   } else {
     plot_type$categorical <- match.arg(plot_type$categorical, choices = "bar")
     plot_type$continuous <- match.arg(
@@ -166,6 +174,9 @@ plot_data_distribution <- function(data, by_feature = NULL, plot_type = "auto",
   if (identical(plot_type, "auto")) {
     plot_type <- list(continuous = "density",
                       categorical = "bar")
+  } else if (!is.list(plot_type)) {
+    stop("plot_type must be either 'auto' or a list. ",
+         "See ? plot_data_split for details.")
   } else {
     plot_type$categorical <- match.arg(plot_type$categorical, choices = "bar")
     plot_type$continuous <- match.arg(
@@ -285,6 +296,12 @@ plot_data_distribution <- function(data, by_feature = NULL, plot_type = "auto",
 plot_data_heatmap <- function(X, y, subsample_rows = 1, subsample_cols = 1,
                             clust_rows = TRUE, clust_cols = TRUE, ...) {
   x <- NULL  # to fix no visible binding for global variable error
+  if (missing(X)) {
+    stop("Must provide X data.")
+  }
+  if (missing(y)) {
+    stop("Must provide y data.")
+  }
 
   if (subsample_rows < 1) {
     keep_rows <- sample(1:nrow(X), size = round(nrow(X) * subsample_rows))
@@ -382,6 +399,24 @@ plot_pairs <- function(data, columns, color = NULL, color_upper = NULL,
   legend_x <- NULL  # to fix no visible binding for global variable error
   plt_color <- NULL
   legend_y <- NULL
+
+  # convert character color vectors to factor for ggplot color/fill aesthetic
+  if (!is.null(color)) {
+    if (is.character(color)) {
+      color <- as.factor(color)
+    }
+  }
+  if (!is.null(color_upper)) {
+    if (is.character(color_upper)) {
+      color_upper <- as.factor(color_upper)
+    }
+  }
+  # check if color and color_upper are identical
+  if (!is.null(color) & !is.null(color_upper)) {
+    if (identical(color, color_upper)) {
+      color_upper <- NULL
+    }
+  }
 
   # adding labels for colors
   plt_df <- as.data.frame(data)
@@ -513,8 +548,8 @@ plot_pairs <- function(data, columns, color = NULL, color_upper = NULL,
       x_str <- as.character(mapping$x[2])
       y_str <- as.character(mapping$y[2])
       p <- ggplot2::ggplot(data) +
-        ggplot2::aes_string(x = .data[[x_str]], y = .data[[y_str]],
-                            color = color) +
+        ggplot2::aes(x = .data[[x_str]], y = .data[[y_str]],
+                     color = color) +
         ggplot2::geom_point(size = point_size, alpha = point_alpha)
       return(p)
     }
@@ -555,7 +590,7 @@ plot_pairs <- function(data, columns, color = NULL, color_upper = NULL,
       y_str <- as.character(mapping$y[2])
       p <- ggplot2::ggplot(data) +
         ggplot2::aes(x = .data[[x_str]], fill = color_upper) +
-        ggplot2::facet_grid(.data[[y]] ~ .) +
+        ggplot2::facet_grid(.data[[y_str]] ~ .) +
         ggplot2::geom_bar()
       return(p)
     }
@@ -846,7 +881,7 @@ plot_pca <- function(X, pca_obj, npcs, pcs,
     X_svd <- list(
       u = pca_obj$scores,
       v = pca_obj$loadings,
-      var_explained = pca_obj$var.explained
+      var_explained = pca_obj$var_explained
     )
     d <- pca_obj$d
   }
@@ -925,7 +960,7 @@ plot_pca <- function(X, pca_obj, npcs, pcs,
   }
 
   return(list(plot = plt, scores = X_svd$u, loadings = X_svd$v, d = d,
-              var.explained = var_explained))
+              var_explained = var_explained))
 }
 
 #' Plot pretty hierarchical clustering dendrograms.
@@ -971,6 +1006,7 @@ plot_hclust <- function(data,
   x <- NULL
   color <- NULL
 
+  leaf_labels <- leaf_labels
   data <- as.matrix(data)
   if (sum(is.na(data)) > 0) {
     stop("NAs found in data")
