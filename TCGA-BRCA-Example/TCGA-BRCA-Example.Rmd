@@ -9,7 +9,6 @@ header-includes:
     - \usepackage{tcolorbox}
 output:
   vdocs::veridical:
-    lab_notebook: true
     number_sections: true
   pdf_document:
     number_sections: true
@@ -206,7 +205,7 @@ This step is important as it can highlight any concerns with your chosen splitti
 
 ```
 
-### Data Splitting Overview {.tabset .custom-tabs}
+### Data Splitting Overview {.tabset .tabset-vmodern}
 
 #### X Data Split {.unnumbered}
 
@@ -273,7 +272,7 @@ Add summary statistics in accompanying tables (or in figures) for quick comparis
 
 ```
 
-### Data Overview {.tabset .custom-tabs}
+### Data Overview {.tabset .tabset-vmodern}
 
 ```{r data-dims, echo = FALSE}
 # summary of data dimensions
@@ -291,7 +290,8 @@ get_data_types(X = Xtrain, y = ytrain)
 # broad array of summary statistics for features in training (X, y)
 tab_ls <- get_data_summary(X = Xtrain, y = ytrain)
 for (dtype in names(tab_ls)) {  # grouped by data type
-  subchunkify(tab_ls[[dtype]], i = dtype, other_args = "results='asis'")
+  vthemes::subchunkify(tab_ls[[dtype]], 
+                       i = dtype, other_args = "results='asis'")
 }
 ```
 
@@ -385,7 +385,7 @@ These accuracy metrics should clearly support the main goal of the study. There 
 ```
 
 
-## Prediction check {.tabset .custom-tabs}
+## Prediction check {.tabset .tabset-vmodern}
 
 Carry out the prediction pipeline, outlined above.
 
@@ -483,7 +483,7 @@ print_eval_results(eval_results, digits = 2, sigfig = FALSE,
                    ))
 ```
 
-## Stability check {.tabset .custom-tabs}
+## Stability check {.tabset .tabset-vmodern}
 
 Taking the prediction methods that pass the prediction check, perform a stability analysis.
 
@@ -567,7 +567,7 @@ bootstrap_model_errs_summary <- bootstrap_model_errs %>%
 
 ```{r stability-check-table, results = "asis"}
 # table of accuracy metrics
-pretty_table(
+vthemes::pretty_table(
   bootstrap_model_errs_summary, 
   digits = 2, sigfig = FALSE, rownames = FALSE,
   caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
@@ -598,7 +598,7 @@ bootstrap_model_errs %>%
   ggplot2::labs(title = "Validation Prediction Accuracies Over Bootstrapped Training Fits")
 ```
 
-## Interpretability {.tabset .custom-tabs}
+## Interpretability {.tabset .tabset-vmodern}
 
 For the models that pass the prediction and stability checks, extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
 
@@ -611,8 +611,8 @@ For the models that pass the prediction and stability checks, extract the import
 #### Table {.unnumbered}
 
 ```{r interpretability-table, add_new_line = TRUE, results = "asis"}
-pretty_table(imp_results, digits = 2, sigfig = FALSE,
-             caption = "Variable Importances")
+vthemes::pretty_table(imp_results, digits = 2, sigfig = FALSE,
+                      caption = "Variable Importances")
 ```
 
 #### Plots {.unnumbered}
@@ -643,7 +643,7 @@ bootstrap_model_imps_summary <- bootstrap_model_imps %>%
                    `Min Importance` = min(Importance),
                    `Max Importance` = max(Importance), 
                    .groups = "keep")
-pretty_table(
+vthemes::pretty_table(
   bootstrap_model_imps_summary, 
   digits = 2, sigfig = F, 
   caption = "Summary of variable importances across bootstrapped models"
@@ -661,7 +661,7 @@ plot_feature_importance_stability(bootstrap_model_imps,
 
 # Main Results
 
-## {.unnumbered .tabset .custom-tabs}
+## {.unnumbered .tabset .tabset-vmodern}
 
 Interpret and summarize the prediction and stability results.
 
