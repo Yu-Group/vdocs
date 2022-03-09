@@ -25,73 +25,40 @@
     <loc>/reference/add_axis_text_colors.html</loc>
   </url>
   <url>
-    <loc>/reference/blank_ggplot_themes.html</loc>
+    <loc>/reference/evaluate_models.html</loc>
   </url>
   <url>
-    <loc>/reference/dataDimensions.html</loc>
+    <loc>/reference/filter_cols.html</loc>
   </url>
   <url>
-    <loc>/reference/dataSplit.html</loc>
+    <loc>/reference/fit_model.html</loc>
   </url>
   <url>
-    <loc>/reference/dataSummary.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dataTypes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/default_mathjax.html</loc>
-  </url>
-  <url>
-    <loc>/reference/evaluateModels.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterCols.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fitModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fitModels.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_aesthetics.html</loc>
+    <loc>/reference/fit_models.html</loc>
   </url>
   <url>
     <loc>/reference/get_custom_color_palette.html</loc>
   </url>
   <url>
-    <loc>/reference/html_dependency_bootstrap.html</loc>
+    <loc>/reference/get_data_dimensions.html</loc>
   </url>
   <url>
-    <loc>/reference/html_dependency_bootstrap_material.html</loc>
+    <loc>/reference/get_data_summary.html</loc>
   </url>
   <url>
-    <loc>/reference/html_dependency_magnific_popup.html</loc>
-  </url>
-  <url>
-    <loc>/reference/html_dependency_material.html</loc>
-  </url>
-  <url>
-    <loc>/reference/html_dependency_navigation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/html_dependency_veridical.html</loc>
-  </url>
-  <url>
-    <loc>/reference/html_template.html</loc>
+    <loc>/reference/get_data_types.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/interpretModel.html</loc>
+    <loc>/reference/interpret_model.html</loc>
   </url>
   <url>
-    <loc>/reference/interpretModels.html</loc>
+    <loc>/reference/interpret_models.html</loc>
   </url>
   <url>
-    <loc>/reference/loadFile.html</loc>
+    <loc>/reference/load_file.html</loc>
   </url>
   <url>
     <loc>/reference/load_saved_responses.html</loc>
@@ -100,88 +67,73 @@
     <loc>/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>/reference/plotBarplot.html</loc>
+    <loc>/reference/plot_bar.html</loc>
   </url>
   <url>
-    <loc>/reference/plotBoxplot.html</loc>
+    <loc>/reference/plot_boxplot.html</loc>
   </url>
   <url>
-    <loc>/reference/plotDataDistribution.html</loc>
+    <loc>/reference/plot_data_distribution.html</loc>
   </url>
   <url>
-    <loc>/reference/plotDataHeatmap.html</loc>
+    <loc>/reference/plot_data_heatmap.html</loc>
   </url>
   <url>
-    <loc>/reference/plotDataSplit.html</loc>
+    <loc>/reference/plot_data_split.html</loc>
   </url>
   <url>
-    <loc>/reference/plotDensity.html</loc>
+    <loc>/reference/plot_density.html</loc>
   </url>
   <url>
-    <loc>/reference/plotFeatureImportance.html</loc>
+    <loc>/reference/plot_feature_importance.html</loc>
   </url>
   <url>
-    <loc>/reference/plotHclust.html</loc>
+    <loc>/reference/plot_hclust.html</loc>
   </url>
   <url>
-    <loc>/reference/plotHeatmap.html</loc>
+    <loc>/reference/plot_heatmap.html</loc>
   </url>
   <url>
-    <loc>/reference/plotHistogram.html</loc>
+    <loc>/reference/plot_histogram.html</loc>
   </url>
   <url>
-    <loc>/reference/plotLine.html</loc>
+    <loc>/reference/plot_line.html</loc>
   </url>
   <url>
-    <loc>/reference/plotPCA.html</loc>
+    <loc>/reference/plot_pairs.html</loc>
   </url>
   <url>
-    <loc>/reference/plotPairs.html</loc>
+    <loc>/reference/plot_pca.html</loc>
   </url>
   <url>
-    <loc>/reference/plotScatter.html</loc>
+    <loc>/reference/plot_point.html</loc>
   </url>
   <url>
-    <loc>/reference/predictModel.html</loc>
+    <loc>/reference/predict_model.html</loc>
   </url>
   <url>
-    <loc>/reference/predictModels.html</loc>
+    <loc>/reference/predict_models.html</loc>
   </url>
   <url>
-    <loc>/reference/prettyTable.html</loc>
+    <loc>/reference/print_eval_results.html</loc>
   </url>
   <url>
-    <loc>/reference/pretty_DT.html</loc>
+    <loc>/reference/print_fit.html</loc>
   </url>
   <url>
-    <loc>/reference/pretty_ggplot_color_fill_themes.html</loc>
+    <loc>/reference/print_fit_results.html</loc>
   </url>
   <url>
-    <loc>/reference/pretty_ggplot_theme.html</loc>
+    <loc>/reference/remove_cols.html</loc>
   </url>
   <url>
-    <loc>/reference/pretty_kable.html</loc>
+    <loc>/reference/split_data.html</loc>
   </url>
   <url>
-    <loc>/reference/printFit.html</loc>
+    <loc>/reference/validate_data.html</loc>
   </url>
   <url>
-    <loc>/reference/printFitResults.html</loc>
-  </url>
-  <url>
-    <loc>/reference/removeCols.html</loc>
-  </url>
-  <url>
-    <loc>/reference/showEvalResults.html</loc>
-  </url>
-  <url>
-    <loc>/reference/subchunkify.html</loc>
-  </url>
-  <url>
-    <loc>/reference/validateData.html</loc>
-  </url>
-  <url>
-    <loc>/reference/validateDataSplit.html</loc>
+    <loc>/reference/validate_data_split.html</loc>
   </url>
   <url>
     <loc>/reference/vdocs_knitr_setup.html</loc>
