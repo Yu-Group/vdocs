@@ -1,12 +1,12 @@
 #' Wrappers for fitting a model using common modeling backends
 #'
-#' @name fitModel
+#' @name fit_model
 #' @family fit_models_family
-#' @description `fitCaret`, `fitTidymodels`, and `fitH2O` are wrappers for
+#' @description `fit_caret`, `fit_tidymodels`, and `fit_h2o` are wrappers for
 #'   fitting a model using caret, tidymodels, and h2o backends,
 #'   respectively. These wrapper functions provide uniformity of input
 #'   arguments to easily switch between the different modeling packages
-#'   (see `fitModels()`).
+#'   (see `fit_models()`).
 #'
 #' @param Xtrain Training data matrix or data frame.
 #' @param ytrain Training response vector.
@@ -27,20 +27,20 @@
 #' @details
 #'   To specify a set of hyperparameters to tune in the model, add an element
 #'   in the `model_options` list named `.tune_params` with the list of named
-#'   hyperparameters to tune. `fitCaret()` and `fitTidymodels()` can also take
-#'   in a data frame of hyperparameters to tune. In `fitCaret()`,
+#'   hyperparameters to tune. `fit_caret()` and `fit_tidymodels()` can also take
+#'   in a data frame of hyperparameters to tune. In `fit_caret()`,
 #'   `model_options$.tune_params` is passed to the `tuneGrid` argument in
-#'   `train()`. In `fitTidymodels()`, `model_options$.tune_params` is passed to
-#'   the `grid` argument in `tune::tune_grid()`. In `fitH2O()`,
+#'   `train()`. In `fit_tidymodels()`, `model_options$.tune_params` is passed to
+#'   the `grid` argument in `tune::tune_grid()`. In `fit_h2o()`,
 #'   `model_options$.tune_params` is passed to the `hyper_params` argument in
 #'   `h2o.grid()`.
 #'
-#'   For `fitCaret()`, `train_options` should be a list of named arguments to
+#'   For `fit_caret()`, `train_options` should be a list of named arguments to
 #'   pass to `trainControl()`, and `model_options` should be a list of named
 #'   arguments to pass to `train()`. Further, see the `metric` argument in
 #'   `train()` for possible options to set for `cv_options$metric`.
 #'
-#'   For `fitTidymodels()`, `train_options` should be a list of named arguments
+#'   For `fit_tidymodels()`, `train_options` should be a list of named arguments
 #'   to pass to `tune::tune_grid()`, which is only used if hyperparameter tuning
 #'   is needed. `model_options` should be a list of named arguments to pass to
 #'   the `parsnip` model function given by `model_name` (e.g.,
@@ -51,7 +51,7 @@
 #'   Further, see the `metric` argument in `tune::select_best()` for possible
 #'   options to set for `cv_options$metric`.
 #'
-#'   For `fitH2O()`, `train_options` should be a list of named arguments to pass
+#'   For `fit_h2o()`, `train_options` should be a list of named arguments to pass
 #'   to `h2o.grid()`, which is only used if hyperparameter tuning is needed.
 #'   `model_options` should be a list of named arguments to pass to `h2o.grid()`
 #'   if tuning is needed or to the `h2o` model function given by `model_name`
@@ -61,16 +61,16 @@
 #'   `cv_options$metric` is one of "auc", "accuracy", "precision", "recall", or
 #'   "f1".
 #'
-#' @returns The trained model fit. Specifically, `fitCaret()` returns a trained
-#'   model fit of class `train` (see output of `train()`). `fitTidymodels()`
+#' @returns The trained model fit. Specifically, `fit_caret()` returns a trained
+#'   model fit of class `train` (see output of `train()`). `fit_tidymodels()`
 #'   returns a trained model fit of class `workflow` (see output of
 #'   `fit-workflow`) if hyperparameter tuning is not needed. If hyperparameter
-#'   tuning is performed, then `fitTidymodels()` returns the trained CV model
+#'   tuning is performed, then `fit_tidymodels()` returns the trained CV model
 #'   fit of class `tune_results` (see output of `tune::tune_grid()`) with the
 #'   additional attribute "best_fit" that holds the trained finalized
-#'   `workflow` fit using the best hyperparameters. `fitH2O` returns a trained
+#'   `workflow` fit using the best hyperparameters. `fit_h2o` returns a trained
 #'   h2o model fit (see output of `h2o.[model_name]`) if hyperparameter tuning
-#'   is not needed. If hyperparameter tuning is performed, then `fitH2O()`
+#'   is not needed. If hyperparameter tuning is performed, then `fit_h2o()`
 #'   returns the trained CV model fit (see output of `h2o.grid()`) with the
 #'   additional attribute "best_fit" that holds the trained finalized h2o model
 #'   fit using the best hyperparmeters.
@@ -79,20 +79,20 @@ NULL
 #' Wrappers for making predictions from a fitted model using common modeling
 #' backends
 #'
-#' @name predictModel
+#' @name predict_model
 #' @family predict_models_family
-#' @description `predictCaret`, `predictTidymodels`, and `predictH2O` are
+#' @description `predict_caret`, `predict_tidymodels`, and `predict_h2o` are
 #'   wrappers for making predictions from a model using caret, tidymodels, and
 #'   h2o backends, respectively. These wrapper functions provide uniformity of
 #'   input arguments to easily switch between the different modeling packages
-#'   (see `predictModels()`).
+#'   (see `predict_models()`).
 #'
-#' @param fit Model fit. Typically the output of `fitCaret()`, `fitH2O()`, or
-#'   `fitTidymodels()`.
+#' @param fit Model fit. Typically the output of `fit_caret()`, `fit_h2o()`, or
+#'   `fit_tidymodels()`.
 #' @param Xtest Data matrix or data frame on which to make predictions.
-#' @param ... Additional arguments to pass to `predict.train()` in `fitCaret()`,
-#'   `h2o.predict()` in `fitH2O()`, or `predict.workflow()` in
-#'   `fitTidymodels()`.
+#' @param ... Additional arguments to pass to `predict.train()` in `fit_caret()`,
+#'   `h2o.predict()` in `fit_h2o()`, or `predict.workflow()` in
+#'   `fit_tidymodels()`.
 #'
 #' @returns A tibble with the following columns:
 #' \describe{
@@ -108,18 +108,18 @@ NULL
 #' Wrappers for extracting feature importances from a fitted model using common
 #' modeling backends
 #'
-#' @name interpretModel
+#' @name interpret_model
 #' @family interpret_models_family
-#' @description `interpretCaret`, `interpretTidymodels`, and `interpretH2O` are
+#' @description `interpret_caret`, `interpret_tidymodels`, and `interpret_h2o` are
 #'   wrappers for extracting feature importances from a fitted model using
 #'   caret, tidymodels, and h2o backends, respectively. These wrapper functions
 #'   provide uniformity of input arguments to easily switch between the
-#'   different modeling packages (see `interpretModels()`).
+#'   different modeling packages (see `interpret_models()`).
 #'
-#' @param fit Model fit. Typically the output of `fitCaret()`, `fitH2O()`, or
-#'   `fitTidymodels()`.
-#' @param ... Additional arguments to pass to `varImp()` in `fitCaret()`,
-#'   `h2o.varimp()` in `fitH2O()`, or `vip::vi()` in `fitTidymodels()`.
+#' @param fit Model fit. Typically the output of `fit_caret()`, `fit_h2o()`, or
+#'   `fit_tidymodels()`.
+#' @param ... Additional arguments to pass to `varImp()` in `fit_caret()`,
+#'   `h2o.varimp()` in `fit_h2o()`, or `vip::vi()` in `fit_tidymodels()`.
 #'
 #' @returns A tibble with the following columns:
 #' \describe{
@@ -130,23 +130,23 @@ NULL
 
 #' Wrappers for printing model fits from common modeling backends
 #'
-#' @name printFit
+#' @name print_fit
 #' @family print_fit_family
-#' @description `printCaretFit`, `printTidymodelsFit`, and `printH2OFit` are
+#' @description `print_caret_fit`, `print_tidymodels_fit`, and `print_h2o_fit` are
 #'   wrappers for printing a summary of the model fit from models that were
 #'   trained using caret, tidymodels, and h2o backends, respectively. These
 #'   wrapper functions provide uniformity of input arguments to easily switch
-#'   between the different modeling packages (see `printFitResults()`).
+#'   between the different modeling packages (see `print_fit_results()`).
 #'
-#' @param fit Model fit. Typically the output of `fitCaret()`, `fitH2O()`, or
-#'   `fitTidymodels()`.
+#' @param fit Model fit. Typically the output of `fit_caret()`, `fit_h2o()`, or
+#'   `fit_tidymodels()`.
 #'
 #' @returns Print fit summary to the console.
 NULL
 
-#' @rdname fitModel
+#' @rdname fit_model
 #' @export
-fitCaret <- function(Xtrain, ytrain, model_name, model_options = list(),
+fit_caret <- function(Xtrain, ytrain, model_name, model_options = list(),
                      cv_options = list(), train_options = list()) {
   if (identical(model_options, list())) {
     model_options <- NULL
@@ -188,9 +188,9 @@ fitCaret <- function(Xtrain, ytrain, model_name, model_options = list(),
   return(fit)
 }
 
-#' @rdname predictModel
+#' @rdname predict_model
 #' @export
-predictCaret <- function(fit, Xtest, ...) {
+predict_caret <- function(fit, Xtest, ...) {
   pred <- stats::predict(fit, as.data.frame(Xtest), type = "raw", ...)
   if (fit$modelType == "Classification") {
     prob_pred <- stats::predict(fit, as.data.frame(Xtest), type = "prob", ...)
@@ -201,18 +201,18 @@ predictCaret <- function(fit, Xtest, ...) {
   return(pred)
 }
 
-#' @rdname interpretModel
+#' @rdname interpret_model
 #' @export
-interpretCaret <- function(fit, ...) {
+interpret_caret <- function(fit, ...) {
   imp <- caret::varImp(fit, ...)$importance %>%
     tibble::rownames_to_column("Variable") %>%
     dplyr::rename("Importance" = "Overall")
   return(imp)
 }
 
-#' @rdname printFit
+#' @rdname print_fit
 #' @export
-printCaretFit <- function(fit) {
+print_caret_fit <- function(fit) {
   cat(sprintf("Fitting time taken: %s min\n\n", attr(fit, "time_taken")))
   print(fit)
 }

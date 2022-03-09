@@ -9,7 +9,6 @@ header-includes:
     - \usepackage{tcolorbox}
 output:
   vdocs::veridical:
-    lab_notebook: true
     number_sections: true
   pdf_document:
     number_sections: true
@@ -71,12 +70,12 @@ vdocs_knitr_setup()
 set.seed(params$seed)
 
 # validate inputs
-validateDataSplit(params$train_prop, params$valid_prop, params$test_prop)
+validate_data_split(params$train_prop, params$valid_prop, params$test_prop)
 
 # load data in
-X <- loadFile(params$X_filepath)
-y <- loadFile(params$y_filepath)
-validateData(X, y)
+X <- load_file(params$X_filepath)
+y <- load_file(params$y_filepath)
+validate_data(X, y)
 ```
 
 ```{r load-saved-responses, eval = knitr::is_html_output(), echo = FALSE, results = "asis", cache = FALSE}
@@ -184,10 +183,10 @@ Note that *how* the data splitting is performed can greatly affect the results. 
 Split the data into a training, validation, and test set.
 
 ```{r split-data}
-data_split <- dataSplit(X = X, y = y, stratified_by = y,
-                        train_prop = params$train_prop, 
-                        valid_prop = params$valid_prop, 
-                        test_prop = params$test_prop)
+data_split <- split_data(X = X, y = y, stratified_by = y,
+                         train_prop = params$train_prop, 
+                         valid_prop = params$valid_prop, 
+                         test_prop = params$test_prop)
 Xtrain <- data_split$X$train
 Xvalid <- data_split$X$validate
 Xtest <- data_split$X$test
@@ -206,20 +205,20 @@ This step is important as it can highlight any concerns with your chosen splitti
 
 ```
 
-### Data Splitting Overview {.tabset .custom-tabs}
+### Data Splitting Overview {.tabset .tabset-vmodern}
 
 #### X Data Split {.unnumbered}
 
 ```{r X-data-split, add_new_line = TRUE}
-plotDataSplit(Xtrain, Xvalid, Xtest, 
-              xlab = "X", title = "Overall X Distribution")
+plot_data_split(Xtrain, Xvalid, Xtest, 
+                xlab = "X", title = "Overall X Distribution")
 ```
 
 #### Y Data Split {.unnumbered}
 
 ```{r y-data-split, add_new_line = TRUE}
-plotDataSplit(ytrain, yvalid, ytest, 
-              xlab = "y", title = "Overall y Distribution")
+plot_data_split(ytrain, yvalid, ytest, 
+                xlab = "y", title = "Overall y Distribution")
 ```
 
 ## Data Cleaning and Preprocessing
@@ -251,9 +250,9 @@ Given this example TCGA BRCA data set, we first preprocess the data by removing 
 ```{r preprocess-data}
 ## DO DATA CLEANING / PRE-PROCESSING HERE 
 Xtrain <- log(Xtrain + 1) %>%
-  removeConstantCols(verbose = 1) %>%
-  removeDuplicateCols(verbose = 1) %>%
-  filterColsByVar(max_p = 1000)
+  remove_constant_cols(verbose = 1) %>%
+  remove_duplicate_cols(verbose = 1) %>%
+  filter_cols_by_var(max_p = 1000)
 Xvalid <- log(Xvalid + 1)[, colnames(Xtrain)]
 Xtest <- log(Xtest + 1)[, colnames(Xtrain)]
 ```
@@ -273,25 +272,26 @@ Add summary statistics in accompanying tables (or in figures) for quick comparis
 
 ```
 
-### Data Overview {.tabset .custom-tabs}
+### Data Overview {.tabset .tabset-vmodern}
 
 ```{r data-dims, echo = FALSE}
 # summary of data dimensions
-dataDimensions(Xtrain = Xtrain, Xvalid = Xvalid, Xtest = Xtest)
+get_data_dimensions(Xtrain = Xtrain, Xvalid = Xvalid, Xtest = Xtest)
 ```
 
 ```{r data-types, results="asis", add_new_line = TRUE}
 # summary of types of features in (X, y) data
-dataTypes(X = Xtrain, y = ytrain)
+get_data_types(X = Xtrain, y = ytrain)
 ```
 
 #### Summary Tables {.unnumbered}
 
 ```{r data-summary-table, results="asis", add_new_line = TRUE}
 # broad array of summary statistics for features in training (X, y)
-tab_ls <- dataSummary(X = Xtrain, y = ytrain)
+tab_ls <- get_data_summary(X = Xtrain, y = ytrain)
 for (dtype in names(tab_ls)) {  # grouped by data type
-  subchunkify(tab_ls[[dtype]], i = dtype, other_args = "results='asis'")
+  vthemes::subchunkify(tab_ls[[dtype]], 
+                       i = dtype, other_args = "results='asis'")
 }
 ```
 
@@ -299,32 +299,32 @@ for (dtype in names(tab_ls)) {  # grouped by data type
 
 ```{r x-dist-plot, add_new_line = TRUE}
 # plot X distribution
-plotDataDistribution(data = Xtrain, 
-                     xlab = "X", title = "Training X Distribution")
+plot_data_distribution(data = Xtrain, 
+                       xlab = "X", title = "Training X Distribution")
 ```
 
 #### Y Distribution {.unnumbered}
 
 ```{r y-dist-plot, add_new_line = TRUE}
 # plot y distribution
-plotDataDistribution(data = ytrain, 
-                     xlab = "y", title = "Training y Distribution")
+plot_data_distribution(data = ytrain, 
+                       xlab = "y", title = "Training y Distribution")
 ```
 
 #### Data Heatmap {.unnumbered}
 
 ```{r data-heatmap, add_new_line = TRUE}
 # (clustered) heatmap of (X, y) data
-plotDataHeatmap(X = Xtrain, y = ytrain, clust_rows = TRUE, clust_cols = TRUE,
-                show_ytext = FALSE, x_text_angle = TRUE)
+plot_data_heatmap(X = Xtrain, y = ytrain, clust_rows = TRUE, clust_cols = TRUE,
+                  show_ytext = FALSE, x_text_angle = TRUE)
 ```
 
 #### Feature Correlation {.unnumbered}
 
 ```{r feature-cor-heatmap, add_new_line = TRUE}
 # (clustered) correlation heatmap
-plotCorHeatmap(X = Xtrain, cor_type = "pearson", clust = TRUE,
-               x_text_angle = TRUE) +
+plot_cor_heatmap(X = Xtrain, cor_type = "pearson", clust = TRUE,
+                 x_text_angle = TRUE) +
   ggplot2::labs(x = "Features", y = "Features", fill = "Cor.")
 ```
 
@@ -335,8 +335,8 @@ plotCorHeatmap(X = Xtrain, cor_type = "pearson", clust = TRUE,
 keep_features <- sort(
   sample(1:ncol(Xtrain), min(ncol(Xtrain), 6), replace = FALSE)
 )
-plotPairs(data = Xtrain, columns = keep_features, 
-          color = ytrain, color_label = "y")
+plot_pairs(data = Xtrain, columns = keep_features, 
+           color = ytrain, color_label = "y")
 ```
 
 #### Marginal Associations {.unnumbered}
@@ -354,8 +354,8 @@ caret::featurePlot(x = Xtrain[, keep_features],
 
 ```{r pca-plot, add_new_line = TRUE}
 # pca plot
-plotPCA(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
-        center = TRUE, scale = FALSE)$plot
+plot_pca(X = Xtrain, npcs = 3, color = ytrain, color_label = "y",
+         center = TRUE, scale = FALSE)$plot
 ```
 
 # Prediction Modeling
@@ -385,7 +385,7 @@ These accuracy metrics should clearly support the main goal of the study. There 
 ```
 
 
-## Prediction check {.tabset .custom-tabs}
+## Prediction check {.tabset .tabset-vmodern}
 
 Carry out the prediction pipeline, outlined above.
 
@@ -451,18 +451,18 @@ model_list <- list(
 
 ```{r fit-models}
 # fit/train models
-fit_results <- fitModels(Xtrain = Xtrain, ytrain = ytrain,
-                         model_list = model_list, cv_options = cv_options,
-                         use = params$modeling_pkg)
+fit_results <- fit_models(Xtrain = Xtrain, ytrain = ytrain,
+                          model_list = model_list, cv_options = cv_options,
+                          use = params$modeling_pkg)
 
 # make prediction on validation set
-pred_results <- predictModels(fit_list = fit_results, Xtest = Xvalid)
+pred_results <- predict_models(fit_list = fit_results, Xtest = Xvalid)
 
 # evaluate predictions on validation set
-eval_results <- evaluateModels(pred_df = pred_results, ytest = yvalid)
+eval_results <- evaluate_models(pred_df = pred_results, ytest = yvalid)
 
 # collect feature importance metrics from model fits
-imp_results <- interpretModels(fit_list = fit_results)
+imp_results <- interpret_models(fit_list = fit_results)
 ```
 
 
@@ -470,20 +470,20 @@ imp_results <- interpretModels(fit_list = fit_results)
 
 ```{r fit-summary, echo = FALSE, results = "asis"}
 # print out fit output summary
-printFitResults(fit_results)
+print_fit_results(fit_results)
 ```
 
 ### Prediction Results {.unnumbered}
 
 ```{r prediction-results, echo = FALSE, results = "asis"}
 # display prediction metrics, confusion matrices, and roc/pr plots if applicable
-showEvalResults(eval_results, digits = 2, sigfig = FALSE,
-                html_options = list(
-                  options = list(dom = "t", pageLength = nrow(eval_results))
-                ))
+print_eval_results(eval_results, digits = 2, sigfig = FALSE,
+                   html_options = list(
+                     options = list(dom = "t", pageLength = nrow(eval_results))
+                   ))
 ```
 
-## Stability check {.tabset .custom-tabs}
+## Stability check {.tabset .tabset-vmodern}
 
 Taking the prediction methods that pass the prediction check, perform a stability analysis.
 
@@ -522,18 +522,18 @@ bootstrap_model_results <- future.apply::future_replicate(
     ytrain_b <- ytrain[bootstrap]
     
     # fit/train models on bootstrap data
-    fit_results_b <- fitModels(Xtrain = Xtrain_b, ytrain = ytrain_b,
-                               model_list = model_list, cv_options = cv_options,
-                               use = params$modeling_pkg)
+    fit_results_b <- fit_models(Xtrain = Xtrain_b, ytrain = ytrain_b,
+                                model_list = model_list, cv_options = cv_options,
+                                use = params$modeling_pkg)
 
     # make prediction on validation set
-    pred_results_b <- predictModels(fit_list = fit_results_b, Xtest = Xvalid)
+    pred_results_b <- predict_models(fit_list = fit_results_b, Xtest = Xvalid)
 
     # evaluate predictions on validation set
-    eval_results_b <- evaluateModels(pred_df = pred_results_b, ytest = yvalid)
+    eval_results_b <- evaluate_models(pred_df = pred_results_b, ytest = yvalid)
     
     # collect feature importance metrics from model fits
-    imp_results_b <- interpretModels(fit_list = fit_results_b)
+    imp_results_b <- interpret_models(fit_list = fit_results_b)
     
     return(list(# fit = fit_results_b,  # uncomment if need bootstrap fits; can be memory intensive
                 predictions = pred_results_b,
@@ -552,8 +552,9 @@ bootstrap_model_imps <- purrr::map_dfr(bootstrap_model_results, "importances",
 
 # summarize bootstrap model error metrics
 bootstrap_model_errs_summary <- bootstrap_model_errs %>%
-  tidyr::pivot_longer(cols = c(-bootstrap_id, -Metric), 
+  tidyr::pivot_longer(cols = c(-bootstrap_id, -metric), 
                       names_to = "Method", values_to = "Value") %>%
+  dplyr::rename(Metric = metric) %>%
   dplyr::group_by(Method, Metric) %>%
   dplyr::summarise(Mean = mean(Value), SD = sd(Value), .groups = "drop") %>%
   tidyr::pivot_longer(cols = c(Mean, SD), 
@@ -566,7 +567,7 @@ bootstrap_model_errs_summary <- bootstrap_model_errs %>%
 
 ```{r stability-check-table, results = "asis"}
 # table of accuracy metrics
-prettyTable(
+vthemes::pretty_table(
   bootstrap_model_errs_summary, 
   digits = 2, sigfig = FALSE, rownames = FALSE,
   caption = "Validation Prediction Accuracies Over Bootstrapped Training Fits", 
@@ -590,14 +591,14 @@ prettyTable(
 ```{r stability-check-boxplot}
 # boxplots
 bootstrap_model_errs %>%
-  tidyr::pivot_longer(cols = c(-bootstrap_id, -Metric), 
+  tidyr::pivot_longer(cols = c(-bootstrap_id, -metric), 
                       names_to = "Method", values_to = "Value") %>%
-  plotBoxplot(x_str = "Method", y_str = "Value") +
-  ggplot2::facet_wrap(~ Metric) +
+  plot_boxplot(x_str = "Method", y_str = "Value") +
+  ggplot2::facet_wrap(~ metric) +
   ggplot2::labs(title = "Validation Prediction Accuracies Over Bootstrapped Training Fits")
 ```
 
-## Interpretability {.tabset .custom-tabs}
+## Interpretability {.tabset .tabset-vmodern}
 
 For the models that pass the prediction and stability checks, extract the important features in the predictive models that are stable across both data and model perturbations. Determining the importance of a feature can be method dependent.
 
@@ -610,23 +611,23 @@ For the models that pass the prediction and stability checks, extract the import
 #### Table {.unnumbered}
 
 ```{r interpretability-table, add_new_line = TRUE, results = "asis"}
-prettyTable(imp_results, digits = 2, sigfig = FALSE,
-            caption = "Variable Importances")
+vthemes::pretty_table(imp_results, digits = 2, sigfig = FALSE,
+                      caption = "Variable Importances")
 ```
 
 #### Plots {.unnumbered}
 
 ```{r interpretability-plot, add_new_line = TRUE}
-plotFeatureImportance(imp_results,
-                      use_rankings = FALSE,
-                      use_facets = TRUE,
-                      interactive = FALSE)
+plot_feature_importance(imp_results,
+                        use_rankings = FALSE,
+                        use_facets = TRUE,
+                        interactive = FALSE)
 ```
 
 ```{r interpretability-pair-plot, add_new_line = TRUE}
-plotFeatureImportancePair(imp_results,
-                          use_rankings = TRUE,
-                          interactive = FALSE)
+plot_feature_importance_pair(imp_results,
+                             use_rankings = TRUE,
+                             interactive = FALSE)
 ```
 
 ### Bootstrapped Model (with stability) {.unnumbered .tabset .tabset-pills}
@@ -642,7 +643,7 @@ bootstrap_model_imps_summary <- bootstrap_model_imps %>%
                    `Min Importance` = min(Importance),
                    `Max Importance` = max(Importance), 
                    .groups = "keep")
-prettyTable(
+vthemes::pretty_table(
   bootstrap_model_imps_summary, 
   digits = 2, sigfig = F, 
   caption = "Summary of variable importances across bootstrapped models"
@@ -652,15 +653,15 @@ prettyTable(
 #### Plots {.unnumbered}
 
 ```{r boot-interpretability-plot, add_new_line = TRUE}
-plotFeatureImportanceStability(bootstrap_model_imps,
-                               use_rankings = FALSE,
-                               use_facets = TRUE,
-                               interactive = FALSE)
+plot_feature_importance_stability(bootstrap_model_imps,
+                                  use_rankings = FALSE,
+                                  use_facets = TRUE,
+                                  interactive = FALSE)
 ```
 
 # Main Results
 
-## {.unnumbered .tabset .custom-tabs}
+## {.unnumbered .tabset .tabset-vmodern}
 
 Interpret and summarize the prediction and stability results.
 
@@ -679,18 +680,18 @@ Xtrain_final <- dplyr::bind_rows(Xtrain, Xvalid)
 ytrain_final <- c(ytrain, yvalid)
 
 # fit/train models
-fit_results_final <- fitModels(Xtrain = Xtrain_final, ytrain = ytrain_final,
-                               model_list = model_list, cv_options = cv_options,
-                               use = params$modeling_pkg)
+fit_results_final <- fit_models(Xtrain = Xtrain_final, ytrain = ytrain_final,
+                                model_list = model_list, cv_options = cv_options,
+                                use = params$modeling_pkg)
 
 # make prediction on test set
-pred_results_final <- predictModels(fit_list = fit_results_final, Xtest = Xtest)
+pred_results_final <- predict_models(fit_list = fit_results_final, Xtest = Xtest)
 
 # evaluate predictions on test set
-eval_results_final <- evaluateModels(pred_df = pred_results_final, ytest = ytest)
+eval_results_final <- evaluate_models(pred_df = pred_results_final, ytest = ytest)
 
 # collect feature importance metrics from model fits
-imp_results_final <- interpretModels(fit_list = fit_results_final)
+imp_results_final <- interpret_models(fit_list = fit_results_final)
 ```
 
 Summarize test set prediction and/or interpretability results.
@@ -704,18 +705,18 @@ Summarize test set prediction and/or interpretability results.
 
 ```{r final-fit-summary, echo = FALSE, results = "asis"}
 # print out fit output summary
-printFitResults(fit_results_final)
+print_fit_results(fit_results_final)
 ```
 
 ### Prediction Results {.unnumbered}
 
 ```{r final-prediction-results, echo = FALSE, results = "asis"}
 # display prediction metrics, confusion matrices, and roc/pr plots if applicable
-showEvalResults(eval_results_final, test_set = TRUE, digits = 2, sigfig = FALSE,
-                html_options = list(
-                  options = list(dom = "t", 
-                                 pageLength = nrow(eval_results_final))
-                ))
+print_eval_results(eval_results_final, test_set = TRUE, digits = 2, sigfig = FALSE,
+                   html_options = list(
+                     options = list(dom = "t", 
+                                    pageLength = nrow(eval_results_final))
+                   ))
 ```
 
 # Post hoc analysis
@@ -742,10 +743,10 @@ Are there certain methods that may not be overall the most accurate, but outperf
 pred_results_final %>%
   dplyr::mutate(.id = rep(1:nrow(Xtest), length.out = dplyr::n())) %>%
   tidyr::pivot_wider(id_cols = .id, 
-                     names_from = "Method", values_from = "predictions") %>%
+                     names_from = "method", values_from = "predictions") %>%
   dplyr::mutate(`True Responses` = ytest) %>%
-  plotPairs(columns = 2:(length(unique(pred_results_final$Method)) + 2),
-            title = "Comparison of model test predictions")
+  plot_pairs(columns = 2:(length(unique(pred_results_final$method)) + 2),
+             title = "Comparison of model test predictions")
 ```
 
 # Conclusions

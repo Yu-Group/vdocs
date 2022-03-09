@@ -1,6 +1,6 @@
-#' @rdname fitModel
+#' @rdname fit_model
 #' @export
-fitH2O <- function(Xtrain, ytrain, model_name, model_options = list(),
+fit_h2o <- function(Xtrain, ytrain, model_name, model_options = list(),
                    cv_options = list(), train_options = list()) {
   train_df <- h2o::as.h2o(dplyr::bind_cols(as.data.frame(Xtrain), .y = ytrain))
 
@@ -58,9 +58,9 @@ fitH2O <- function(Xtrain, ytrain, model_name, model_options = list(),
   return(fit)
 }
 
-#' @rdname predictModel
+#' @rdname predict_model
 #' @export
-predictH2O <- function(fit, Xtest, ...) {
+predict_h2o <- function(fit, Xtest, ...) {
   predict <- NULL  # to fix no visible binding for global variable error
 
   if (inherits(fit, "H2OGrid")) {
@@ -79,9 +79,9 @@ predictH2O <- function(fit, Xtest, ...) {
   return(pred)
 }
 
-#' @rdname interpretModel
+#' @rdname interpret_model
 #' @export
-interpretH2O <- function(fit, ...)  {
+interpret_h2o <- function(fit, ...)  {
   if (inherits(fit, "H2OGrid")) {
     fit <- attr(fit, "best_fit")
   }
@@ -92,9 +92,9 @@ interpretH2O <- function(fit, ...)  {
   return(imp)
 }
 
-#' @rdname printFit
+#' @rdname print_fit
 #' @export
-printH2OFit <- function(fit) {
+print_h2o_fit <- function(fit) {
   cat(sprintf("Fitting time taken: %s min\n\n", attr(fit, "time_taken")))
 
   if (!is.null(attr(fit, "best_fit"))) {

@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+
+<!-- modify header -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    // add show and hide all info button
+    var settings_item = $(".btn-toolbar>.btn-group>ul:first>.divider") 
+    settings_item.after(
+      '<li><a id="show-all-info" href="#">Show All Tips</a></li>',
+      '<li><a id="hide-all-info" href="#">Hide All Tips</a></li>',
+      '<li role="separator" class="divider"></li>'
+    )
+    $('#show-all-info').click(function(){
+      $(".help-info").show()
+    });
+    $('#hide-all-info').click(function(){
+      $(".help-info").hide()
+    })
+
+    // add save responses button
+    var settings_item = $(".btn-toolbar>.btn-group")
+    settings_item[0].style.float = "unset"
+    settings_item.before(
+      '<div class="btn-group" style="float: unset"><i class="fas fa-save fa-lg" accesskey="s" title="Save responses" onclick="saveResponses()" style="cursor: pointer; margin-right: 7px;"></i></div>'
+    )
+  });
+</script>
+
+<!-- clickable checkboxes -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(".section>p").each(function(index) {
+      if ($('#custom-checkbox-' + index).length == 0)
+        if (($( this ).text() != "") && (!$( this ).text().match("^TODO")))
+          $( this ).wrapInner(
+            '<span>'
+          ).prepend(
+            '<label for="custom-checkbox-' + index + '">'
+          ).prepend(
+            '<input type="checkbox" id="custom-checkbox-' + index + '">'
+          )
+    })
+
+    // read in saved checkbox selections
+    var checkboxValues = getCheckboxResponses();
+    $.each(checkboxValues, function(key, value) {
+      $("#" + key).prop('checked', value);
+    });
+  });
+</script>
+
+<!-- collapsible help/info boxes -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    // js function to add info button before collapsible info block
+    $( ".help-info" ).each(function(index) {
+      if ($('#help-btn-' + index).length == 0)
+        $( this ).prev('p').append(
+          ' <span class="help-btn" id="help-btn-' + index + '">&#9432;</span>'
+        )
+    })
+
+    // js function to show collapsible info help text
+    $('.help-btn').click(function(){
+      $( this ).parent().next('.help-info').slideToggle('fast')
+    });
+  });
+</script>

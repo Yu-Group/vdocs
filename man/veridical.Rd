@@ -5,7 +5,6 @@
 \title{veridical design - bootstrap HTML output format}
 \usage{
 veridical(
-  lab_notebook = FALSE,
   fig_width = 10,
   fig_height = 8,
   number_sections = FALSE,
@@ -13,6 +12,7 @@ veridical(
   code_download = TRUE,
   use_bookdown = TRUE,
   includes = NULL,
+  css = NULL,
   fig_caption = TRUE,
   highlight = "kate",
   lightbox = TRUE,
@@ -26,10 +26,6 @@ veridical(
 )
 }
 \arguments{
-\item{lab_notebook}{Logical indicating whether the veridical theme is being
-used for a PCS lab notebook. If \code{TRUE}, the veridical theme will
-also load additional scripts to enable interactivity of the notebook.}
-
 \item{fig_width}{Default width (in inches) for figures}
 
 \item{fig_height}{Default width (in inches) for figures}
@@ -50,6 +46,11 @@ a link that can be used by readers to download the code.}
 
 \item{includes}{Named list of additional content to include within the
 document (typically created using the \code{\link[rmarkdown]{includes}} function).}
+
+\item{css}{CSS and/or Sass files to include. Files with an extension of .sass
+or .scss are compiled to CSS via \code{sass::sass()}. Also, if \code{theme} is a
+\code{\link[bslib:bs_theme]{bslib::bs_theme()}} object, Sass code may reference the relevant Bootstrap
+Sass variables, functions, mixins, etc.}
 
 \item{fig_caption}{\code{TRUE} to render figures with captions}
 
@@ -72,15 +73,20 @@ highlighting.}
 
 \item{mathjax}{set to NULL to disable Mathjax insertion}
 
-\item{...}{Additional function arguments passed to `rmdformats::material()`.}
+\item{...}{Additional function arguments passed to `vthemes::vmodern()`.}
 }
 \value{
 R Markdown output format to pass to \code{\link[rmarkdown]{render}}
 }
 \description{
 Format for converting from R Markdown to an HTML document
-  using the veridical design theme. The veridical theme is largely based upon the
-  material design theme from the `rmdformats` R package. See
+  using the veridical design theme. The veridical theme is a wrapper around
+  the vmodern design theme from the `vthemes` R package with the difference
+  that the veridical theme is tailored specifically for the PCS lab
+  notebook and thus adds interactive capabilities such as clickable
+  checkboxes, editable textboxes, and collapsible tips. Note that the vmodern
+  design theme and hence the veridical design theme are largely based upon
+  the material design theme from the `rmdformats` R package. See
   \url{https://github.com/juba/rmdformats} for the source code.
 }
 \details{

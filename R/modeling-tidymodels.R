@@ -1,6 +1,6 @@
-#' @rdname fitModel
+#' @rdname fit_model
 #' @export
-fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
+fit_tidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
                           cv_options = list(), train_options = list()) {
   if (identical(train_options, list())) {
     train_options <- NULL
@@ -83,9 +83,9 @@ fitTidymodels <- function(Xtrain, ytrain, model_name, model_options = list(),
   return(fit)
 }
 
-#' @rdname predictModel
+#' @rdname predict_model
 #' @export
-predictTidymodels <- function(fit, Xtest, ...) {
+predict_tidymodels <- function(fit, Xtest, ...) {
   if (inherits(fit, "tune_results")) {
     fit <- attr(fit, "best_fit")
   }
@@ -103,9 +103,9 @@ predictTidymodels <- function(fit, Xtest, ...) {
   return(pred)
 }
 
-#' @rdname interpretModel
+#' @rdname interpret_model
 #' @export
-interpretTidymodels <- function(fit, ...) {
+interpret_tidymodels <- function(fit, ...) {
 
   if (inherits(fit, "tune_results")) {
     fit <- attr(fit, "best_fit")
@@ -118,9 +118,9 @@ interpretTidymodels <- function(fit, ...) {
   return(imp)
 }
 
-#' @rdname printFit
+#' @rdname print_fit
 #' @export
-printTidymodelsFit <- function(fit) {
+print_tidymodels_fit <- function(fit) {
   id <- NULL  # to fix no visible binding for global variable error
   .metrics <- NULL
   .estimator <- NULL

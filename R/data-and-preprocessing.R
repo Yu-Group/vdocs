@@ -26,31 +26,37 @@
 #'
 #' @examples
 #' # splits iris data into training (60%), validation (20%), and test (20%) sets
-#' data_split <- dataSplit(X = iris %>% dplyr::select(-Species),
-#'                         y = iris$Species,
-#'                         train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2)
+#' data_split <- split_data(X = iris %>% dplyr::select(-Species),
+#'                          y = iris$Species,
+#'                          train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2)
 #'
 #' # splits iris data into training, validation, and test sets while keeping
 #' # `Species` distribution constant across partitions
-#' stratified_data_split <- dataSplit(X = iris %>% dplyr::select(-Species),
-#'                                    y = iris$Species,
-#'                                    stratified_by = iris$Species,
-#'                                    train_prop = 0.6, valid_prop = 0.2,
-#'                                    test_prop = 0.2)
+#' stratified_data_split <- split_data(X = iris %>% dplyr::select(-Species),
+#'                                     y = iris$Species,
+#'                                     stratified_by = iris$Species,
+#'                                     train_prop = 0.6, valid_prop = 0.2,
+#'                                     test_prop = 0.2)
 #'
 #' @export
-dataSplit <- function(X, y, stratified_by = NULL,
-                      train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2) {
+split_data <- function(X, y, stratified_by = NULL,
+                       train_prop = 0.6, valid_prop = 0.2, test_prop = 0.2) {
   .group <- NULL  # to fix no visible binding for global variable error
   .split <- NULL
+
+  prop_vec <- c(train_prop, valid_prop, test_prop)
+  prop_names_vec <- c("train", "validate", "test")
+  if (all(prop_vec == 0)) {
+    stop("At least one of train_prop, valid_prop, test_prop must be non-zero.")
+  } else if (any(prop_vec == 0)) {
+    prop_names_vec <- prop_names_vec[prop_vec != 0]
+    prop_vec <- prop_vec[prop_vec != 0]
+  }
 
   n <- nrow(X)
   if (is.null(stratified_by)) {
     split_labels <- sample(
-      cut(
-        1:n, n * cumsum(c(0, train_prop, valid_prop, test_prop)),
-        labels = c("train", "validate", "test")
-      )
+      cut(1:n, n * cumsum(c(0, prop_vec)), labels = prop_names_vec)
     )
   } else {
     split_labels <- data.frame(.group = stratified_by) %>%
@@ -59,8 +65,8 @@ dataSplit <- function(X, y, stratified_by = NULL,
         .split = sample(
           cut(
             1:dplyr::n(),
-            dplyr::n() * cumsum(c(0, train_prop, valid_prop, test_prop)),
-            labels = c("train", "validate", "test")
+            dplyr::n() * cumsum(c(0, prop_vec)),
+            labels = prop_names_vec
           )
         )
       ) %>%
@@ -73,12 +79,12 @@ dataSplit <- function(X, y, stratified_by = NULL,
 
 #' Basic cleaning functions to remove columns in data.
 #'
-#' @name removeCols
+#' @name remove_cols
 #' @description Given data X, removes columns in X according to various
-#'   data preprocessing/cleaning procedures. `removeNACols` removes all
-#'   columns in the data with at least one NA value. `removeConstantCols`
+#'   data preprocessing/cleaning procedures. `remove_na_cols` removes all
+#'   columns in the data with at least one NA value. `remove_constant_cols`
 #'   removes all columns in the data that are a constant value (ignoring NAs).
-#'   `removeDuplicateCols` removes columns in the data that are duplicates of
+#'   `remove_duplicate_cols` removes columns in the data that are duplicates of
 #'   another column in the data so that each column in the resulting cleaned
 #'   data is unique.
 #'
@@ -89,9 +95,9 @@ dataSplit <- function(X, y, stratified_by = NULL,
 #'
 NULL
 
-#' @rdname removeCols
+#' @rdname remove_cols
 #' @export
-removeNACols <- function(X, verbose = 0) {
+remove_na_cols <- function(X, verbose = 0) {
 
   col_nas <- apply(X, 2, function(x) sum(is.na(x)))
 
@@ -115,37 +121,41 @@ removeNACols <- function(X, verbose = 0) {
   return(X_cleaned)
 }
 
-#' @rdname removeCols
+#' @rdname remove_cols
 #' @export
-removeConstantCols <- function(X, verbose = 0) {
-  col_vars <- apply(X, 2, stats::var, na.rm = T)
+remove_constant_cols <- function(X, verbose = 0) {
+  const_cols <- apply(X, 2, function(x) all(duplicated(x)[-1L]))
 
   if (verbose >= 2) {
-    cat("Constant columns: \n")
-    if (!is.null(names(col_vars))) {
-      cat(paste(names(col_vars)[col_vars == 0], X[1, col_vars == 0],
-                sep = " with value "), sep = "\n")
-    } else {
-      cat(paste(which(col_vars == 0), X[1, col_vars == 0],
-                sep = " with value "), sep = "\n")
+    if (any(const_cols)) {
+      cat("Constant columns: \n")
+      if (!is.null(names(const_cols))) {
+        cat(paste(names(const_cols)[const_cols], X[1, const_cols],
+                  sep = " with value "), sep = "\n")
+      } else {
+        cat(paste(which(const_cols), X[1, const_cols],
+                  sep = " with value "), sep = "\n")
+      }
     }
-    graphics::hist(col_vars, main = "Histogram of Column Variances",
-                   xlab = "Variance")
   }
   if (verbose >= 1) {
-    cat(paste("Removed", sum(col_vars == 0), "features with constant values\n"))
+    cat(paste("Removed", sum(const_cols), "features with constant values\n"))
   }
 
-  X_cleaned <- X[, col_vars > 0, drop = FALSE]
+  X_cleaned <- X[, !const_cols, drop = FALSE]
 
   return(X_cleaned)
 }
 
-#' @rdname removeCols
+#' @rdname remove_cols
 #' @export
-removeDuplicateCols <- function(X, verbose = 0) {
+remove_duplicate_cols <- function(X, verbose = 0) {
 
-  dup_cols <- duplicated(as.list(X))
+  if (is.data.frame(X)) {
+    dup_cols <- duplicated(as.list(X))
+  } else if (is.matrix(X)) {
+    dup_cols <- duplicated(t(X))
+  }
 
   if (verbose >= 2) {
     cat("Duplicated columns: \n")
@@ -166,9 +176,9 @@ removeDuplicateCols <- function(X, verbose = 0) {
 
 #' Filter out columns in data to reduce dimension.
 #'
-#' @name filterCols
+#' @name filter_cols
 #' @description Given data X, filters out columns in X according to various
-#'   data preprocessing/cleaning procedures. `filterColsByVar` reduces the
+#'   data preprocessing/cleaning procedures. `filter_cols_by_var` reduces the
 #'   number of features in the data by keeping those with the largest variance.
 #'
 #' @param X A data matrix or data frame.
@@ -183,9 +193,9 @@ removeDuplicateCols <- function(X, verbose = 0) {
 #'
 NULL
 
-#' @rdname filterCols
+#' @rdname filter_cols
 #' @export
-filterColsByVar <- function(X, min_var = NULL, max_p = NULL) {
+filter_cols_by_var <- function(X, min_var = NULL, max_p = NULL) {
   if (is.null(min_var) & is.null(max_p)) {
     return(X)
   }
@@ -196,9 +206,11 @@ filterColsByVar <- function(X, min_var = NULL, max_p = NULL) {
     X <- X[, vars >= min_var, drop = FALSE]
     vars <- vars[vars >= min_var]
   }
-  if (!is.null(max_p) & (ncol(X) > max_p)) {
-    var_cutoff <- sort(vars, decreasing = T)[max_p]
-    X <- X[, vars >= var_cutoff, drop = FALSE]
+  if (!is.null(max_p)) {
+    if (ncol(X) > max_p) {
+      var_cutoff <- sort(vars, decreasing = T)[max_p]
+      X <- X[, vars >= var_cutoff, drop = FALSE]
+    }
   }
 
   return(X)

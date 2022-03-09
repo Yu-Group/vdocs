@@ -1,8 +1,8 @@
 #' Wrapper for fitting models using common modeling backends
 #'
-#' @name fitModels
+#' @name fit_models
 #' @family fit_models_family
-#' @description `fitModels` is a wrapper function for fitting multiple models
+#' @description `fit_models` is a wrapper function for fitting multiple models
 #'   using caret, tidymodels, or h2o backends. This wrapper function provides
 #'   uniformity of input arguments to easily switch between the different
 #'   modeling packages.
@@ -12,7 +12,7 @@
 #' @param model_list List of models to train. Each name in the list should
 #'   correspond to the name of the model to fit (see caret, h2o, or tidymodels
 #'   for a list of available models). Each list element is a list of named
-#'   model options. See `model_options` arugument and details of `fitModel()`
+#'   model options. See `model_options` arugument and details of `fit_model()`
 #'   for possible options and more information.
 #' @param cv_options List of cross-validation options to use for tuning
 #'   hyperparameters. Possible options are `nfolds` (default is 10), `foldids`,
@@ -22,17 +22,17 @@
 #'   used for training in that fold. `metric` is a string that specifies which
 #'   metric to use to select the best hyperparameters. See details below.
 #' @param train_options List of additional training control options. See details
-#'   of `fitModel()` for possible options and more information.
+#'   of `fit_model()` for possible options and more information.
 #' @param use One of "caret", "h2o", "tidymodels", indicating the modeling
 #'   package to use.
 #' @param verbose Level of verbosity (0-2).
 #'
 #' @returns A list of the same length as `model_list` with the fitted models.
-#'   See `fitModel` for details of specified outputs for each of the modeling
+#'   See `fit_model` for details of specified outputs for each of the modeling
 #'   backends.
 #'
 #' @export
-fitModels <- function(Xtrain, ytrain, model_list,
+fit_models <- function(Xtrain, ytrain, model_list,
                       cv_options = list(), train_options = list(),
                       use = c("caret", "h2o", "tidymodels"),
                       verbose = 0) {
@@ -47,11 +47,11 @@ fitModels <- function(Xtrain, ytrain, model_list,
     model_list,
     function(model_options, model_name) {
       if (use == "caret") {
-        fit_func <- fitCaret
+        fit_func <- fit_caret
       } else if (use == "h2o") {
-        fit_func <- fitH2O
+        fit_func <- fit_h2o
       } else if (use == "tidymodels") {
-        fit_func <- fitTidymodels
+        fit_func <- fit_tidymodels
       }
       fit_start_time <- Sys.time()
       fit <- fit_func(Xtrain, ytrain, model_name,
@@ -78,15 +78,15 @@ fitModels <- function(Xtrain, ytrain, model_list,
 #' Wrapper for making predictions from fitted models using common modeling
 #' backends
 #'
-#' @name predictModels
+#' @name predict_models
 #' @family predict_models_family
-#' @description `predictModels` is a wrapper function for making predictions
+#' @description `predict_models` is a wrapper function for making predictions
 #'   from multiple fitted models that were trained using caret, tidymodels, or
 #'   h2o backends. This wrapper function provides uniformity of input arguments
 #'   to easily switch between the different modeling packages.
 #'
 #' @param fit_list List of fitted models for which to make predictions.
-#'   Typically the output of `fitModels()`.
+#'   Typically the output of `fit_models()`.
 #' @param Xtest Data matrix or data frame on which to make predictions.
 #' @param options Named list of additional arguments to pass to
 #'   `predict.train()` if using caret backend, `h2o.predict()` if using h2o
@@ -102,7 +102,7 @@ fitModels <- function(Xtrain, ytrain, model_list,
 #'
 #' @returns A tibble with the following columns:
 #' \describe{
-#' \item{Method}{Name of method that made the associated prediction.}
+#' \item{method}{Name of method that made the associated prediction.}
 #' \item{predictions}{Raw predicted value (e.g., the predicted class in a
 #'   classification problem and the predicted continuous value in a
 #'   regression problem.)}
@@ -115,7 +115,7 @@ fitModels <- function(Xtrain, ytrain, model_list,
 #' that of the Xtest input.
 #'
 #' @export
-predictModels <- function(fit_list, Xtest, options = list(), use = NULL) {
+predict_models <- function(fit_list, Xtest, options = list(), use = NULL) {
   if (!all(names(options) %in% names(fit_list))) {
     # repeat/use same options across all models
     options_list <- purrr::map(fit_list, ~options)
@@ -132,17 +132,17 @@ predictModels <- function(fit_list, Xtest, options = list(), use = NULL) {
         use_pkg <- match.arg(use, choices = c("caret", "h2o", "tidymodels"))
       }
       if (use_pkg == "caret") {
-        pred_fun <- predictCaret
+        pred_fun <- predict_caret
       } else if (use_pkg == "h2o") {
-        pred_fun <- predictH2O
+        pred_fun <- predict_h2o
       } else if (use_pkg == "tidymodels") {
-        pred_fun <- predictTidymodels
+        pred_fun <- predict_tidymodels
       }
       preds <- do.call(pred_fun,
                        args = c(list(fit = fit, Xtest = Xtest), options))
       return(preds)
     },
-    .id = "Method"
+    .id = "method"
   )
   return(pred_list)
 }
@@ -150,14 +150,14 @@ predictModels <- function(fit_list, Xtest, options = list(), use = NULL) {
 #' Wrapper for evaluating predictions from fitted models using common modeling
 #' backends
 #'
-#' @name evaluateModels
-#' @description `evaluateModels` is a wrapper function for evaluating
+#' @name evaluate_models
+#' @description `evaluate_models` is a wrapper function for evaluating
 #'   predictions from multiple fitted models that were trained using caret,
 #'   tidymodels, or h2o backends. This wrapper function provides uniformity of
 #'   input arguments to easily switch between the different modeling packages.
 #'
 #' @param pred_df Data frame of predictions to evaluate against `ytest`.
-#'   Typically the output of `predictModels()`.
+#'   Typically the output of `predict_models()`.
 #' @param ytest Test response vector for which to evaluate against the
 #'   predictions.
 #' @param metrics A `metric_set` object indicating the metrics to evaluate. See
@@ -169,7 +169,8 @@ predictModels <- function(fit_list, Xtest, options = list(), use = NULL) {
 #'
 #' @returns A list with the following elements:
 #' \describe{
-#' \item{metrics}{Name of method that made the associated prediction.}
+#' \item{metrics}{A tibble containing the metric name and its evaluated value
+#'   for each method in `pred_df`.}
 #' \item{conf}{In a classification problem, this is a tibble with the confusion
 #'   matrices for each method (see output of `yardstick::conf_mat()`). This
 #'   element is omitted for regression problems.}
@@ -184,12 +185,12 @@ predictModels <- function(fit_list, Xtest, options = list(), use = NULL) {
 #' }
 #'
 #' @export
-evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
-  Method <- NULL  # to fix no visible binding for global variable error
+evaluate_models <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
+  method <- NULL  # to fix no visible binding for global variable error
   y <- NULL
   predictions <- NULL
   .metric <- NULL
-  Metric <- NULL
+  metric <- NULL
   .estimate <- NULL
 
   if (!is.null(metrics) && !inherits(metrics, "metric_set")) {
@@ -209,7 +210,7 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
 
   pred_df <- pred_df %>%
     dplyr::mutate(y = rep(ytest, length.out = dplyr::n())) %>%
-    dplyr::group_by(Method)
+    dplyr::group_by(method)
 
   is_class <- !is.numeric(ytest)
   if (is.null(metrics)) {
@@ -239,9 +240,9 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
     res <- metrics(
       data = pred_df, truth = y, estimate = predictions, na_rm = na_rm
     ) %>%
-      dplyr::rename(Metric = .metric) %>%
+      dplyr::rename(metric = .metric) %>%
       tidyr::pivot_wider(
-        id_cols = Metric, names_from = Method, values_from = .estimate,
+        id_cols = metric, names_from = method, values_from = .estimate,
       )
     attr(res, "metrics_info") <- metrics
     return(list(metrics = res))
@@ -251,9 +252,9 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
       data = pred_df, truth = y, estimate = predictions,
       tidyselect::all_of(prob_cols), na_rm = na_rm
     ) %>%
-      dplyr::rename(Metric = .metric) %>%
+      dplyr::rename(metric = .metric) %>%
       tidyr::pivot_wider(
-        id_cols = Metric, names_from = Method, values_from = .estimate,
+        id_cols = metric, names_from = method, values_from = .estimate,
       )
     attr(res, "metrics_info") <- metrics
 
@@ -269,15 +270,15 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
       )
       roc_plot <- ggplot2::autoplot(roc_df) +
         ggplot2::labs(x = "FPR", y = "TPR", color = "Method") +
-        pretty_ggplot_color(color = as.factor(roc_df$Method)) +
-        pretty_ggplot_theme()
+        vthemes::scale_color_vmodern(discrete = TRUE) +
+        vthemes::theme_vmodern()
       pr_df <- yardstick::pr_curve(
         data = pred_df, truth = y, tidyselect::all_of(prob_cols)
       )
       pr_plot <- ggplot2::autoplot(pr_df) +
         ggplot2::labs(x = "Recall", y = "Precision", color = "Method") +
-        pretty_ggplot_color(color = as.factor(pr_df$Method)) +
-        pretty_ggplot_theme()
+        vthemes::scale_color_vmodern(discrete = TRUE) +
+        vthemes::theme_vmodern()
     } else {
       roc_plot <- NULL
       pr_plot <- NULL
@@ -290,15 +291,15 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
 #' Wrapper for extracting feature importances from fitted models using common
 #' modeling backends
 #'
-#' @name interpretModels
+#' @name interpret_models
 #' @family interpret_models_family
-#' @description `interpretModels` is a wrapper function for extracting feature
+#' @description `interpret_models` is a wrapper function for extracting feature
 #'   importances from multiple fitted models that were trained using caret,
 #'   tidymodels, or h2o backends. This wrapper function provides uniformity of
 #'   input arguments to easily switch between the different modeling packages.
 #'
 #' @param fit_list List of fitted models for which to make predictions.
-#'   Typically the output of `fitModels()`.
+#'   Typically the output of `fit_models()`.
 #' @param options Named list of additional arguments to pass to
 #'   `varImp()` if using caret backend, `h2o.varimp()` if using h2o
 #'   backend, or `vip::vi()` if using tidymodels backend. If different
@@ -319,7 +320,7 @@ evaluateModels <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
 #' }
 #'
 #' @export
-interpretModels <- function(fit_list, options = list(), use = NULL) {
+interpret_models <- function(fit_list, options = list(), use = NULL) {
   if (!all(names(options) %in% names(fit_list))) {
     # repeat/use same options across all models
     options_list <- purrr::map(fit_list, ~options)
@@ -337,11 +338,11 @@ interpretModels <- function(fit_list, options = list(), use = NULL) {
         use_pkg <- match.arg(use, choices = c("caret", "h2o", "tidymodels"))
       }
       if (use_pkg == "caret") {
-        imp_fun <- interpretCaret
+        imp_fun <- interpret_caret
       } else if (use_pkg == "h2o") {
-        imp_fun <- interpretH2O
+        imp_fun <- interpret_h2o
       } else if (use_pkg == "tidymodels") {
-        imp_fun <- interpretTidymodels
+        imp_fun <- interpret_tidymodels
       }
       imp <- do.call(imp_fun, args = c(list(fit = fit), options))
       return(imp)
@@ -354,13 +355,13 @@ interpretModels <- function(fit_list, options = list(), use = NULL) {
 #' Print fit results summary
 #'
 #' @family print_fit_family
-#' @description `printFitResults` is a wrapper function for printing a summary
+#' @description `print_fit_results` is a wrapper function for printing a summary
 #'   of the model fit from models that were trained using caret,
 #'   tidymodels, or h2o backends. This wrapper function provides uniformity of
 #'   input arguments to easily switch between the different modeling packages.
 #'
 #' @param fit_list List of fitted models for which to make predictions.
-#'   Typically the output of `fitModels()`.
+#'   Typically the output of `fit_models()`.
 #' @param test_set Logical indicating whether or not this evaluation is for the
 #'   test set. If `FALSE`, output is assumed to be associated with validation
 #'   set.
@@ -373,7 +374,7 @@ interpretModels <- function(fit_list, options = list(), use = NULL) {
 #' @returns Print fit summary to the console.
 #'
 #' @export
-printFitResults <- function(fit_list, test_set = FALSE, use = NULL,
+print_fit_results <- function(fit_list, test_set = FALSE, use = NULL,
                             html = knitr::is_html_output()) {
 
   for (fit_idx in 1:length(fit_list)) {
@@ -385,13 +386,13 @@ printFitResults <- function(fit_list, test_set = FALSE, use = NULL,
       use_pkg <- match.arg(use, choices = c("caret", "h2o", "tidymodels"))
     }
     if (use_pkg == "caret") {
-      print_func <- printCaretFit
+      print_func <- print_caret_fit
     } else if (use_pkg == "h2o") {
-      print_func <- printH2OFit
+      print_func <- print_h2o_fit
     } else if (use_pkg == "tidymodels") {
-      print_func <- printTidymodelsFit
+      print_func <- print_tidymodels_fit
     }
-    subchunkify(print_func(fit),
+    vthemes::subchunkify(print_func(fit),
                 i = paste0(names(fit_list)[fit_idx], fit_idx, "_",
                            ifelse(test_set, "test", "valid")),
                 other_args = "results = 'markup'")
@@ -401,11 +402,11 @@ printFitResults <- function(fit_list, test_set = FALSE, use = NULL,
 
 #' Display evaluation results summary in Rmd
 #'
-#' @description `showEvalResults` transforms the evaluation results from
-#'   `evaluateModels()` for output in an R Markdown document.
+#' @description `print_eval_results` transforms the evaluation results from
+#'   `evaluate_models()` for output in an R Markdown document.
 #'
-#' @inheritParams prettyTable
-#' @param eval_results Output of `evaluateModels()`
+#' @inheritParams vthemes::pretty_table
+#' @param eval_results Output of `evaluate_models()`
 #' @param test_set Logical indicating whether or not this evaluation is for the
 #'   test set. If `FALSE`, output is assumed to be associated with validation
 #'   set.
@@ -417,7 +418,7 @@ printFitResults <- function(fit_list, test_set = FALSE, use = NULL,
 #' @returns Outputs html or latex text for the R Markdown document.
 #'
 #' @export
-showEvalResults <- function(eval_results, test_set = FALSE,
+print_eval_results <- function(eval_results, test_set = FALSE,
                             html = knitr::is_html_output(),
                             digits = 2, sigfig = TRUE, na_disp = "NA",
                             html_options = NULL, latex_options = NULL,
@@ -427,7 +428,7 @@ showEvalResults <- function(eval_results, test_set = FALSE,
   res_tab <- eval_results$metrics
   metrics <- attr(res_tab, "metrics_info")
   metrics_direction <- purrr::map_chr(
-    res_tab$Metric,
+    res_tab$metric,
     ~attr(attr(metrics, "metrics")[[.x]], "direction")
   )
 
@@ -438,14 +439,14 @@ showEvalResults <- function(eval_results, test_set = FALSE,
   )
 
   res_kab <- res_tab %>%
-    tibble::column_to_rownames("Metric") %>%
-    prettyTable(
+    tibble::column_to_rownames("metric") %>%
+    vthemes::pretty_table(
       html = html, bold_function = bold_func, bold_margin = 1,
       digits = digits, sigfig = sigfig, na_disp = na_disp,
       caption = sprintf("%s Prediction Accuracies", results_type),
       html_options = html_options, latex_options = latex_options
     )
-  subchunkify(res_kab,
+  vthemes::subchunkify(res_kab,
               i = paste0("prediction_results_",
                          ifelse(test_set, "test", "valid")),
               other_args = "results='asis'")
@@ -463,9 +464,9 @@ showEvalResults <- function(eval_results, test_set = FALSE,
         # dplyr::mutate(
         #   .row_head = kableExtra::cell_spec(.row_head, angle = -90)
         # ) %>%
-        pretty_kable(
+        vthemes::pretty_kable(
           caption = sprintf("%s Confusion Matrix on %s Set",
-                            eval_results$conf$Method[[model_idx]],
+                            eval_results$conf$method[[model_idx]],
                             results_type),
           # col.names = c(" ", " ", colnames(conf_tab)),
           format = ifelse(html, "html", "latex"), full_width = FALSE
@@ -477,8 +478,8 @@ showEvalResults <- function(eval_results, test_set = FALSE,
         # kableExtra::collapse_rows(columns = 1, valign = "middle",
         #                           headers_to_remove = 1)
         kableExtra::column_spec(1, bold = TRUE)
-      subchunkify(conf_kab,
-                  i = paste0("conf_tab_", eval_results$conf$Method[[model_idx]],
+      vthemes::subchunkify(conf_kab,
+                  i = paste0("conf_tab_", eval_results$conf$method[[model_idx]],
                              model_idx, "_", ifelse(test_set, "test", "valid")),
                   other_args = "results='asis'")
     }
@@ -486,7 +487,7 @@ showEvalResults <- function(eval_results, test_set = FALSE,
       cat("\n\n### ROC Plot {.unnumbered}\n\n")
       plt <- eval_results$roc_plot +
         ggplot2::labs(title = sprintf("%s ROC Plot", results_type))
-      subchunkify(plt,
+      vthemes::subchunkify(plt,
                   i = paste0("roc_plot_", ifelse(test_set, "test", "valid")),
                   fig_height = fig_height, fig_width = fig_width)
     }
@@ -494,7 +495,7 @@ showEvalResults <- function(eval_results, test_set = FALSE,
       cat("\n\n### PR Plot {.unnumbered}\n\n")
       plt <- eval_results$pr_plot +
         ggplot2::labs(title = sprintf("%s PR Plot", results_type))
-      subchunkify(plt,
+      vthemes::subchunkify(plt,
                   i = paste0("pr_plot_", ifelse(test_set, "test", "valid")),
                   fig_height = fig_height, fig_width = fig_width)
     }

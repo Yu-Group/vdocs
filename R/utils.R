@@ -9,7 +9,7 @@
 #'   all other file types.
 #'
 #' @export
-loadFile <- function(file_path) {
+load_file <- function(file_path) {
   if (is.null(file_path)) {
     stop("Cannot upload file. Must provide file path.")
   } else if (!file.exists(file_path)) {
@@ -35,7 +35,7 @@ loadFile <- function(file_path) {
 #' @param test_prop Proportion of data to put in test set
 #'
 #' @export
-validateDataSplit <- function(train_prop, valid_prop, test_prop) {
+validate_data_split <- function(train_prop, valid_prop, test_prop) {
   props <- c(train_prop, valid_prop, test_prop)
   if (sum(props) != 1) {
     stop("Training, validation, test proportions must sum to 1.")
@@ -56,7 +56,7 @@ validateDataSplit <- function(train_prop, valid_prop, test_prop) {
 #' @param y A response vector.
 #'
 #' @export
-validateData <- function(X, y) {
+validate_data <- function(X, y) {
   if (nrow(X) != length(y)) {
     stop("The number of rows in X do not match the length of the response y.")
   }
