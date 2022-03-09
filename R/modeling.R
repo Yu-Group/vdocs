@@ -270,15 +270,15 @@ evaluate_models <- function(pred_df, ytest, metrics = NULL, na_rm = TRUE) {
       )
       roc_plot <- ggplot2::autoplot(roc_df) +
         ggplot2::labs(x = "FPR", y = "TPR", color = "Method") +
-        pretty_ggplot_color(color = as.factor(roc_df$method)) +
-        pretty_ggplot_theme()
+        vthemes::scale_color_vmodern(discrete = TRUE) +
+        vthemes::theme_vmodern()
       pr_df <- yardstick::pr_curve(
         data = pred_df, truth = y, tidyselect::all_of(prob_cols)
       )
       pr_plot <- ggplot2::autoplot(pr_df) +
         ggplot2::labs(x = "Recall", y = "Precision", color = "Method") +
-        pretty_ggplot_color(color = as.factor(pr_df$method)) +
-        pretty_ggplot_theme()
+        vthemes::scale_color_vmodern(discrete = TRUE) +
+        vthemes::theme_vmodern()
     } else {
       roc_plot <- NULL
       pr_plot <- NULL
@@ -392,7 +392,7 @@ print_fit_results <- function(fit_list, test_set = FALSE, use = NULL,
     } else if (use_pkg == "tidymodels") {
       print_func <- print_tidymodels_fit
     }
-    subchunkify(print_func(fit),
+    vthemes::subchunkify(print_func(fit),
                 i = paste0(names(fit_list)[fit_idx], fit_idx, "_",
                            ifelse(test_set, "test", "valid")),
                 other_args = "results = 'markup'")
@@ -405,7 +405,7 @@ print_fit_results <- function(fit_list, test_set = FALSE, use = NULL,
 #' @description `print_eval_results` transforms the evaluation results from
 #'   `evaluate_models()` for output in an R Markdown document.
 #'
-#' @inheritParams pretty_table
+#' @inheritParams vthemes::pretty_table
 #' @param eval_results Output of `evaluate_models()`
 #' @param test_set Logical indicating whether or not this evaluation is for the
 #'   test set. If `FALSE`, output is assumed to be associated with validation
@@ -440,13 +440,13 @@ print_eval_results <- function(eval_results, test_set = FALSE,
 
   res_kab <- res_tab %>%
     tibble::column_to_rownames("metric") %>%
-    pretty_table(
+    vthemes::pretty_table(
       html = html, bold_function = bold_func, bold_margin = 1,
       digits = digits, sigfig = sigfig, na_disp = na_disp,
       caption = sprintf("%s Prediction Accuracies", results_type),
       html_options = html_options, latex_options = latex_options
     )
-  subchunkify(res_kab,
+  vthemes::subchunkify(res_kab,
               i = paste0("prediction_results_",
                          ifelse(test_set, "test", "valid")),
               other_args = "results='asis'")
@@ -464,7 +464,7 @@ print_eval_results <- function(eval_results, test_set = FALSE,
         # dplyr::mutate(
         #   .row_head = kableExtra::cell_spec(.row_head, angle = -90)
         # ) %>%
-        pretty_kable(
+        vthemes::pretty_kable(
           caption = sprintf("%s Confusion Matrix on %s Set",
                             eval_results$conf$method[[model_idx]],
                             results_type),
@@ -478,7 +478,7 @@ print_eval_results <- function(eval_results, test_set = FALSE,
         # kableExtra::collapse_rows(columns = 1, valign = "middle",
         #                           headers_to_remove = 1)
         kableExtra::column_spec(1, bold = TRUE)
-      subchunkify(conf_kab,
+      vthemes::subchunkify(conf_kab,
                   i = paste0("conf_tab_", eval_results$conf$method[[model_idx]],
                              model_idx, "_", ifelse(test_set, "test", "valid")),
                   other_args = "results='asis'")
@@ -487,7 +487,7 @@ print_eval_results <- function(eval_results, test_set = FALSE,
       cat("\n\n### ROC Plot {.unnumbered}\n\n")
       plt <- eval_results$roc_plot +
         ggplot2::labs(title = sprintf("%s ROC Plot", results_type))
-      subchunkify(plt,
+      vthemes::subchunkify(plt,
                   i = paste0("roc_plot_", ifelse(test_set, "test", "valid")),
                   fig_height = fig_height, fig_width = fig_width)
     }
@@ -495,7 +495,7 @@ print_eval_results <- function(eval_results, test_set = FALSE,
       cat("\n\n### PR Plot {.unnumbered}\n\n")
       plt <- eval_results$pr_plot +
         ggplot2::labs(title = sprintf("%s PR Plot", results_type))
-      subchunkify(plt,
+      vthemes::subchunkify(plt,
                   i = paste0("pr_plot_", ifelse(test_set, "test", "valid")),
                   fig_height = fig_height, fig_width = fig_width)
     }

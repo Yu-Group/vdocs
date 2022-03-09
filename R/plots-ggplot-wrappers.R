@@ -13,7 +13,7 @@
 #'   to use as fill aesthetic in plot.
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   pretty_ggplot_theme().
+#'   vthemes::theme_vmodern().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_bar()].
 #'
@@ -43,7 +43,7 @@ plot_bar <- function(data, x_str, y_str = NULL,
   }
 
   plt <- ggplot2::ggplot(data) +
-    get_aesthetics(x_str = x_str, y_str = y_str,
+    vthemes::get_aesthetics(x_str = x_str, y_str = y_str,
                              fill_str = fill_str) +
     ggplot2::labs(x = x_str, y = ylab, fill = fill_str)
   if (!is.null(fill_str)) {
@@ -53,17 +53,17 @@ plot_bar <- function(data, x_str, y_str = NULL,
     plt <- plt +
       ggplot2::geom_bar(position = position, stat = stat, color = "grey98",
                         ...) +
-      pretty_ggplot_fill(fill = data[[fill_str]])
+      vthemes::scale_fill_vmodern(discrete = !is.numeric(data[[fill_str]]))
   } else {
     plt <- plt +
       ggplot2::geom_bar(position = position, stat = stat, color = "grey98",
                         fill = fill, ...)
   }
   if (is.null(theme_options)) {
-    plt <- plt + pretty_ggplot_theme()
+    plt <- plt + vthemes::theme_vmodern()
   } else {
     plt <- plt +
-      do.call(pretty_ggplot_theme, args = theme_options)
+      do.call(vthemes::theme_vmodern, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -86,7 +86,7 @@ plot_bar <- function(data, x_str, y_str = NULL,
 #' @param horizontal Logical. Whether the boxplots should be horizontal instead
 #'   of vertical.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   pretty_ggplot_theme().
+#'   vthemes::theme_vmodern().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_boxplot()].
 #'
@@ -118,7 +118,7 @@ plot_boxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
   group_str <- x_str
 
   plt <- ggplot2::ggplot(data) +
-    get_aesthetics(x_str = x_str, y_str = y_str,
+    vthemes::get_aesthetics(x_str = x_str, y_str = y_str,
                              fill_str = fill_str, group_str = group_str) +
     ggplot2::geom_boxplot(...) +
     ggplot2::labs(x = x_str, y = y_str, fill = fill_str)
@@ -129,16 +129,17 @@ plot_boxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
     plt <- plt + ggplot2::aes(group = !!group_str)
   }
   if (!is.null(fill_str)) {
-    plt <- plt + pretty_ggplot_fill(fill = data[[fill_str]])
+    plt <- plt +
+      vthemes::scale_fill_vmodern(discrete = !is.numeric(data[[fill_str]]))
   }
   if (horizontal) {
     plt <- plt + ggplot2::coord_flip()
   }
   if (is.null(theme_options)) {
-    plt <- plt + pretty_ggplot_theme()
+    plt <- plt + vthemes::theme_vmodern()
   } else {
     plt <- plt +
-      do.call(pretty_ggplot_theme, args = theme_options)
+      do.call(vthemes::theme_vmodern, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -159,7 +160,7 @@ plot_boxplot <- function(data, x_str = NULL, y_str = NULL, fill_str = NULL,
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param alpha Alpha value for transparency.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   pretty_ggplot_theme().
+#'   vthemes::theme_vmodern().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_density()].
 #'
@@ -185,7 +186,7 @@ plot_density <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
   }
 
   plt <- ggplot2::ggplot(data) +
-    get_aesthetics(x_str = x_str, fill_str = fill_str) +
+    vthemes::get_aesthetics(x_str = x_str, fill_str = fill_str) +
     ggplot2::labs(x = x_str, y = "Density", fill = fill_str)
   if (!is.null(fill_str)) {
     if (is.character(data[[fill_str]])) {
@@ -193,16 +194,16 @@ plot_density <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
     }
     plt <- plt +
       ggplot2::geom_density(color = "black", alpha = alpha, ...) +
-      pretty_ggplot_fill(fill = data[[fill_str]])
+      vthemes::scale_fill_vmodern(discrete = !is.numeric(data[[fill_str]]))
   } else {
     plt <- plt +
       ggplot2::geom_density(color = "black", alpha = alpha, fill = fill, ...)
   }
   if (is.null(theme_options)) {
-    plt <- plt + pretty_ggplot_theme()
+    plt <- plt + vthemes::theme_vmodern()
   } else {
     plt <- plt +
-      do.call(pretty_ggplot_theme, args = theme_options)
+      do.call(vthemes::theme_vmodern, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -223,7 +224,7 @@ plot_density <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3",
 #' @param fill Fill color. Used only if \code{fill_str} is \code{NULL}.
 #' @param bins Number of histogram bins.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   pretty_ggplot_theme().
+#'   vthemes::theme_vmodern().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_histogram()].
 #'
@@ -249,7 +250,7 @@ plot_histogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3"
   }
 
   plt <- ggplot2::ggplot(data) +
-    get_aesthetics(x_str = x_str, fill_str = fill_str) +
+    vthemes::get_aesthetics(x_str = x_str, fill_str = fill_str) +
     ggplot2::labs(x = x_str, y = "Frequency", fill = fill_str)
   if (!is.null(fill_str)) {
     if (is.character(data[[fill_str]])) {
@@ -257,16 +258,16 @@ plot_histogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3"
     }
     plt <- plt +
       ggplot2::geom_histogram(color = "grey98", bins = bins, ...) +
-      pretty_ggplot_fill(fill = data[[fill_str]])
+      vthemes::scale_fill_vmodern(discrete = !is.numeric(data[[fill_str]]))
   } else {
     plt <- plt +
       ggplot2::geom_histogram(color = "grey98", bins = bins, fill = fill, ...)
   }
   if (is.null(theme_options)) {
-    plt <- plt + pretty_ggplot_theme()
+    plt <- plt + vthemes::theme_vmodern()
   } else {
     plt <- plt +
-      do.call(pretty_ggplot_theme, args = theme_options)
+      do.call(vthemes::theme_vmodern, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -287,7 +288,7 @@ plot_histogram <- function(data, x_str = NULL, fill_str = NULL, fill = "#6FBBE3"
 #' @param color_str Character string (optional). Name of variable in \code{data}
 #'   to use as color aesthetic in plot.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   pretty_ggplot_theme().
+#'   vthemes::theme_vmodern().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_line()].
 #'
@@ -310,7 +311,7 @@ plot_line <- function(data, x_str, y_str, color_str = NULL,
   }
 
   plt <- ggplot2::ggplot(data) +
-    get_aesthetics(x_str = x_str, y_str = y_str,
+    vthemes::get_aesthetics(x_str = x_str, y_str = y_str,
                              color_str = color_str, group_str = color_str) +
     ggplot2::geom_line(...) +
     ggplot2::labs(x = x_str, y = y_str, color = color_str)
@@ -318,13 +319,14 @@ plot_line <- function(data, x_str, y_str, color_str = NULL,
     if (is.character(data[[color_str]])) {
       data[[color_str]] <- as.factor(data[[color_str]])
     }
-    plt <- plt + pretty_ggplot_color(color = data[[color_str]])
+    plt <- plt +
+      vthemes::scale_color_vmodern(discrete = !is.numeric(data[[color_str]]))
   }
   if (is.null(theme_options)) {
-    plt <- plt + pretty_ggplot_theme()
+    plt <- plt + vthemes::theme_vmodern()
   } else {
     plt <- plt +
-      do.call(pretty_ggplot_theme, args = theme_options)
+      do.call(vthemes::theme_vmodern, args = theme_options)
   }
   if (show_plot) {
     print(plt)
@@ -345,7 +347,7 @@ plot_line <- function(data, x_str, y_str, color_str = NULL,
 #' @param color_str Character string (optional). Name of variable in \code{data}
 #'   to use as color aesthetic in plot.
 #' @param theme_options (Optional) list of arguments to pass to
-#'   pretty_ggplot_theme().
+#'   vthemes::theme_vmodern().
 #' @param show_plot Logical. Should this plot be printed? Default \code{FALSE}.
 #' @param ... Other arguments to pass to [ggplot2::geom_point()].
 #'
@@ -366,7 +368,7 @@ plot_point <- function(data, x_str, y_str, color_str = NULL,
   }
 
   plt <- ggplot2::ggplot(data) +
-    get_aesthetics(x_str = x_str, y_str = y_str,
+    vthemes::get_aesthetics(x_str = x_str, y_str = y_str,
                              color_str = color_str) +
     ggplot2::geom_point(...) +
     ggplot2::labs(x = x_str, y = y_str, color = color_str)
@@ -374,13 +376,14 @@ plot_point <- function(data, x_str, y_str, color_str = NULL,
     if (is.character(data[[color_str]])) {
       data[[color_str]] <- as.factor(data[[color_str]])
     }
-    plt <- plt + pretty_ggplot_color(color = data[[color_str]])
+    plt <- plt +
+      vthemes::scale_color_vmodern(discrete = !is.numeric(data[[color_str]]))
   }
   if (is.null(theme_options)) {
-    plt <- plt + pretty_ggplot_theme()
+    plt <- plt + vthemes::theme_vmodern()
   } else {
     plt <- plt +
-      do.call(pretty_ggplot_theme, args = theme_options)
+      do.call(vthemes::theme_vmodern, args = theme_options)
   }
   if (show_plot) {
     print(plt)

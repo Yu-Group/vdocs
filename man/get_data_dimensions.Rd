@@ -20,6 +20,6 @@ the console.}
 A character string with the text summary of the data dimensions.
 }
 \description{
-Returns a character string, summarizing the number of features 
+Returns a character string, summarizing the number of features
   and samples in the training, validation, and test data sets.
 }

@@ -1,21 +1,4 @@
 reference:
-  - title: "General Themes"
-    desc: >
-      A library of beautiful themes for Rmarkdown files, ggplots, and tables.
-  - subtitle: "Rmarkdown"
-    contents:
-      - veridical
-  - subtitle: "ggplot"
-    contents:
-      - pretty_ggplot_theme
-      - pretty_ggplot_color
-      - pretty_ggplot_fill
-      - blank_ggplot_themes
-  - subtitle: "Tables"
-    contents:
-      - pretty_table
-      - pretty_DT
-      - pretty_kable
   - title: "General Visualization Functions"
     desc: >
       A library of general functions for making beautiful visualizations.
@@ -47,9 +30,6 @@ reference:
       - get_data_summary
       - get_data_types
       - get_data_dimensions
-  - subtitle: "Utilities"
-    contents: 
-      - get_aesthetics
   - title: "Data Cleaning and Preprocessing Functions"
     desc: >
       A library of functions to preprocess or clean data.
@@ -74,7 +54,7 @@ reference:
     desc: >
       Utility functions for creating the vdocs Rmarkdown template.
     contents:
-      - subchunkify
+      - veridical
       - load_saved_responses
       - load_file
       - print_fit_results

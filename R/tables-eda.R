@@ -37,11 +37,11 @@ get_data_dimensions <- function(Xtrain, Xvalid, Xtest, print = TRUE) {
 #' @param y Response vector.
 #' @param html Logical indicating whether or not the output is an html table
 #'   or a latex table.
-#' @param ... Additional arguments to pass to pretty_DT() if
-#'   \code{html = TRUE} or pretty_kable() if \code{html = FALSE}.
+#' @param ... Additional arguments to pass to vthemes::pretty_DT() if
+#'   \code{html = TRUE} or vthemes::pretty_kable() if \code{html = FALSE}.
 #'
-#' @returns Returns an html table (i.e., the output of pretty_DT()) or
-#'   a latex table (i.e., the output of pretty_kable()),
+#' @returns Returns an html table (i.e., the output of vthemes::pretty_DT()) or
+#'   a latex table (i.e., the output of vthemes::pretty_kable()),
 #'   containing the frequency of each data type in the given (X, y) data.
 #'
 #' @export
@@ -63,7 +63,7 @@ get_data_types <- function(X, y, html = knitr::is_html_output(), ...) {
     tidyr::spread(key = "Class", value = "Freq") %>%
     tibble::column_to_rownames("group")
   if (html) {
-    tab_out <- pretty_DT(
+    tab_out <- vthemes::pretty_DT(
       dtypes_df,
       caption = shiny::tags$caption(
         style = "color: black; font-weight: bold; font-size: 125%",
@@ -73,7 +73,7 @@ get_data_types <- function(X, y, html = knitr::is_html_output(), ...) {
       ...
     )
   } else {
-    tab_out <- pretty_kable(dtypes_df, caption = "Frequency of column",
+    tab_out <- vthemes::pretty_kable(dtypes_df, caption = "Frequency of column",
                                      format = "latex", ...)
   }
   return(tab_out)
@@ -89,7 +89,9 @@ get_data_types <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   types are ignored.
 #'
 #' @inheritParams get_data_types
-#' @inheritParams pretty_DT
+#' @inheritParams vthemes::pretty_DT
+#' @param skim_out (Optional) cached output of `skimr::skim()`. Specify if
+#'   the skim output has been pre-computed in order to reduce computation.
 #' @param features (Optional) vector of features to include in summary. Default
 #'   (\code{NULL}) is to include all features.
 #' @param max_features (Optional) maximum number of features to include in
@@ -97,8 +99,8 @@ get_data_types <- function(X, y, html = knitr::is_html_output(), ...) {
 #'   number of features in X exceeds `max_features`, the features kept in the
 #'   summary are chosen randomly.
 #'
-#' @returns Returns an html table (i.e., the output of pretty_DT()) or
-#'   a latex table (i.e., the output of pretty_kable()),
+#' @returns Returns an html table (i.e., the output of vthemes::pretty_DT()) or
+#'   a latex table (i.e., the output of vthemes::pretty_kable()),
 #'   containing a broad overview of summary statistics for each data column.
 #'
 #' @export
@@ -212,7 +214,7 @@ get_data_summary <- function(X, y = NULL, skim_out = NULL,
 
     caption <- paste("Summary of", stringr::str_to_title(dtype), "Variables")
     if (html) {
-      tab_ls[[dtype]] <- pretty_DT(
+      tab_ls[[dtype]] <- vthemes::pretty_DT(
         skim_df,
         caption = shiny::tags$caption(
           style = "color: black; font-weight: bold; font-size: 125%", caption
@@ -223,7 +225,7 @@ get_data_summary <- function(X, y = NULL, skim_out = NULL,
         ...
       )
     } else {
-      tab_ls[[dtype]] <- pretty_kable(
+      tab_ls[[dtype]] <- vthemes::pretty_kable(
         skim_df,
         caption = caption, format = "latex", row.names = FALSE, escape = TRUE,
         ...

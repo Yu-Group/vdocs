@@ -36,10 +36,10 @@ decimal places.}
 \item{na_disp}{Character string to display if NA entry is found in table.}
 
 \item{html_options}{List of additional named arguments to pass to
-`pretty_DT()`.}
+\code{pretty_DT()}.}
 
 \item{latex_options}{List of additional named arguments to pass to
-`pretty_kable()`.}
+\code{pretty_kable()}.}
 
 \item{fig_height}{Height of plot (in inches). See `fig.height` in the knitr
 chunk options.}

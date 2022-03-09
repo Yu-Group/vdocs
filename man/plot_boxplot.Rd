@@ -31,7 +31,7 @@ to use as fill aesthetic in plot.}
 of vertical.}
 
 \item{theme_options}{(Optional) list of arguments to pass to
-pretty_ggplot_theme().}
+vthemes::theme_vmodern().}
 
 \item{show_plot}{Logical. Should this plot be printed? Default \code{FALSE}.}
 

@@ -25,7 +25,8 @@ the computation proceeds.}
 \value{
 A list with the following elements:
 \describe{
-\item{metrics}{Name of method that made the associated prediction.}
+\item{metrics}{A tibble containing the metric name and its evaluated value
+  for each method in `pred_df`.}
 \item{conf}{In a classification problem, this is a tibble with the confusion
   matrices for each method (see output of `yardstick::conf_mat()`). This
   element is omitted for regression problems.}

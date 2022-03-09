@@ -78,7 +78,7 @@ plot_feature_importance <- function(data, feature_col = "Variable",
                        fill_str = model_col, stat = "identity")
   }
   plt <- plt +
-    pretty_ggplot_theme(x_text_angle = TRUE) +
+    vthemes::theme_vmodern(x_text_angle = TRUE) +
     ggplot2::labs(x = "Feature", y = importance_label, fill = "Method")
   if (interactive) {
     plt <- plotly::ggplotly(plt)
@@ -163,10 +163,10 @@ plot_feature_importance_stability <- function(data, feature_col = "Variable",
       ggplot2::aes(x = .data[[feature_col]], y = .data[[importance_col]],
                    fill = .data[[model_col]]) +
       ggplot2::geom_boxplot() +
-      pretty_ggplot_fill(fill = as.factor(data[[model_col]]))
+      vthemes::scale_fill_vmodern(discrete = TRUE)
   }
   plt <- plt +
-    pretty_ggplot_theme(x_text_angle = TRUE) +
+    vthemes::theme_vmodern(x_text_angle = TRUE) +
     ggplot2::labs(x = "Feature", y = importance_label, fill = "Method")
   if (interactive) {
     plt <- plotly::ggplotly(plt)

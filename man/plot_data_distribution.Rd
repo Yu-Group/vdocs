@@ -41,7 +41,7 @@ in the data. For example, heights = c(2, 1) would make the first row twice
 as tall as the second row.}
 
 \item{theme_options}{(Optional) list of arguments to pass to
-pretty_ggplot_theme().}
+vthemes::theme_vmodern().}
 
 \item{...}{Additional arguments to pass to ggplot2::geom_*().}
 }

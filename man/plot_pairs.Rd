@@ -68,12 +68,12 @@ upper panels). If \code{NULL} (default), viridis color scheme is used.}
 \item{drop}{Logical. Whether or not to drop factors with no observations.}
 
 \item{theme_function}{function which adds theme() to ggpairs() object. If
-\code{NULL}, add \code{pretty_ggplot_theme()} to
+\code{NULL}, add \code{vthemes::theme_vmodern()} to
 [GGally::ggpairs()] object.}
 
 \item{show_plot}{Logical. Should this plot be printed? Default \code{FALSE}.}
 
-\item{...}{Other arguments to pass to \code{pretty_ggplot_theme()}
+\item{...}{Other arguments to pass to \code{vthemes::theme_vmodern()}
 or \code{theme_function()}}
 }
 \value{

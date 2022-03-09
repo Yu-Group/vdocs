@@ -19,13 +19,11 @@ Imports:
     data.table,
     dendextend,
     dplyr,
-    DT,
     future.apply,
     GGally,
     ggdendro,
     ggplot2,
     h2o,
-    htmltools,
     irlba,
     kableExtra,
     knitr,
@@ -36,7 +34,6 @@ Imports:
     plotly,
     purrr,
     rlang,
-    rmdformats,
     rsample,
     scales,
     shiny,
@@ -48,6 +45,7 @@ Imports:
     tune,
     vip,
     viridis,
+    vthemes,
     workflows,
     yardstick
 Suggests: 
@@ -58,5 +56,7 @@ Suggests:
     utils,
     rmarkdown,
     vdiffr
+Remotes:
+    Yu-Group/vthemes
 Config/testthat/edition: 3
 VignetteBuilder: knitr
