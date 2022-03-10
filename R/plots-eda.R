@@ -395,7 +395,7 @@ plot_pairs <- function(data, columns, color = NULL, color_upper = NULL,
                       color_scheme = NULL, color_scheme_upper = NULL,
                       column_labels = NULL, title = "",
                       point_size = .5, point_alpha = .5, cor_text_size = 3.5,
-                      subsample = 1, show_upper = TRUE, drop = FALSE,
+                      subsample = 1, show_upper = TRUE, drop = TRUE,
                       theme_function = NULL, show_plot = FALSE, ...) {
   legend_x <- NULL  # to fix no visible binding for global variable error
   plt_color <- NULL

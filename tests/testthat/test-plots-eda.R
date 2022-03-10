@@ -101,6 +101,11 @@ test_that("plot_pairs works properly", {
   plt <- plot_pairs(data = X, columns = 1:6,
                     color = X$Species, color_upper = X$Species)
   vdiffr::expect_doppelganger("plot_pairs2", plt)
+
+  # check colors match when a factor is missing
+  plt <- plot_pairs(data = X %>% dplyr::filter(Species != "setosa"),
+                    columns = 1:6, color = X$Species[X$Species != "setosa"])
+  vdiffr::expect_doppelganger("plot_pairs6", plt)
 })
 
 test_that("plot_pca works properly", {
