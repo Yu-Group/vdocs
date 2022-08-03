@@ -59,209 +59,288 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_heatmap</span><span class="op">(</span>
-  <span class="va">X</span>,
-  y_groups <span class="op">=</span> <span class="cn">NULL</span>,
-  x_groups <span class="op">=</span> <span class="cn">NULL</span>,
-  ytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,
-  xtext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,
-  ytext_num <span class="op">=</span> <span class="cn">FALSE</span>,
-  xtext_num <span class="op">=</span> <span class="cn">FALSE</span>,
-  ytext_colors <span class="op">=</span> <span class="cn">NULL</span>,
-  xtext_colors <span class="op">=</span> <span class="cn">NULL</span>,
-  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,
-  show_xtext <span class="op">=</span> <span class="cn">TRUE</span>,
-  center <span class="op">=</span> <span class="cn">FALSE</span>,
-  scale <span class="op">=</span> <span class="cn">FALSE</span>,
-  z_range <span class="op">=</span> <span class="cn">NULL</span>,
-  text_size <span class="op">=</span> <span class="fl">0</span>,
-  y_orient <span class="op">=</span> <span class="st">"identity"</span>,
-  size <span class="op">=</span> <span class="fl">0</span>,
-  color_by_quantile <span class="op">=</span> <span class="cn">FALSE</span>,
-  n_quantiles <span class="op">=</span> <span class="fl">5</span>,
-  color_scheme <span class="op">=</span> <span class="st">"viridis"</span>,
-  viridis_option <span class="op">=</span> <span class="st">"C"</span>,
-  theme_function <span class="op">=</span> <span class="cn">NULL</span>,
-  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="fu">plot_hclust_heatmap</span><span class="op">(</span>
-  <span class="va">X</span>,
-  y_groups <span class="op">=</span> <span class="cn">NULL</span>,
-  x_groups <span class="op">=</span> <span class="cn">NULL</span>,
-  ytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,
-  xtext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,
-  ytext_num <span class="op">=</span> <span class="cn">FALSE</span>,
-  xtext_num <span class="op">=</span> <span class="cn">FALSE</span>,
-  ytext_colors <span class="op">=</span> <span class="cn">NULL</span>,
-  xtext_colors <span class="op">=</span> <span class="cn">NULL</span>,
-  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,
-  show_xtext <span class="op">=</span> <span class="cn">TRUE</span>,
-  clust_x <span class="op">=</span> <span class="cn">TRUE</span>,
-  clust_y <span class="op">=</span> <span class="cn">TRUE</span>,
-  clust_x_wi_group <span class="op">=</span> <span class="cn">TRUE</span>,
-  clust_y_wi_group <span class="op">=</span> <span class="cn">TRUE</span>,
-  dist_metric_x <span class="op">=</span> <span class="st">"euclidean"</span>,
-  dist_metric_y <span class="op">=</span> <span class="st">"euclidean"</span>,
-  dist_matrix_x <span class="op">=</span> <span class="cn">NULL</span>,
-  dist_matrix_y <span class="op">=</span> <span class="cn">NULL</span>,
-  linkage_x <span class="op">=</span> <span class="st">"ward.D"</span>,
-  linkage_y <span class="op">=</span> <span class="st">"ward.D"</span>,
-  center <span class="op">=</span> <span class="cn">FALSE</span>,
-  scale <span class="op">=</span> <span class="cn">FALSE</span>,
-  z_range <span class="op">=</span> <span class="cn">NULL</span>,
-  text_size <span class="op">=</span> <span class="fl">0</span>,
-  size <span class="op">=</span> <span class="fl">0</span>,
-  color_by_quantile <span class="op">=</span> <span class="cn">FALSE</span>,
-  n_quantiles <span class="op">=</span> <span class="fl">5</span>,
-  color_scheme <span class="op">=</span> <span class="st">"viridis"</span>,
-  viridis_option <span class="op">=</span> <span class="st">"C"</span>,
-  theme_function <span class="op">=</span> <span class="cn">NULL</span>,
-  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="fu">plot_cor_heatmap</span><span class="op">(</span>
-  <span class="va">X</span>,
-  cor_type <span class="op">=</span> <span class="st">"pearson"</span>,
-  xytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,
-  xytext_colors <span class="op">=</span> <span class="cn">NULL</span>,
-  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,
-  show_xtext <span class="op">=</span> <span class="cn">TRUE</span>,
-  clust <span class="op">=</span> <span class="cn">TRUE</span>,
-  linkage <span class="op">=</span> <span class="st">"ward.D"</span>,
-  z_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,
-  text_size <span class="op">=</span> <span class="fl">0</span>,
-  color_by_quantile <span class="op">=</span> <span class="cn">FALSE</span>,
-  n_quantiles <span class="op">=</span> <span class="fl">5</span>,
-  color_scheme <span class="op">=</span> <span class="st">"cor_temperature"</span>,
-  viridis_option <span class="op">=</span> <span class="st">"C"</span>,
-  theme_function <span class="op">=</span> <span class="cn">NULL</span>,
-  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_heatmap</span><span class="op">(</span></span>
+<span>  <span class="va">X</span>,</span>
+<span>  y_groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x_groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>  xtext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>  ytext_num <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  xtext_num <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ytext_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xtext_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_xtext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  z_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  y_orient <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  color_by_quantile <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_quantiles <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  color_scheme <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  viridis_option <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  theme_function <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plot_hclust_heatmap</span><span class="op">(</span></span>
+<span>  <span class="va">X</span>,</span>
+<span>  y_groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x_groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>  xtext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>  ytext_num <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  xtext_num <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ytext_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xtext_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_xtext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clust_x <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clust_y <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clust_x_wi_group <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clust_y_wi_group <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  dist_metric_x <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
+<span>  dist_metric_y <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
+<span>  dist_matrix_x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dist_matrix_y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linkage_x <span class="op">=</span> <span class="st">"ward.D"</span>,</span>
+<span>  linkage_y <span class="op">=</span> <span class="st">"ward.D"</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  z_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  color_by_quantile <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_quantiles <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  color_scheme <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  viridis_option <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  theme_function <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plot_cor_heatmap</span><span class="op">(</span></span>
+<span>  <span class="va">X</span>,</span>
+<span>  cor_type <span class="op">=</span> <span class="st">"pearson"</span>,</span>
+<span>  xytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>  xytext_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_xtext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clust <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  linkage <span class="op">=</span> <span class="st">"ward.D"</span>,</span>
+<span>  z_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  color_by_quantile <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_quantiles <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  color_scheme <span class="op">=</span> <span class="st">"cor_temperature"</span>,</span>
+<span>  viridis_option <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  theme_function <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>X</dt>
 <dd><p>Data matrix or data frame to use for heatmap.</p></dd>
+
+
 <dt>y_groups</dt>
 <dd><p>Data vector of group ids to use for grouping rows in heatmap.</p></dd>
+
+
 <dt>x_groups</dt>
 <dd><p>Data vector of group ids to use for grouping columns in
 heatmap.</p></dd>
+
+
 <dt>ytext_labels</dt>
 <dd><p>y-axis labels in heatmap.</p></dd>
+
+
 <dt>xtext_labels</dt>
 <dd><p>x-axis labels in heatmap.</p></dd>
+
+
 <dt>ytext_num</dt>
 <dd><p>Logical; whether or not y labels are numeric/continuous.</p></dd>
+
+
 <dt>xtext_num</dt>
 <dd><p>Logical; whether or not x labels are numeric/continuous.</p></dd>
+
+
 <dt>ytext_colors</dt>
 <dd><p>(Optional) Data vector to use for coloring y-axis text.</p></dd>
+
+
 <dt>xtext_colors</dt>
 <dd><p>(Optional) Data vector to use for coloring x-axis text.</p></dd>
+
+
 <dt>show_ytext</dt>
 <dd><p>Logical; whether or not to show y-axis text labels.</p></dd>
+
+
 <dt>show_xtext</dt>
 <dd><p>Logical; whether or not to show x-axis text labels.</p></dd>
+
+
 <dt>center</dt>
 <dd><p>Logical; whether or not to center columns of <code>X</code>.</p></dd>
+
+
 <dt>scale</dt>
 <dd><p>Logical; whether or not to scale columns of <code>X</code>.</p></dd>
+
+
 <dt>z_range</dt>
 <dd><p>Vector of length 2 with the min and max of the fill color
 range for heatmap. Used to set bounds for fill legend.</p></dd>
+
+
 <dt>text_size</dt>
 <dd><p>Numeric; size of text on heatmap. If <code>text_size</code> = 0
 (default), no text is shown.</p></dd>
+
+
 <dt>y_orient</dt>
 <dd><p>One of "identity" or "ordered". If "identity", plots heatmap
 of <code>X</code> as if it is an image. If "ordered", plots first row of <code>X</code>
 at the bottom of the heatmap and the last row of <code>X</code> on top.</p></dd>
+
+
 <dt>size</dt>
 <dd><p>Size argument in [ggplot2::geom_tile()] to avoid white lines in
 continuous heatmap.</p></dd>
+
+
 <dt>color_by_quantile</dt>
 <dd><p>Logical; whether or not to use quantiles to
 construct fill color scale. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt>n_quantiles</dt>
 <dd><p>Number of quantiles for color scheme. Used only if
 <code>color_by_quantile = TRUE</code>.</p></dd>
+
+
 <dt>color_scheme</dt>
 <dd><p>One of "viridis", "temperature", "cor_temperature", or a
 data vector of colors to use for the fill color scale.</p></dd>
+
+
 <dt>viridis_option</dt>
 <dd><p>Argument indicating viridis palette name. Only used if
 `color_scheme = "viridis"`.</p></dd>
+
+
 <dt>theme_function</dt>
 <dd><p>Function which adds theme() to ggplot object. If
 <code>NULL</code>, adds <code><a href="https://rdrr.io/pkg/vthemes/man/theme_vmodern.html" class="external-link">vthemes::theme_vmodern()</a></code> to ggplot.</p></dd>
+
+
 <dt>show_plot</dt>
 <dd><p>Logical. Should this plot be printed? Default <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments to pass to <code><a href="https://rdrr.io/pkg/vthemes/man/theme_vmodern.html" class="external-link">vthemes::theme_vmodern()</a></code>
 or <code>theme_function()</code>.</p></dd>
+
+
 <dt>clust_x</dt>
 <dd><p>Logical; whether or not to cluster columns.</p></dd>
+
+
 <dt>clust_y</dt>
 <dd><p>Logical; whether or not to cluster rows.</p></dd>
+
+
 <dt>clust_x_wi_group</dt>
 <dd><p>Logical; whether or not cluster within x_groups.</p></dd>
+
+
 <dt>clust_y_wi_group</dt>
 <dd><p>Logical; whether or not cluster within y_groups.</p></dd>
+
+
 <dt>dist_metric_x</dt>
 <dd><p>Distance metric for clustering columns (see
 [stats::dist()]).</p></dd>
+
+
 <dt>dist_metric_y</dt>
 <dd><p>Distance metric for clustering rows (see
 [stats::dist()]).</p></dd>
+
+
 <dt>dist_matrix_x</dt>
 <dd><p>Distance matrix for clustering columns (optional). Must
 provide either <code>dist_metric</code> or <code>dist_mat</code> if <code>clust_x = T</code>.</p></dd>
+
+
 <dt>dist_matrix_y</dt>
 <dd><p>Distance matrix for clustering rows (optional). Must
 provide either <code>dist_metric</code> or <code>dist_mat</code> if <code>clust_y = T</code>.</p></dd>
+
+
 <dt>linkage_x</dt>
 <dd><p>Type of linkage for clustering columns (see
 [stats::hclust()]).</p></dd>
+
+
 <dt>linkage_y</dt>
 <dd><p>Type of linkage for clustering rows (see [stats::hclust()]).</p></dd>
+
+
 <dt>cor_type</dt>
 <dd><p>Type of correlation. Must be one of "pearson", "kendall",
 or "spearman"</p></dd>
+
+
 <dt>xytext_labels</dt>
 <dd><p>x- and y-axis labels for correlation heatmap.</p></dd>
+
+
 <dt>xytext_colors</dt>
 <dd><p>(Optional) Data vector to use for coloring x- and y-axis
 text labels in correlation heatmap.</p></dd>
+
+
 <dt>clust</dt>
 <dd><p>Logical; whether or not to cluster columns and rows in
 correlation heatmap</p></dd>
+
+
 <dt>linkage</dt>
 <dd><p>Type of linkage for clustering rows and columns in
 correlation heatmap (see [stats::hclust()]).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A ggplot object.</p>
+    
+
+<p>A ggplot object.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, nrow <span class="op">=</span> <span class="fl">10</span>, byrow <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">df</span>,  y_orient <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, nrow <span class="op">=</span> <span class="fl">10</span>, byrow <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">df</span>,  y_orient <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_heatmap-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">df</span>,  y_orient <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">df</span>,  y_orient <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_heatmap-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plot_hclust_heatmap</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plot_hclust_heatmap</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_heatmap-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plot_cor_heatmap</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plot_cor_heatmap</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_heatmap-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -276,7 +355,7 @@ correlation heatmap (see [stats::hclust()]).</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

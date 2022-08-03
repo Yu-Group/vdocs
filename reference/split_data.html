@@ -51,38 +51,51 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">split_data</span><span class="op">(</span>
-  <span class="va">X</span>,
-  <span class="va">y</span>,
-  stratified_by <span class="op">=</span> <span class="cn">NULL</span>,
-  train_prop <span class="op">=</span> <span class="fl">0.6</span>,
-  valid_prop <span class="op">=</span> <span class="fl">0.2</span>,
-  test_prop <span class="op">=</span> <span class="fl">0.2</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">split_data</span><span class="op">(</span></span>
+<span>  <span class="va">X</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  stratified_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  train_prop <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>  valid_prop <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  test_prop <span class="op">=</span> <span class="fl">0.2</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>X</dt>
 <dd><p>A data matrix or data frame.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>A response vector.</p></dd>
+
+
 <dt>stratified_by</dt>
 <dd><p>An optional vector of group IDs to stratify by. That is,
 the random paritioning occurs within each group so that the group
 proportions are similar across the training, validation, and test sets.
 Vector must be the same length as `y`. If <code>NULL</code> (default), the full
 data set is randomly partitioned into training, validation, and test sets.</p></dd>
+
+
 <dt>train_prop</dt>
 <dd><p>Proportion of data in training set. Default is 0.6.</p></dd>
+
+
 <dt>valid_prop</dt>
 <dd><p>Proportion of data in validation set. Default is 0.2.</p></dd>
+
+
 <dt>test_prop</dt>
 <dd><p>Proportion of data in test set. Default is 0.2.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of two:</p><dl><dt>X</dt>
+    
+
+<p>A list of two:</p><dl><dt>X</dt>
 <dd><p>A list of three data matrices or data frames named `train`,
   `validate`, and `test` containing the training, validation, and test X
   partitions, respectively.</p></dd>
@@ -96,19 +109,19 @@ data set is randomly partitioned into training, validation, and test sets.</p></
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># splits iris data into training (60%), validation (20%), and test (20%) sets</span></span>
-<span class="r-in"><span class="va">data_split</span> <span class="op">&lt;-</span> <span class="fu">split_data</span><span class="op">(</span>X <span class="op">=</span> <span class="va">iris</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Species</span><span class="op">)</span>,</span>
-<span class="r-in">                         y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>,</span>
-<span class="r-in">                         train_prop <span class="op">=</span> <span class="fl">0.6</span>, valid_prop <span class="op">=</span> <span class="fl">0.2</span>, test_prop <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># splits iris data into training, validation, and test sets while keeping</span></span>
-<span class="r-in"><span class="co"># `Species` distribution constant across partitions</span></span>
-<span class="r-in"><span class="va">stratified_data_split</span> <span class="op">&lt;-</span> <span class="fu">split_data</span><span class="op">(</span>X <span class="op">=</span> <span class="va">iris</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Species</span><span class="op">)</span>,</span>
-<span class="r-in">                                    y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>,</span>
-<span class="r-in">                                    stratified_by <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>,</span>
-<span class="r-in">                                    train_prop <span class="op">=</span> <span class="fl">0.6</span>, valid_prop <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span class="r-in">                                    test_prop <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># splits iris data into training (60%), validation (20%), and test (20%) sets</span></span></span>
+<span class="r-in"><span><span class="va">data_split</span> <span class="op">&lt;-</span> <span class="fu">split_data</span><span class="op">(</span>X <span class="op">=</span> <span class="va">iris</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Species</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                         y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>,</span></span>
+<span class="r-in"><span>                         train_prop <span class="op">=</span> <span class="fl">0.6</span>, valid_prop <span class="op">=</span> <span class="fl">0.2</span>, test_prop <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># splits iris data into training, validation, and test sets while keeping</span></span></span>
+<span class="r-in"><span><span class="co"># `Species` distribution constant across partitions</span></span></span>
+<span class="r-in"><span><span class="va">stratified_data_split</span> <span class="op">&lt;-</span> <span class="fu">split_data</span><span class="op">(</span>X <span class="op">=</span> <span class="va">iris</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Species</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                    y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>,</span></span>
+<span class="r-in"><span>                                    stratified_by <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>,</span></span>
+<span class="r-in"><span>                                    train_prop <span class="op">=</span> <span class="fl">0.6</span>, valid_prop <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>                                    test_prop <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -123,7 +136,7 @@ data set is randomly partitioned into training, validation, and test sets.</p></
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

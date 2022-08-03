@@ -59,39 +59,39 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_feature_importance</span><span class="op">(</span>
-  <span class="va">data</span>,
-  feature_col <span class="op">=</span> <span class="st">"Variable"</span>,
-  importance_col <span class="op">=</span> <span class="st">"Importance"</span>,
-  model_col <span class="op">=</span> <span class="st">"Method"</span>,
-  max_features <span class="op">=</span> <span class="fl">50</span>,
-  use_rankings <span class="op">=</span> <span class="cn">FALSE</span>,
-  use_facets <span class="op">=</span> <span class="cn">TRUE</span>,
-  interactive <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="fu">plot_feature_importance_pair</span><span class="op">(</span>
-  <span class="va">data</span>,
-  feature_col <span class="op">=</span> <span class="st">"Variable"</span>,
-  importance_col <span class="op">=</span> <span class="st">"Importance"</span>,
-  model_col <span class="op">=</span> <span class="st">"Method"</span>,
-  use_rankings <span class="op">=</span> <span class="cn">FALSE</span>,
-  interactive <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="fu">plot_feature_importance_stability</span><span class="op">(</span>
-  <span class="va">data</span>,
-  feature_col <span class="op">=</span> <span class="st">"Variable"</span>,
-  importance_col <span class="op">=</span> <span class="st">"Importance"</span>,
-  model_col <span class="op">=</span> <span class="st">"Method"</span>,
-  max_features <span class="op">=</span> <span class="fl">50</span>,
-  use_rankings <span class="op">=</span> <span class="cn">FALSE</span>,
-  use_facets <span class="op">=</span> <span class="cn">TRUE</span>,
-  interactive <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_feature_importance</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  feature_col <span class="op">=</span> <span class="st">"Variable"</span>,</span>
+<span>  importance_col <span class="op">=</span> <span class="st">"Importance"</span>,</span>
+<span>  model_col <span class="op">=</span> <span class="st">"Method"</span>,</span>
+<span>  max_features <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  use_rankings <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use_facets <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plot_feature_importance_pair</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  feature_col <span class="op">=</span> <span class="st">"Variable"</span>,</span>
+<span>  importance_col <span class="op">=</span> <span class="st">"Importance"</span>,</span>
+<span>  model_col <span class="op">=</span> <span class="st">"Method"</span>,</span>
+<span>  use_rankings <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plot_feature_importance_stability</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  feature_col <span class="op">=</span> <span class="st">"Variable"</span>,</span>
+<span>  importance_col <span class="op">=</span> <span class="st">"Importance"</span>,</span>
+<span>  model_col <span class="op">=</span> <span class="st">"Method"</span>,</span>
+<span>  max_features <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  use_rankings <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use_facets <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -100,34 +100,53 @@
 <dd><p>A data frame with the feature importance information. At a
 minimum, this data frame should contain columns with the names specified by
 `feature_col`, `importance_col`, and `model_col`.</p></dd>
+
+
 <dt>feature_col</dt>
 <dd><p>Character string. Name of the column in `data` with the
 feature names.</p></dd>
+
+
 <dt>importance_col</dt>
 <dd><p>Character string. Name of the column in `data` with the
 feature importance scores.</p></dd>
+
+
 <dt>model_col</dt>
 <dd><p>Character string. Name of the column in `data` with the
 model names.</p></dd>
+
+
 <dt>max_features</dt>
 <dd><p>Maximum number of features to display in the plot.</p></dd>
+
+
 <dt>use_rankings</dt>
 <dd><p>Logical indicating whether or not to use the feature
 importance rankings, rather than the raw feature importance scores, for
 plotting.</p></dd>
+
+
 <dt>use_facets</dt>
 <dd><p>Logical indicating whether or not to use faceting to
 separate the feature importances by model.</p></dd>
+
+
 <dt>interactive</dt>
 <dd><p>Logical indicating whether or not to return an interactive
 plot.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass to `plot_pairs()`. Only used in
 `plot_feature_importance_pair()`.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>If `interactive = FALSE`, returns a ggplot object. If
+    
+
+<p>If `interactive = FALSE`, returns a ggplot object. If
   `interactive = TRUE`, returns an interactive plotly object.</p>
     </div>
 
@@ -143,7 +162,7 @@ plot.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

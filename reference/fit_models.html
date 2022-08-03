@@ -53,29 +53,35 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fit_models</span><span class="op">(</span>
-  <span class="va">Xtrain</span>,
-  <span class="va">ytrain</span>,
-  <span class="va">model_list</span>,
-  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  use <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"caret"</span>, <span class="st">"h2o"</span>, <span class="st">"tidymodels"</span><span class="op">)</span>,
-  verbose <span class="op">=</span> <span class="fl">0</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fit_models</span><span class="op">(</span></span>
+<span>  <span class="va">Xtrain</span>,</span>
+<span>  <span class="va">ytrain</span>,</span>
+<span>  <span class="va">model_list</span>,</span>
+<span>  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  use <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"caret"</span>, <span class="st">"h2o"</span>, <span class="st">"tidymodels"</span><span class="op">)</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>Xtrain</dt>
 <dd><p>Training data matrix or data frame.</p></dd>
+
+
 <dt>ytrain</dt>
 <dd><p>Training response vector.</p></dd>
+
+
 <dt>model_list</dt>
 <dd><p>List of models to train. Each name in the list should
 correspond to the name of the model to fit (see caret, h2o, or tidymodels
 for a list of available models). Each list element is a list of named
 model options. See `model_options` arugument and details of `fit_model()`
 for possible options and more information.</p></dd>
+
+
 <dt>cv_options</dt>
 <dd><p>List of cross-validation options to use for tuning
 hyperparameters. Possible options are `nfolds` (default is 10), `foldids`,
@@ -84,18 +90,27 @@ scheme. `foldids` is a list with elements for each cross-validation fold,
 where each list element is a vector of integers corresponding to the rows
 used for training in that fold. `metric` is a string that specifies which
 metric to use to select the best hyperparameters. See details below.</p></dd>
+
+
 <dt>train_options</dt>
 <dd><p>List of additional training control options. See details
 of `fit_model()` for possible options and more information.</p></dd>
+
+
 <dt>use</dt>
 <dd><p>One of "caret", "h2o", "tidymodels", indicating the modeling
 package to use.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>Level of verbosity (0-2).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of the same length as `model_list` with the fitted models.
+    
+
+<p>A list of the same length as `model_list` with the fitted models.
   See `fit_model` for details of specified outputs for each of the modeling
   backends.</p>
     </div>
@@ -117,7 +132,7 @@ package to use.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

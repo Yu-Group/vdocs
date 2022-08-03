@@ -49,25 +49,34 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_data_types</span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span>, html <span class="op">=</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/output_type.html" class="external-link">is_html_output</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_data_types</span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span>, html <span class="op">=</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/output_type.html" class="external-link">is_html_output</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>X</dt>
 <dd><p>Data matrix or data frame.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>Response vector.</p></dd>
+
+
 <dt>html</dt>
 <dd><p>Logical indicating whether or not the output is an html table
 or a latex table.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass to vthemes::pretty_DT() if
 <code>html = TRUE</code> or vthemes::pretty_kable() if <code>html = FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns an html table (i.e., the output of vthemes::pretty_DT()) or
+    
+
+<p>Returns an html table (i.e., the output of vthemes::pretty_DT()) or
   a latex table (i.e., the output of vthemes::pretty_kable()),
   containing the frequency of each data type in the given (X, y) data.</p>
     </div>
@@ -84,7 +93,7 @@ or a latex table.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

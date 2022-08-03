@@ -49,45 +49,62 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_boxplot</span><span class="op">(</span>
-  <span class="va">data</span>,
-  x_str <span class="op">=</span> <span class="cn">NULL</span>,
-  y_str <span class="op">=</span> <span class="cn">NULL</span>,
-  fill_str <span class="op">=</span> <span class="cn">NULL</span>,
-  horizontal <span class="op">=</span> <span class="cn">FALSE</span>,
-  theme_options <span class="op">=</span> <span class="cn">NULL</span>,
-  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_boxplot</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  x_str <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_str <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fill_str <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  horizontal <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  theme_options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>Data frame to use for plot.</p></dd>
+
+
 <dt>x_str</dt>
 <dd><p>Character string. Name of variable in <code>data</code> to plot on
 x-axis. If <code>NULL</code>, plot boxplot using all values in data frame.</p></dd>
+
+
 <dt>y_str</dt>
 <dd><p>Character string (optional). Name of variable in <code>data</code> to
 plot on y-axis. Should be a factor variable.</p></dd>
+
+
 <dt>fill_str</dt>
 <dd><p>Character string (optional). Name of variable in <code>data</code>
 to use as fill aesthetic in plot.</p></dd>
+
+
 <dt>horizontal</dt>
 <dd><p>Logical. Whether the boxplots should be horizontal instead
 of vertical.</p></dd>
+
+
 <dt>theme_options</dt>
 <dd><p>(Optional) list of arguments to pass to
 vthemes::theme_vmodern().</p></dd>
+
+
 <dt>show_plot</dt>
 <dd><p>Logical. Should this plot be printed? Default <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments to pass to [ggplot2::geom_boxplot()].</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A ggplot boxplot.</p>
+    
+
+<p>A ggplot boxplot.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -101,22 +118,22 @@ vthemes::theme_vmodern().</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## plot boxplot of all data in data frame</span></span>
-<span class="r-in"><span class="fu">plot_boxplot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## plot boxplot of all data in data frame</span></span></span>
+<span class="r-in"><span><span class="fu">plot_boxplot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co">## plot boxplot of single column in data frame</span></span>
-<span class="r-in"><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="co">## plot boxplot of single column in data frame</span></span></span>
+<span class="r-in"><span><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris</span>, x_str <span class="op">=</span> <span class="st">"Species"</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris</span>, x_str <span class="op">=</span> <span class="st">"Species"</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="va">iris2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">iris</span>,</span>
-<span class="r-in">                    z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>,</span>
-<span class="r-in">                                  length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris2</span>, x_str <span class="op">=</span> <span class="st">"Species"</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span>, fill_str <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">iris2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">iris</span>,</span></span>
+<span class="r-in"><span>                    z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>                                  length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris2</span>, x_str <span class="op">=</span> <span class="st">"Species"</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span>, fill_str <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris2</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span>, fill_str <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plot_boxplot</span><span class="op">(</span><span class="va">iris2</span>, y_str <span class="op">=</span> <span class="st">"Sepal.Width"</span>, fill_str <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -131,7 +148,7 @@ vthemes::theme_vmodern().</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

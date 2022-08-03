@@ -49,55 +49,76 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">print_eval_results</span><span class="op">(</span>
-  <span class="va">eval_results</span>,
-  test_set <span class="op">=</span> <span class="cn">FALSE</span>,
-  html <span class="op">=</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/output_type.html" class="external-link">is_html_output</a></span><span class="op">(</span><span class="op">)</span>,
-  digits <span class="op">=</span> <span class="fl">2</span>,
-  sigfig <span class="op">=</span> <span class="cn">TRUE</span>,
-  na_disp <span class="op">=</span> <span class="st">"NA"</span>,
-  html_options <span class="op">=</span> <span class="cn">NULL</span>,
-  latex_options <span class="op">=</span> <span class="cn">NULL</span>,
-  fig_height <span class="op">=</span> <span class="fl">6</span>,
-  fig_width <span class="op">=</span> <span class="fl">10</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">print_eval_results</span><span class="op">(</span></span>
+<span>  <span class="va">eval_results</span>,</span>
+<span>  test_set <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  html <span class="op">=</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/output_type.html" class="external-link">is_html_output</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  sigfig <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  na_disp <span class="op">=</span> <span class="st">"NA"</span>,</span>
+<span>  html_options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  latex_options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fig_height <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  fig_width <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>eval_results</dt>
 <dd><p>Output of `evaluate_models()`</p></dd>
+
+
 <dt>test_set</dt>
 <dd><p>Logical indicating whether or not this evaluation is for the
 test set. If `FALSE`, output is assumed to be associated with validation
 set.</p></dd>
+
+
 <dt>html</dt>
 <dd><p>Logical indicating whether the output should be in html format.
 If <code>FALSE</code>, output is in latex format.</p></dd>
+
+
 <dt>digits</dt>
 <dd><p>Number of digits to display for numeric values</p></dd>
+
+
 <dt>sigfig</dt>
 <dd><p>Logical. If <code>TRUE</code>, <code>digits</code> refers to the number of
 significant figures. If <code>FALSE</code>, <code>digits</code> refers to the number of
 decimal places.</p></dd>
+
+
 <dt>na_disp</dt>
 <dd><p>Character string to display if NA entry is found in table.</p></dd>
+
+
 <dt>html_options</dt>
 <dd><p>List of additional named arguments to pass to
 <code>pretty_DT()</code>.</p></dd>
+
+
 <dt>latex_options</dt>
 <dd><p>List of additional named arguments to pass to
 <code>pretty_kable()</code>.</p></dd>
+
+
 <dt>fig_height</dt>
 <dd><p>Height of plot (in inches). See `fig.height` in the knitr
 chunk options.</p></dd>
+
+
 <dt>fig_width</dt>
 <dd><p>Width of plot (in inches). See `fig.width` in the knitr
 chunk options.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Outputs html or latex text for the R Markdown document.</p>
+    
+
+<p>Outputs html or latex text for the R Markdown document.</p>
     </div>
 
   </div>
@@ -112,7 +133,7 @@ chunk options.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

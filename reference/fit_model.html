@@ -55,46 +55,54 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fit_caret</span><span class="op">(</span>
-  <span class="va">Xtrain</span>,
-  <span class="va">ytrain</span>,
-  <span class="va">model_name</span>,
-  model_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="fu">fit_h2o</span><span class="op">(</span>
-  <span class="va">Xtrain</span>,
-  <span class="va">ytrain</span>,
-  <span class="va">model_name</span>,
-  model_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="fu">fit_tidymodels</span><span class="op">(</span>
-  <span class="va">Xtrain</span>,
-  <span class="va">ytrain</span>,
-  <span class="va">model_name</span>,
-  model_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fit_caret</span><span class="op">(</span></span>
+<span>  <span class="va">Xtrain</span>,</span>
+<span>  <span class="va">ytrain</span>,</span>
+<span>  <span class="va">model_name</span>,</span>
+<span>  model_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fit_h2o</span><span class="op">(</span></span>
+<span>  <span class="va">Xtrain</span>,</span>
+<span>  <span class="va">ytrain</span>,</span>
+<span>  <span class="va">model_name</span>,</span>
+<span>  model_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fit_tidymodels</span><span class="op">(</span></span>
+<span>  <span class="va">Xtrain</span>,</span>
+<span>  <span class="va">ytrain</span>,</span>
+<span>  <span class="va">model_name</span>,</span>
+<span>  model_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  cv_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  train_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>Xtrain</dt>
 <dd><p>Training data matrix or data frame.</p></dd>
+
+
 <dt>ytrain</dt>
 <dd><p>Training response vector.</p></dd>
+
+
 <dt>model_name</dt>
 <dd><p>Name of model to fit. See caret, h2o, or tidymodels
 for a list of available models.</p></dd>
+
+
 <dt>model_options</dt>
 <dd><p>List of named arguments to input into the model as
 arguments. See details below.</p></dd>
+
+
 <dt>cv_options</dt>
 <dd><p>List of cross-validation options to use for tuning
 hyperparameters. Possible options are `nfolds` (default is 10), `foldids`,
@@ -103,13 +111,18 @@ scheme. `foldids` is a list with elements for each cross-validation fold,
 where each list element is a vector of integers corresponding to the rows
 used for training in that fold. `metric` is a string that specifies which
 metric to use to select the best hyperparameters. See details below.</p></dd>
+
+
 <dt>train_options</dt>
 <dd><p>List of additional training control options. See details
 below.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The trained model fit. Specifically, `fit_caret()` returns a trained
+    
+
+<p>The trained model fit. Specifically, `fit_caret()` returns a trained
   model fit of class `train` (see output of `train()`). `fit_tidymodels()`
   returns a trained model fit of class `workflow` (see output of
   `fit-workflow`) if hyperparameter tuning is not needed. If hyperparameter
@@ -176,7 +189,7 @@ below.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

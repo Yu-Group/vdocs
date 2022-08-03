@@ -57,52 +57,71 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_data_summary</span><span class="op">(</span>
-  <span class="va">X</span>,
-  y <span class="op">=</span> <span class="cn">NULL</span>,
-  skim_out <span class="op">=</span> <span class="cn">NULL</span>,
-  digits <span class="op">=</span> <span class="fl">2</span>,
-  sigfig <span class="op">=</span> <span class="cn">FALSE</span>,
-  features <span class="op">=</span> <span class="cn">NULL</span>,
-  max_features <span class="op">=</span> <span class="fl">1000</span>,
-  html <span class="op">=</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/output_type.html" class="external-link">is_html_output</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_data_summary</span><span class="op">(</span></span>
+<span>  <span class="va">X</span>,</span>
+<span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  skim_out <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  sigfig <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  features <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_features <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  html <span class="op">=</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/output_type.html" class="external-link">is_html_output</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>X</dt>
 <dd><p>Data matrix or data frame.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>Response vector.</p></dd>
+
+
 <dt>skim_out</dt>
 <dd><p>(Optional) cached output of `skimr::skim()`. Specify if
 the skim output has been pre-computed in order to reduce computation.</p></dd>
+
+
 <dt>digits</dt>
 <dd><p>Number of digits to display for numeric values</p></dd>
+
+
 <dt>sigfig</dt>
 <dd><p>Logical. If <code>TRUE</code>, <code>digits</code> refers to the number of
 significant figures. If <code>FALSE</code>, <code>digits</code> refers to the number of
 decimal places.</p></dd>
+
+
 <dt>features</dt>
 <dd><p>(Optional) vector of features to include in summary. Default
 (<code>NULL</code>) is to include all features.</p></dd>
+
+
 <dt>max_features</dt>
 <dd><p>(Optional) maximum number of features to include in
 summary. Only used if <code>features = NULL</code>. Default is 1000. If the
 number of features in X exceeds `max_features`, the features kept in the
 summary are chosen randomly.</p></dd>
+
+
 <dt>html</dt>
 <dd><p>Logical indicating whether or not the output is an html table
 or a latex table.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass to vthemes::pretty_DT() if
 <code>html = TRUE</code> or vthemes::pretty_kable() if <code>html = FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns an html table (i.e., the output of vthemes::pretty_DT()) or
+    
+
+<p>Returns an html table (i.e., the output of vthemes::pretty_DT()) or
   a latex table (i.e., the output of vthemes::pretty_kable()),
   containing a broad overview of summary statistics for each data column.</p>
     </div>
@@ -119,7 +138,7 @@ or a latex table.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

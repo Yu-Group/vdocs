@@ -56,7 +56,7 @@ backends</h1>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">predict_models</span><span class="op">(</span><span class="va">fit_list</span>, <span class="va">Xtest</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, use <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">predict_models</span><span class="op">(</span><span class="va">fit_list</span>, <span class="va">Xtest</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, use <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -64,8 +64,12 @@ backends</h1>
     <dl><dt>fit_list</dt>
 <dd><p>List of fitted models for which to make predictions.
 Typically the output of `fit_models()`.</p></dd>
+
+
 <dt>Xtest</dt>
 <dd><p>Data matrix or data frame on which to make predictions.</p></dd>
+
+
 <dt>options</dt>
 <dd><p>Named list of additional arguments to pass to
 `predict.train()` if using caret backend, `h2o.predict()` if using h2o
@@ -75,14 +79,19 @@ should be a list where each element is named after the model (i.e., the
 same name as in `fit_list`) and is a list of named arguments. If `options`
 is not a list of list, then all list elements are passed to the predict
 function for every model.</p></dd>
+
+
 <dt>use</dt>
 <dd><p>One of "caret", "h2o", "tidymodels", indicating the modeling
 package to use. If <code>NULL</code> (default), the modeling package is inferred
 from the fit.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with the following columns:</p><dl><dt>method</dt>
+    
+
+<p>A tibble with the following columns:</p><dl><dt>method</dt>
 <dd><p>Name of method that made the associated prediction.</p></dd>
 
 <dt>predictions</dt>
@@ -117,7 +126,7 @@ that of the Xtest input.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

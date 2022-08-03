@@ -55,33 +55,41 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_data_split</span><span class="op">(</span>
-  train <span class="op">=</span> <span class="cn">NULL</span>,
-  valid <span class="op">=</span> <span class="cn">NULL</span>,
-  test <span class="op">=</span> <span class="cn">NULL</span>,
-  by_feature <span class="op">=</span> <span class="cn">NULL</span>,
-  plot_type <span class="op">=</span> <span class="st">"auto"</span>,
-  xlab <span class="op">=</span> <span class="st">"Value"</span>,
-  title <span class="op">=</span> <span class="cn">NULL</span>,
-  plot_heights <span class="op">=</span> <span class="fl">1</span>,
-  theme_options <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_data_split</span><span class="op">(</span></span>
+<span>  train <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  valid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  test <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  by_feature <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plot_type <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Value"</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plot_heights <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  theme_options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>train</dt>
 <dd><p>Training data matrix, data frame, or vector.</p></dd>
+
+
 <dt>valid</dt>
 <dd><p>Validation data matrix, data frame, or vector.</p></dd>
+
+
 <dt>test</dt>
 <dd><p>Test data matrix, data frame, or vector.</p></dd>
+
+
 <dt>by_feature</dt>
 <dd><p>Logical. If <code>TRUE</code>, plots distributions for each
 feature separately. If <code>FALSE</code>, plots distribution of all features
 together. Default is <code>TRUE</code> if there are &lt;10 features and <code>FALSE</code>
 otherwise.</p></dd>
+
+
 <dt>plot_type</dt>
 <dd><p>Type of plot. Default is "auto", which uses a kernel
 density plot for continuous features and a bar plot for categorical
@@ -90,24 +98,37 @@ elements: `continuous` and `categorical`. The `continuous` element must be
 one of "density", "histogram", and "boxplot" while the `categorical`
 element must be "bar" (with more options to come), indicating the type of
 plot to use for continuous and categorical features, respectively.</p></dd>
+
+
 <dt>xlab</dt>
 <dd><p>X-axis label.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>Plot title.</p></dd>
+
+
 <dt>plot_heights</dt>
 <dd><p>(Optional) numeric vector of relative row heights of
 subplots. Only used if both continuous and categorical features are found
 in the data. For example, heights = c(2, 1) would make the first row twice
 as tall as the second row.</p></dd>
+
+
 <dt>theme_options</dt>
 <dd><p>(Optional) list of arguments to pass to
 vthemes::theme_vmodern().</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass to ggplot2::geom_*().</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A ggplot object.</p>
+    
+
+<p>A ggplot object.</p>
     </div>
 
   </div>
@@ -122,7 +143,7 @@ vthemes::theme_vmodern().</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

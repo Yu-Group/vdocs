@@ -51,25 +51,32 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">filter_cols_by_var</span><span class="op">(</span><span class="va">X</span>, min_var <span class="op">=</span> <span class="cn">NULL</span>, max_p <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">filter_cols_by_var</span><span class="op">(</span><span class="va">X</span>, min_var <span class="op">=</span> <span class="cn">NULL</span>, max_p <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>X</dt>
 <dd><p>A data matrix or data frame.</p></dd>
+
+
 <dt>min_var</dt>
 <dd><p>(Optional) minimum variance threshold. All columns with
 variance lower than `min_var` are removed. If <code>NULL</code> (default), no
 variance threshold is applied.</p></dd>
+
+
 <dt>max_p</dt>
 <dd><p>(Optional) maximum number of features to keep. Only features
 with the top `max_p` highest variances are kept. If <code>NULL</code> (default),
 there is no limit on the maximum number of features to keep.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A cleaned data matrix or data frame.</p>
+    
+
+<p>A cleaned data matrix or data frame.</p>
     </div>
 
   </div>
@@ -84,7 +91,7 @@ there is no limit on the maximum number of features to keep.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

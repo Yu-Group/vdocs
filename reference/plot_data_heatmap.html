@@ -59,41 +59,56 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_data_heatmap</span><span class="op">(</span>
-  <span class="va">X</span>,
-  <span class="va">y</span>,
-  subsample_rows <span class="op">=</span> <span class="fl">1</span>,
-  subsample_cols <span class="op">=</span> <span class="fl">1</span>,
-  clust_rows <span class="op">=</span> <span class="cn">TRUE</span>,
-  clust_cols <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_data_heatmap</span><span class="op">(</span></span>
+<span>  <span class="va">X</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  subsample_rows <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  subsample_cols <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  clust_rows <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clust_cols <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>X</dt>
 <dd><p>Data matrix or data frame to use for heatmap.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>A response vector.</p></dd>
+
+
 <dt>subsample_rows</dt>
 <dd><p>Proportion of rows to subsample and keep in plotting
 display. Default is 1, which does not perform any subsampling.</p></dd>
+
+
 <dt>subsample_cols</dt>
 <dd><p>Proportion of columns to subsample and keep in plotting
 display. Default is 1, which does not perform any subsampling.</p></dd>
+
+
 <dt>clust_rows</dt>
 <dd><p>Logical indicating whether or not to cluster the rows in X
 via hierarchical clustering.</p></dd>
+
+
 <dt>clust_cols</dt>
 <dd><p>Logical indicating whether or not to cluster the columns
 in X via hierarchical clustering.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass to plot_hclust_heatmap()</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A gglot object. Specifically, if y is a continuous response vector,
+    
+
+<p>A gglot object. Specifically, if y is a continuous response vector,
   then this function returns a `patchwork` object with two ggplots: one for
   the heatmap of X and another for the scatter plot of y values. If y is
   categorical, this function returns a single ggplot object with the
@@ -112,7 +127,7 @@ in X via hierarchical clustering.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

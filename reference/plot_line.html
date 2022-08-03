@@ -49,41 +49,56 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_line</span><span class="op">(</span>
-  <span class="va">data</span>,
-  <span class="va">x_str</span>,
-  <span class="va">y_str</span>,
-  color_str <span class="op">=</span> <span class="cn">NULL</span>,
-  theme_options <span class="op">=</span> <span class="cn">NULL</span>,
-  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_line</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">x_str</span>,</span>
+<span>  <span class="va">y_str</span>,</span>
+<span>  color_str <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  theme_options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>Data frame to use for plot.</p></dd>
+
+
 <dt>x_str</dt>
 <dd><p>Character string. Name of variable in <code>data</code> to plot on
 x-axis.</p></dd>
+
+
 <dt>y_str</dt>
 <dd><p>Character string. Name of variable in <code>data</code> to plot on
 y-axis.</p></dd>
+
+
 <dt>color_str</dt>
 <dd><p>Character string (optional). Name of variable in <code>data</code>
 to use as color aesthetic in plot.</p></dd>
+
+
 <dt>theme_options</dt>
 <dd><p>(Optional) list of arguments to pass to
 vthemes::theme_vmodern().</p></dd>
+
+
 <dt>show_plot</dt>
 <dd><p>Logical. Should this plot be printed? Default <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments to pass to [ggplot2::geom_line()].</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A ggplot line plot.</p>
+    
+
+<p>A ggplot line plot.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -97,14 +112,14 @@ vthemes::theme_vmodern().</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, value <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">9</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plot_line</span><span class="op">(</span><span class="va">df</span>, x_str <span class="op">=</span> <span class="st">"time"</span>, y_str <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, value <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">9</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_line</span><span class="op">(</span><span class="va">df</span>, x_str <span class="op">=</span> <span class="st">"time"</span>, y_str <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_line-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="va">df2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span>, value <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span>
-<span class="r-in">                  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plot_line</span><span class="op">(</span><span class="va">df2</span>, x_str <span class="op">=</span> <span class="st">"time"</span>, y_str <span class="op">=</span> <span class="st">"value"</span>, color_str <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">df2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span>, value <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_line</span><span class="op">(</span><span class="va">df2</span>, x_str <span class="op">=</span> <span class="st">"time"</span>, y_str <span class="op">=</span> <span class="st">"value"</span>, color_str <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_line-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -119,7 +134,7 @@ vthemes::theme_vmodern().</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

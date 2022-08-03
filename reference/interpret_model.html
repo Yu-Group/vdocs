@@ -58,11 +58,11 @@ modeling backends</h1>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">interpret_caret</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">interpret_h2o</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">interpret_tidymodels</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">interpret_caret</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">interpret_h2o</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">interpret_tidymodels</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -70,13 +70,18 @@ modeling backends</h1>
     <dl><dt>fit</dt>
 <dd><p>Model fit. Typically the output of `fit_caret()`, `fit_h2o()`, or
 `fit_tidymodels()`.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass to `varImp()` in `fit_caret()`,
 `h2o.varimp()` in `fit_h2o()`, or `vip::vi()` in `fit_tidymodels()`.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with the following columns:</p><dl><dt>Variable</dt>
+    
+
+<p>A tibble with the following columns:</p><dl><dt>Variable</dt>
 <dd><p>Name of feature/variable.</p></dd>
 
 <dt>Importance</dt>
@@ -102,7 +107,7 @@ modeling backends</h1>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
