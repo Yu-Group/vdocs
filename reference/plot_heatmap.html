@@ -125,6 +125,7 @@
 <span><span class="fu">plot_cor_heatmap</span><span class="op">(</span></span>
 <span>  <span class="va">X</span>,</span>
 <span>  cor_type <span class="op">=</span> <span class="st">"pearson"</span>,</span>
+<span>  absolute_value <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  xytext_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
 <span>  xytext_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_ytext <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -301,6 +302,10 @@ provide either <code>dist_metric</code> or <code>dist_mat</code> if <code>clust_
 <dt>cor_type</dt>
 <dd><p>Type of correlation. Must be one of "pearson", "kendall",
 or "spearman"</p></dd>
+
+
+<dt>absolute_value</dt>
+<dd><p>Logical indicating whether or not to show absolute value of the correlation values in the correlation heatmap.</p></dd>
 
 
 <dt>xytext_labels</dt>
